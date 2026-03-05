@@ -551,6 +551,22 @@ a:hover { text-decoration: underline; }
 }
 
 /* --- Studies Tree --- */
+
+/* Column header row */
+.study-col-header {
+  display: grid;
+  grid-template-columns: 24px 130px 70px 100px 80px 80px 80px 1fr;
+  gap: 8px;
+  padding: 8px 16px 8px 24px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  min-width: 600px;
+}
+
 .table-controls {
   margin-bottom: 12px;
 }
@@ -638,6 +654,69 @@ a:hover { text-decoration: underline; }
   white-space: nowrap;
 }
 
+.l1-info-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.l1-info-btn:hover {
+  color: var(--accent);
+}
+
+.l1-info-popup {
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.l1-info-popup.collapsed {
+  max-height: 0;
+  padding: 0 24px;
+}
+
+.l1-info-popup.expanded {
+  max-height: 500px;
+  padding: 12px 24px;
+}
+
+.study-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.study-info-row {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.study-info-row strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.l2-design {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.l3-design {
+  color: var(--text-secondary);
+}
+
 .l1-children {
   max-height: 0;
   overflow: hidden;
@@ -689,12 +768,6 @@ a:hover { text-decoration: underline; }
 
 .l2-date { color: var(--text-secondary); }
 
-.l2-recruit {
-  color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 .l2-children {
   max-height: 0;
@@ -731,12 +804,6 @@ a:hover { text-decoration: underline; }
 
 .l3-date { color: var(--text-secondary); }
 
-.l3-recruit {
-  color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 .table-empty {
   text-align: center;
