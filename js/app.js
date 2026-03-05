@@ -143,9 +143,9 @@ function renderMetricCharts() {
 
 // --- Theme toggle ---
 function initThemeToggle() {
-  // Restore saved preference
+  // Restore saved preference (light is default)
   var saved = localStorage.getItem('dqh-theme');
-  if (saved === 'light') {
+  if (saved !== 'dark') {
     document.documentElement.setAttribute('data-theme', 'light');
   }
 
