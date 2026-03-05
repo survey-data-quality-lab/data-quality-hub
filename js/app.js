@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   initMoreToggle();
   initFilterToggles();
   initFilterEvents();
+  initDownloadCSV();
   bindChange('metric-select', renderMetricCharts);
 });
 
@@ -322,6 +323,67 @@ function highlightDataPoint(canvasId, platform, studyDate) {
     chart.tooltip.setActiveElements(activeElements, { x: element.x, y: element.y });
     chart.update();
   }
+}
+
+// --- CSV Download ---
+function initDownloadCSV() {
+  var btn = document.getElementById('download-csv');
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    var studies = window.DQH.dataStore.studies;
+    if (!studies.length) return;
+
+    var cols = [
+      { key: 'paperReference', label: 'Study Title' },
+      { key: 'researcherName', label: 'Researcher' },
+      { key: 'affiliation', label: 'Affiliation' },
+      { key: 'platform', label: 'Platform' },
+      { key: 'sampleSize', label: 'Sample Size' },
+      { key: 'studyDate', label: 'Study Date' },
+      { key: 'recruitmentMethod', label: 'Recruitment Method' },
+      { key: 'stage', label: 'Stage' },
+      { key: 'overallPassRate', label: 'Overall Pass Rate (%)' },
+      { key: 'qualityDescription', label: 'Quality Measure Description' },
+      { key: 'attentionCheckRate', label: 'Attention Check Rate (%)' },
+      { key: 'attentionCheckDescription', label: 'Attention Check Description' },
+      { key: 'aiDetectionRate', label: 'AI Detection Rate (%)' },
+      { key: 'aiDetectionDescription', label: 'AI Detection Description' },
+      { key: 'accountFraudRate', label: 'Account Fraud Rate (%)' },
+      { key: 'accountFraudDescription', label: 'Account Fraud Description' },
+      { key: 'otherMetric1Name', label: 'Other Metric 1 Name' },
+      { key: 'otherMetric1Rate', label: 'Other Metric 1 Rate (%)' },
+      { key: 'otherMetric1Description', label: 'Other Metric 1 Description' },
+      { key: 'otherMetric2Name', label: 'Other Metric 2 Name' },
+      { key: 'otherMetric2Rate', label: 'Other Metric 2 Rate (%)' },
+      { key: 'otherMetric2Description', label: 'Other Metric 2 Description' },
+      { key: 'studyDescription', label: 'Study Description' },
+      { key: 'studyLink', label: 'Study Link' },
+      { key: 'additionalNotes', label: 'Notes' }
+    ];
+
+    var csvVal = function(v) {
+      if (v === null || v === undefined) return '';
+      var s = String(v);
+      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    };
+
+    var rows = [cols.map(function(c) { return c.label; }).join(',')];
+    for (var i = 0; i < studies.length; i++) {
+      var s = studies[i];
+      rows.push(cols.map(function(c) { return csvVal(s[c.key]); }).join(','));
+    }
+
+    var blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'data-quality-hub.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
 }
 
 // --- Helpers ---
