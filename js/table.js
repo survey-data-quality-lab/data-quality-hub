@@ -203,14 +203,16 @@ window.DQH.table = {
     var entries = study.allEntries;
     var html = '<div class="study-info-content">';
 
-    // Study description (from first entry that has one)
+    // Collect unique descriptions, quality measures, and notes across all entries
     var desc = '';
     var qualDesc = '';
-    var notes = '';
+    var notesList = [];
+    var notesSeen = {};
     for (var i = 0; i < entries.length; i++) {
       if (!desc && entries[i].studyDescription) desc = entries[i].studyDescription;
       if (!qualDesc && entries[i].qualityDescription) qualDesc = entries[i].qualityDescription;
-      if (!notes && entries[i].additionalNotes) notes = entries[i].additionalNotes;
+      var n = entries[i].additionalNotes;
+      if (n && !notesSeen[n]) { notesSeen[n] = true; notesList.push(n); }
     }
 
     // Study link (from first entry that has one)
@@ -223,29 +225,16 @@ window.DQH.table = {
       html += '<div class="study-info-row"><strong>Study:</strong> ' + this.esc(desc) + '</div>';
     }
     if (studyLink) {
-      html += '<div class="study-info-row"><strong>Link:</strong> <a href="' + this.esc(studyLink) + '" target="_blank" rel="noopener">' + this.esc(studyLink) + '</a></div>';
+      html += '<div class="study-info-row"><a href="' + this.esc(studyLink) + '" target="_blank" rel="noopener">View paper / study details &rarr;</a></div>';
     }
     if (qualDesc) {
       html += '<div class="study-info-row"><strong>Pass rate measure:</strong> ' + this.esc(qualDesc) + '</div>';
     }
-
-    // Recruitment method
-    var recruit = entries[0].recruitmentMethod || '';
-    if (recruit) {
-      html += '<div class="study-info-row"><strong>Design:</strong> ' + this.esc(recruit) + '</div>';
+    if (notesList.length) {
+      html += '<div class="study-info-row"><strong>Details:</strong> ' + this.esc(notesList.join(' | ')) + '</div>';
     }
 
-    // Stage info
-    var stage = entries[0].stage || '';
-    if (stage) {
-      html += '<div class="study-info-row"><strong>Stage:</strong> ' + this.esc(stage) + '</div>';
-    }
-
-    if (notes) {
-      html += '<div class="study-info-row"><strong>Notes:</strong> ' + this.esc(notes) + '</div>';
-    }
-
-    if (!desc && !qualDesc && !recruit) {
+    if (!desc && !qualDesc && !studyLink) {
       html += '<div class="study-info-row" style="color:var(--text-tertiary);font-style:italic">No additional details available for this study.</div>';
     }
 

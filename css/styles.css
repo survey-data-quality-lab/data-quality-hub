@@ -555,9 +555,9 @@ a:hover { text-decoration: underline; }
 /* Column header row — must match .study-l2 grid exactly */
 .study-col-header {
   display: grid;
-  grid-template-columns: 24px 130px 70px 100px 80px 80px 80px 1fr;
+  grid-template-columns: 20px 100px 60px 80px 75px 75px 75px 1fr;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 8px 16px 8px 24px;
   font-size: 0.7rem;
   font-weight: 600;
@@ -735,9 +735,9 @@ a:hover { text-decoration: underline; }
 
 .study-l2 {
   display: grid;
-  grid-template-columns: 24px 130px 70px 100px 80px 80px 80px 1fr;
+  grid-template-columns: 20px 100px 60px 80px 75px 75px 75px 1fr;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 10px 16px 10px 24px;
   font-size: 0.875rem;
   border-bottom: 1px solid rgba(46, 51, 72, 0.4);
@@ -786,9 +786,9 @@ a:hover { text-decoration: underline; }
 
 .study-l3 {
   display: grid;
-  grid-template-columns: 24px 130px 70px 100px 80px 80px 80px 1fr;
+  grid-template-columns: 20px 100px 60px 80px 75px 75px 75px 1fr;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 8px 16px 8px 48px;
   font-size: 0.85rem;
   background: rgba(108, 142, 255, 0.03);
@@ -979,14 +979,15 @@ a:hover { text-decoration: underline; }
     flex-wrap: wrap;
   }
 
+  .study-col-header,
   .study-l2 {
-    grid-template-columns: 20px 110px 60px 80px 70px 70px 70px 1fr;
+    grid-template-columns: 18px 90px 55px 72px 68px 68px 68px 1fr;
     gap: 4px;
     font-size: 0.8rem;
   }
 
   .study-l3 {
-    grid-template-columns: 20px 110px 60px 80px 70px 70px 70px 1fr;
+    grid-template-columns: 18px 90px 55px 72px 68px 68px 68px 1fr;
     gap: 4px;
     font-size: 0.78rem;
   }

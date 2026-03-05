@@ -14,6 +14,7 @@ RESEARCHER="Çelebi, Exley, Harrs, Kivimaki, Serra-Garcia & Yusof"
 AFFILIATION="University of Vienna, University of Michigan, UC San Diego, University of Stuttgart"
 STUDY_TITLE="Mission Possible: The Collection of High-Quality Data"
 STUDY_LINK=""
+STUDY_DESC="Evidence-based assessment of data quality across five online survey platforms and laboratory benchmarks, comparing attention checks, video comprehension, typed text analysis, typing speed, and unique IP detection."
 QUALITY_DESC="Combined pass rate for all five data quality checks (classic attention, video attention, typed text, typing speed, unique IP)"
 QUALITY_DESC_2ND="Combined pass rate for all five data quality checks after two-stage screening"
 
@@ -86,10 +87,10 @@ submit "Lab" "314" "2025" "8" "1" "Other" "" \
   "" "" \
   "Video Attention Check" "97" "Correctly answered video attention check" \
   "Typed Text (not pasted)" "100" "Typed open-ended responses rather than pasting" \
-  "In-person laboratory sessions at UC San Diego (Summer/Fall 2025)" \
-  "Typing speed pass rate: 97%"
+  "$STUDY_DESC" \
+  "Lab: typed text 100%, typing speed 97%"
 
-# 3. MTurk 1st stage
+# 2. MTurk 1st stage
 submit "MTurk" "881" "2025" "9" "1" "Two-stage recruitment" "First stage (baseline)" \
   "9" "$QUALITY_DESC" \
   "56" "Classic multiple-choice attention check" \
@@ -97,10 +98,10 @@ submit "MTurk" "881" "2025" "9" "1" "Two-stage recruitment" "First stage (baseli
   "" "" \
   "Video Attention Check" "20" "Correctly answered video attention check" \
   "Unique IP Address" "79" "No duplicate IP addresses detected" \
-  "First-stage data collection on Amazon Mechanical Turk" \
-  "Typed text pass rate: 19%. Typing speed pass rate: 79%"
+  "$STUDY_DESC" \
+  "MTurk 1st stage: typed text 19%, typing speed 79%"
 
-# 4. Moblab 1st stage
+# 3. Moblab 1st stage
 submit "Moblab" "313" "2025" "10" "1" "Two-stage recruitment" "First stage (baseline)" \
   "55" "$QUALITY_DESC" \
   "85" "Classic multiple-choice attention check" \
@@ -108,10 +109,10 @@ submit "Moblab" "313" "2025" "10" "1" "Two-stage recruitment" "First stage (base
   "" "" \
   "Video Attention Check" "98" "Correctly answered video attention check" \
   "Unique IP Address" "78" "No duplicate IP addresses detected" \
-  "First-stage data collection on Moblab platform" \
-  "Typed text pass rate: 79%. Typing speed pass rate: 77%"
+  "$STUDY_DESC" \
+  "Moblab 1st stage: typed text 79%, typing speed 77%"
 
-# 5. Moblab 2nd stage
+# 4. Moblab 2nd stage
 submit "Moblab" "100" "2025" "11" "1" "Two-stage recruitment" "Second stage (main study)" \
   "95" "$QUALITY_DESC_2ND" \
   "99" "Classic multiple-choice attention check" \
@@ -119,10 +120,10 @@ submit "Moblab" "100" "2025" "11" "1" "Two-stage recruitment" "Second stage (mai
   "" "" \
   "Video Attention Check" "99" "Correctly answered video attention check" \
   "Unique IP Address" "98" "No duplicate IP addresses detected" \
-  "Second-stage data collection on Moblab after screening" \
-  "Typed text pass rate: 99%. Typing speed pass rate: 99%"
+  "$STUDY_DESC" \
+  "Moblab 2nd stage: typed text 99%, typing speed 99%"
 
-# 6. Bilendi 1st stage
+# 5. Bilendi 1st stage
 submit "Bilendi" "366" "2025" "10" "1" "Two-stage recruitment" "First stage (baseline)" \
   "73" "$QUALITY_DESC" \
   "91" "Classic multiple-choice attention check" \
@@ -130,10 +131,10 @@ submit "Bilendi" "366" "2025" "10" "1" "Two-stage recruitment" "First stage (bas
   "" "" \
   "Video Attention Check" "90" "Correctly answered video attention check" \
   "Unique IP Address" "99" "No duplicate IP addresses detected" \
-  "First-stage data collection on Bilendi platform" \
-  "Typed text pass rate: 92%. Typing speed pass rate: 90%"
+  "$STUDY_DESC" \
+  "Bilendi 1st stage: typed text 92%, typing speed 90%"
 
-# 7. Bilendi 2nd stage
+# 6. Bilendi 2nd stage
 submit "Bilendi" "144" "2025" "11" "1" "Two-stage recruitment" "Second stage (main study)" \
   "93" "$QUALITY_DESC_2ND" \
   "95" "Classic multiple-choice attention check" \
@@ -141,10 +142,10 @@ submit "Bilendi" "144" "2025" "11" "1" "Two-stage recruitment" "Second stage (ma
   "" "" \
   "Video Attention Check" "97" "Correctly answered video attention check" \
   "Unique IP Address" "100" "No duplicate IP addresses detected" \
-  "Second-stage data collection on Bilendi after screening" \
-  "Typed text pass rate: 100%. Typing speed pass rate: 99%"
+  "$STUDY_DESC" \
+  "Bilendi 2nd stage: typed text 100%, typing speed 99%"
 
-# 8. Prolific 1st stage
+# 7. Prolific 1st stage
 submit "Prolific" "900" "2025" "8" "1" "Two-stage recruitment" "First stage (baseline)" \
   "90" "$QUALITY_DESC" \
   "98" "Classic multiple-choice attention check" \
@@ -152,10 +153,10 @@ submit "Prolific" "900" "2025" "8" "1" "Two-stage recruitment" "First stage (bas
   "" "" \
   "Video Attention Check" "98" "Correctly answered video attention check" \
   "Unique IP Address" "100" "No duplicate IP addresses detected" \
-  "First-stage data collection on Prolific Academic" \
-  "Typed text pass rate: 95%. Typing speed pass rate: 94%"
+  "$STUDY_DESC" \
+  "Prolific 1st stage: typed text 95%, typing speed 94%"
 
-# 9. Prolific 2nd stage
+# 8. Prolific 2nd stage
 submit "Prolific" "300" "2025" "9" "1" "Two-stage recruitment" "Second stage (main study)" \
   "93" "$QUALITY_DESC_2ND" \
   "97" "Classic multiple-choice attention check" \
@@ -163,8 +164,8 @@ submit "Prolific" "300" "2025" "9" "1" "Two-stage recruitment" "Second stage (ma
   "" "" \
   "Video Attention Check" "98" "Correctly answered video attention check" \
   "Unique IP Address" "100" "No duplicate IP addresses detected" \
-  "Second-stage data collection on Prolific after screening" \
-  "Typed text pass rate: 98%. Typing speed pass rate: 98%"
+  "$STUDY_DESC" \
+  "Prolific 2nd stage: typed text 98%, typing speed 98%"
 
 echo ""
 echo "Done! 8 entries submitted."
