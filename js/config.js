@@ -15,7 +15,9 @@ window.DQH.config = {
     'Timestamp': 'timestamp',
     'Researcher Name': 'researcherName',
     'Researcher Affiliation': 'affiliation',
-    'Paper or Study Reference': 'paperReference',
+    'Study Title': 'paperReference',
+    'Paper or Study Reference': 'paperReference', // legacy
+    'Study link': 'studyLink',
     'Contact Email': 'contactEmail',
     'Platform': 'platform',
     'If Other, please specify': 'platformOther',

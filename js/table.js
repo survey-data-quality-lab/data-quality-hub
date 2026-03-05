@@ -213,8 +213,17 @@ window.DQH.table = {
       if (!notes && entries[i].additionalNotes) notes = entries[i].additionalNotes;
     }
 
+    // Study link (from first entry that has one)
+    var studyLink = '';
+    for (var j = 0; j < entries.length; j++) {
+      if (!studyLink && entries[j].studyLink) { studyLink = entries[j].studyLink; break; }
+    }
+
     if (desc) {
       html += '<div class="study-info-row"><strong>Study:</strong> ' + this.esc(desc) + '</div>';
+    }
+    if (studyLink) {
+      html += '<div class="study-info-row"><strong>Link:</strong> <a href="' + this.esc(studyLink) + '" target="_blank" rel="noopener">' + this.esc(studyLink) + '</a></div>';
     }
     if (qualDesc) {
       html += '<div class="study-info-row"><strong>Pass rate measure:</strong> ' + this.esc(qualDesc) + '</div>';
