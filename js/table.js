@@ -125,7 +125,6 @@ window.DQH.table = {
     }
 
     var html = '';
-    html += this.renderColumnHeader();
     for (var i = 0; i < hierarchy.length; i++) {
       html += this.renderL1(hierarchy[i], i);
     }
@@ -166,6 +165,7 @@ window.DQH.table = {
     html += '</div>';
 
     html += '<div class="l1-children" data-parent="' + index + '">';
+    html += this.renderColumnHeader();
 
     var platformNames = Object.keys(study.platforms);
     for (var j = 0; j < platformNames.length; j++) {
