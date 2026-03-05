@@ -203,6 +203,7 @@ function initFilterToggles() {
   bindToggleBtn('trend-filter-toggle', 'trend-filter-body');
   bindToggleBtn('metric-filter-toggle', 'metric-filter-body');
   bindToggleBtn('chart-info-btn', 'chart-info-popup');
+  bindToggleBtn('submit-info-btn', 'submit-info-popup');
   bindToggleBtn('trend-info-btn', 'trend-info-popup');
   bindToggleBtn('metric-info-btn', 'metric-info-popup');
   bindToggleBtn('definitions-toggle', 'definitions-body');

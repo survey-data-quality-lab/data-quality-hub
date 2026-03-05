@@ -124,9 +124,21 @@
 
     <!-- Submit -->
     <section id="submit" class="submit-bar">
-      <div class="container submit-bar-inner">
-        <span class="submit-text">Every study helps the community make better decisions.</span>
-        <a href="https://forms.gle/4hRy2EfM5vVDjEA59" target="_blank" rel="noopener" class="btn-submit">Share Your Results &rarr;</a>
+      <div class="container">
+        <div class="submit-bar-inner">
+          <span class="submit-text">Every study helps the community make better decisions.</span>
+          <div class="submit-actions">
+            <a href="https://forms.gle/4hRy2EfM5vVDjEA59" target="_blank" rel="noopener" class="btn-submit">Share Your Results &rarr;</a>
+            <button class="info-btn" id="submit-info-btn" type="button">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="info-popup collapsed" id="submit-info-popup">
+          <p><strong>What to share:</strong> Fill out a short Google Form with your study's data quality results &mdash; platform used, sample size, study date, overall pass rate, and optionally specific metrics like attention check rates, AI detection rates, or account fraud rates.</p>
+          <p><strong>Format:</strong> All fields are straightforward (names, percentages, short descriptions). The form takes about 2&ndash;3 minutes to complete. You can submit multiple entries if your study covers several platforms or uses a two-stage design.</p>
+          <p><strong>What happens next:</strong> Submissions are reviewed before appearing on the dashboard. Once approved, your data points will show up in the trend charts and studies table, contributing to the community's understanding of platform-level data quality.</p>
+        </div>
       </div>
     </section>
 
