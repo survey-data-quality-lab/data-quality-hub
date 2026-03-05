@@ -1028,17 +1028,17 @@ a:hover { text-decoration: underline; }
     display: none;
   }
 
-  /* Also hide Date and Attention on phone — keep Platform, N, Pass Rate */
-  .col-date, .col-attention,
-  .l2-date, .l2-attention,
-  .l3-date, .l3-attention {
+  /* Also hide Attention on phone — keep Platform, N, Date, Pass Rate */
+  .col-attention,
+  .l2-attention,
+  .l3-attention {
     display: none;
   }
 
   .study-col-header,
   .study-l2,
   .study-l3 {
-    grid-template-columns: 16px 70px 42px 58px;
+    grid-template-columns: 16px 70px 38px 62px 54px;
     gap: 4px;
     padding-left: 12px;
     padding-right: 12px;
