@@ -6,7 +6,7 @@
 # Submits fake papers with varied platforms, quality levels, and stages.
 # Remember to approve rows in the Google Sheet (set Approved column = 1).
 #
-# Updated March 2026 with current form entry IDs.
+# Uses ANSWER IDs (inner IDs) for POST, and _year/_month/_day for date field.
 
 set -e
 
@@ -116,53 +116,57 @@ submit() {
   local study_link="$4"
   local platform="$5"
   local sample_size="$6"
-  local study_date="$7"
-  local recruitment="$8"
-  local stage="$9"
-  local overall_rate="${10}"
-  local quality_desc="${11}"
-  local attention_rate="${12}"
-  local attention_desc="${13}"
-  local ai_rate="${14}"
-  local ai_desc="${15}"
-  local fraud_rate="${16}"
-  local fraud_desc="${17}"
-  local other1_name="${18}"
-  local other1_rate="${19}"
-  local other1_desc="${20}"
-  local other2_name="${21}"
-  local other2_rate="${22}"
-  local other2_desc="${23}"
-  local study_desc="${24}"
-  local notes="${25}"
+  local study_year="$7"
+  local study_month="$8"
+  local study_day="$9"
+  local recruitment="${10}"
+  local stage="${11}"
+  local overall_rate="${12}"
+  local quality_desc="${13}"
+  local attention_rate="${14}"
+  local attention_desc="${15}"
+  local ai_rate="${16}"
+  local ai_desc="${17}"
+  local fraud_rate="${18}"
+  local fraud_desc="${19}"
+  local other1_name="${20}"
+  local other1_rate="${21}"
+  local other1_desc="${22}"
+  local other2_name="${23}"
+  local other2_rate="${24}"
+  local other2_desc="${25}"
+  local study_desc="${26}"
+  local notes="${27}"
 
   local result
   result=$(curl -s -o /dev/null -w "%{http_code}" "$FORM_URL" \
-    --data-urlencode "entry.1025924398=$researcher" \
-    --data-urlencode "entry.1753712777=$affiliation" \
-    --data-urlencode "entry.553660695=$title" \
-    --data-urlencode "entry.1294449217=$study_link" \
-    --data-urlencode "entry.1348448374=$platform" \
-    --data-urlencode "entry.1709553096=$sample_size" \
-    --data-urlencode "entry.479876277=$study_date" \
-    --data-urlencode "entry.307649121=$recruitment" \
-    --data-urlencode "entry.1221093619=$stage" \
-    --data-urlencode "entry.1105656283=$overall_rate" \
-    --data-urlencode "entry.1169083885=$quality_desc" \
-    --data-urlencode "entry.1693394084=$attention_rate" \
-    --data-urlencode "entry.1188972179=$attention_desc" \
-    --data-urlencode "entry.1263469340=$ai_rate" \
-    --data-urlencode "entry.1439346069=$ai_desc" \
-    --data-urlencode "entry.45396690=$fraud_rate" \
-    --data-urlencode "entry.2035716411=$fraud_desc" \
-    --data-urlencode "entry.1709639059=$other1_name" \
-    --data-urlencode "entry.1678687352=$other1_rate" \
-    --data-urlencode "entry.118511467=$other1_desc" \
-    --data-urlencode "entry.527222764=$other2_name" \
-    --data-urlencode "entry.1008897191=$other2_rate" \
-    --data-urlencode "entry.2016243872=$other2_desc" \
-    --data-urlencode "entry.514324026=$study_desc" \
-    --data-urlencode "entry.1071273851=$notes")
+    --data-urlencode "entry.1963181326=$researcher" \
+    --data-urlencode "entry.85079298=$affiliation" \
+    --data-urlencode "entry.922883871=$title" \
+    --data-urlencode "entry.1524998877=$study_link" \
+    --data-urlencode "entry.1430705517=$platform" \
+    --data-urlencode "entry.1278581784=$sample_size" \
+    --data-urlencode "entry.917548678_year=$study_year" \
+    --data-urlencode "entry.917548678_month=$study_month" \
+    --data-urlencode "entry.917548678_day=$study_day" \
+    --data-urlencode "entry.1585946288=$recruitment" \
+    --data-urlencode "entry.1287529605=$stage" \
+    --data-urlencode "entry.1080494118=$overall_rate" \
+    --data-urlencode "entry.1519438551=$quality_desc" \
+    --data-urlencode "entry.1469448153=$attention_rate" \
+    --data-urlencode "entry.613334208=$attention_desc" \
+    --data-urlencode "entry.1247420935=$ai_rate" \
+    --data-urlencode "entry.1231155518=$ai_desc" \
+    --data-urlencode "entry.1224298642=$fraud_rate" \
+    --data-urlencode "entry.1389589153=$fraud_desc" \
+    --data-urlencode "entry.1982864965=$other1_name" \
+    --data-urlencode "entry.140697627=$other1_rate" \
+    --data-urlencode "entry.1729103723=$other1_desc" \
+    --data-urlencode "entry.1508874603=$other2_name" \
+    --data-urlencode "entry.1585493516=$other2_rate" \
+    --data-urlencode "entry.1692023885=$other2_desc" \
+    --data-urlencode "entry.1833475543=$study_desc" \
+    --data-urlencode "entry.1146672378=$notes")
 
   echo "  [$platform] $stage: HTTP $result"
 }
@@ -181,8 +185,8 @@ for (( i=1; i<=K; i++ )); do
 
   # Random date in 2025-2026
   year=$(pick "2025" "2026")
-  month=$(printf "%02d" $(rand_range 1 12))
-  study_date="${year}-${month}-01"
+  month=$(rand_range 1 12)
+  day=1
 
   # Decide: two-stage (40% chance) or single (60%)
   is_two_stage=0
@@ -250,7 +254,7 @@ for (( i=1; i<=K; i++ )); do
     if (( is_two_stage == 1 )); then
       # 1st stage
       submit "$researcher" "$affiliation" "$title" "" \
-        "$platform" "$sample_size" "$study_date" \
+        "$platform" "$sample_size" "$year" "$month" "$day" \
         "Two-stage recruitment" "First stage (baseline)" \
         "$base_quality" "$quality_desc" \
         "$attention_rate" "$attention_desc" \
@@ -282,7 +286,7 @@ for (( i=1; i<=K; i++ )); do
       fi
 
       submit "$researcher" "$affiliation" "$title" "" \
-        "$platform" "$second_n" "$study_date" \
+        "$platform" "$second_n" "$year" "$month" "$day" \
         "Two-stage recruitment" "Second stage (main study)" \
         "$second_overall" "Combined pass rate after two-stage screening" \
         "$second_attention" "$attention_desc" \
@@ -296,7 +300,7 @@ for (( i=1; i<=K; i++ )); do
     else
       # Single stage
       submit "$researcher" "$affiliation" "$title" "" \
-        "$platform" "$sample_size" "$study_date" \
+        "$platform" "$sample_size" "$year" "$month" "$day" \
         "Other" "" \
         "$base_quality" "$quality_desc" \
         "$attention_rate" "$attention_desc" \

@@ -5,7 +5,8 @@
 # Submits 9 entries from "Mission Possible: The Collection of High-Quality Data"
 # by Çelebi, Exley, Harrs, Kivimaki, Serra-Garcia & Yusof (2026)
 #
-# NEW ENTRY IDS (updated March 2026 after form edit)
+# ANSWER IDs (the inner IDs used for POST, not the question IDs)
+# Date field uses _year/_month/_day suffixes (Google Forms date picker)
 
 FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSfhwduzGfQl-vvU59Jm8R-U8QAGhR7PsE0XApvJLtC1tURObQ/formResponse"
 
@@ -19,53 +20,57 @@ QUALITY_DESC_2ND="Combined pass rate for all five data quality checks after two-
 submit() {
   local platform="$1"
   local sample_size="$2"
-  local study_date="$3"    # YYYY-MM-DD format
-  local recruitment="$4"
-  local stage="$5"
-  local overall_rate="$6"
-  local quality_desc="$7"
-  local attention_rate="$8"
-  local attention_desc="$9"
-  local ai_rate="${10}"
-  local ai_desc="${11}"
-  local fraud_rate="${12}"
-  local fraud_desc="${13}"
-  local other1_name="${14}"
-  local other1_rate="${15}"
-  local other1_desc="${16}"
-  local other2_name="${17}"
-  local other2_rate="${18}"
-  local other2_desc="${19}"
-  local study_desc="${20}"
-  local notes="${21}"
+  local study_year="$3"
+  local study_month="$4"
+  local study_day="$5"
+  local recruitment="$6"
+  local stage="$7"
+  local overall_rate="$8"
+  local quality_desc="$9"
+  local attention_rate="${10}"
+  local attention_desc="${11}"
+  local ai_rate="${12}"
+  local ai_desc="${13}"
+  local fraud_rate="${14}"
+  local fraud_desc="${15}"
+  local other1_name="${16}"
+  local other1_rate="${17}"
+  local other1_desc="${18}"
+  local other2_name="${19}"
+  local other2_rate="${20}"
+  local other2_desc="${21}"
+  local study_desc="${22}"
+  local notes="${23}"
 
   local result
   result=$(curl -s -o /dev/null -w "%{http_code}" "$FORM_URL" \
-    --data-urlencode "entry.1025924398=$RESEARCHER" \
-    --data-urlencode "entry.1753712777=$AFFILIATION" \
-    --data-urlencode "entry.553660695=$STUDY_TITLE" \
-    --data-urlencode "entry.1294449217=$STUDY_LINK" \
-    --data-urlencode "entry.1348448374=$platform" \
-    --data-urlencode "entry.1709553096=$sample_size" \
-    --data-urlencode "entry.479876277=$study_date" \
-    --data-urlencode "entry.307649121=$recruitment" \
-    --data-urlencode "entry.1221093619=$stage" \
-    --data-urlencode "entry.1105656283=$overall_rate" \
-    --data-urlencode "entry.1169083885=$quality_desc" \
-    --data-urlencode "entry.1693394084=$attention_rate" \
-    --data-urlencode "entry.1188972179=$attention_desc" \
-    --data-urlencode "entry.1263469340=$ai_rate" \
-    --data-urlencode "entry.1439346069=$ai_desc" \
-    --data-urlencode "entry.45396690=$fraud_rate" \
-    --data-urlencode "entry.2035716411=$fraud_desc" \
-    --data-urlencode "entry.1709639059=$other1_name" \
-    --data-urlencode "entry.1678687352=$other1_rate" \
-    --data-urlencode "entry.118511467=$other1_desc" \
-    --data-urlencode "entry.527222764=$other2_name" \
-    --data-urlencode "entry.1008897191=$other2_rate" \
-    --data-urlencode "entry.2016243872=$other2_desc" \
-    --data-urlencode "entry.514324026=$study_desc" \
-    --data-urlencode "entry.1071273851=$notes")
+    --data-urlencode "entry.1963181326=$RESEARCHER" \
+    --data-urlencode "entry.85079298=$AFFILIATION" \
+    --data-urlencode "entry.922883871=$STUDY_TITLE" \
+    --data-urlencode "entry.1524998877=$STUDY_LINK" \
+    --data-urlencode "entry.1430705517=$platform" \
+    --data-urlencode "entry.1278581784=$sample_size" \
+    --data-urlencode "entry.917548678_year=$study_year" \
+    --data-urlencode "entry.917548678_month=$study_month" \
+    --data-urlencode "entry.917548678_day=$study_day" \
+    --data-urlencode "entry.1585946288=$recruitment" \
+    --data-urlencode "entry.1287529605=$stage" \
+    --data-urlencode "entry.1080494118=$overall_rate" \
+    --data-urlencode "entry.1519438551=$quality_desc" \
+    --data-urlencode "entry.1469448153=$attention_rate" \
+    --data-urlencode "entry.613334208=$attention_desc" \
+    --data-urlencode "entry.1247420935=$ai_rate" \
+    --data-urlencode "entry.1231155518=$ai_desc" \
+    --data-urlencode "entry.1224298642=$fraud_rate" \
+    --data-urlencode "entry.1389589153=$fraud_desc" \
+    --data-urlencode "entry.1982864965=$other1_name" \
+    --data-urlencode "entry.140697627=$other1_rate" \
+    --data-urlencode "entry.1729103723=$other1_desc" \
+    --data-urlencode "entry.1508874603=$other2_name" \
+    --data-urlencode "entry.1585493516=$other2_rate" \
+    --data-urlencode "entry.1692023885=$other2_desc" \
+    --data-urlencode "entry.1833475543=$study_desc" \
+    --data-urlencode "entry.1146672378=$notes")
 
   echo "  $platform ($stage): HTTP $result"
 }
@@ -74,7 +79,7 @@ echo "Submitting Mission Possible paper data..."
 echo ""
 
 # 1. AI Agents
-submit "AI Agents" "240" "2025-10-01" "Other" "" \
+submit "AI Agents" "240" "2025" "10" "1" "Other" "" \
   "0" "$QUALITY_DESC" \
   "99" "Classic multiple-choice attention check" \
   "" "" \
@@ -85,7 +90,7 @@ submit "AI Agents" "240" "2025-10-01" "Other" "" \
   "Typing speed pass rate: 8%"
 
 # 2. Lab
-submit "Lab" "314" "2025-08-01" "Other" "" \
+submit "Lab" "314" "2025" "8" "1" "Other" "" \
   "80" "$QUALITY_DESC" \
   "84" "Classic multiple-choice attention check" \
   "" "" \
@@ -96,7 +101,7 @@ submit "Lab" "314" "2025-08-01" "Other" "" \
   "Typing speed pass rate: 97%"
 
 # 3. MTurk 1st stage
-submit "MTurk" "881" "2025-09-01" "Two-stage recruitment" "First stage (baseline)" \
+submit "MTurk" "881" "2025" "9" "1" "Two-stage recruitment" "First stage (baseline)" \
   "9" "$QUALITY_DESC" \
   "56" "Classic multiple-choice attention check" \
   "" "" \
@@ -107,7 +112,7 @@ submit "MTurk" "881" "2025-09-01" "Two-stage recruitment" "First stage (baseline
   "Typed text pass rate: 19%. Typing speed pass rate: 79%"
 
 # 4. Moblab 1st stage
-submit "Moblab" "313" "2025-10-01" "Two-stage recruitment" "First stage (baseline)" \
+submit "Moblab" "313" "2025" "10" "1" "Two-stage recruitment" "First stage (baseline)" \
   "55" "$QUALITY_DESC" \
   "85" "Classic multiple-choice attention check" \
   "" "" \
@@ -118,7 +123,7 @@ submit "Moblab" "313" "2025-10-01" "Two-stage recruitment" "First stage (baselin
   "Typed text pass rate: 79%. Typing speed pass rate: 77%"
 
 # 5. Moblab 2nd stage
-submit "Moblab" "100" "2025-11-01" "Two-stage recruitment" "Second stage (main study)" \
+submit "Moblab" "100" "2025" "11" "1" "Two-stage recruitment" "Second stage (main study)" \
   "95" "$QUALITY_DESC_2ND" \
   "99" "Classic multiple-choice attention check" \
   "" "" \
@@ -129,7 +134,7 @@ submit "Moblab" "100" "2025-11-01" "Two-stage recruitment" "Second stage (main s
   "Typed text pass rate: 99%. Typing speed pass rate: 99%"
 
 # 6. Bilendi 1st stage
-submit "Bilendi" "366" "2025-10-01" "Two-stage recruitment" "First stage (baseline)" \
+submit "Bilendi" "366" "2025" "10" "1" "Two-stage recruitment" "First stage (baseline)" \
   "73" "$QUALITY_DESC" \
   "91" "Classic multiple-choice attention check" \
   "" "" \
@@ -140,7 +145,7 @@ submit "Bilendi" "366" "2025-10-01" "Two-stage recruitment" "First stage (baseli
   "Typed text pass rate: 92%. Typing speed pass rate: 90%"
 
 # 7. Bilendi 2nd stage
-submit "Bilendi" "144" "2025-11-01" "Two-stage recruitment" "Second stage (main study)" \
+submit "Bilendi" "144" "2025" "11" "1" "Two-stage recruitment" "Second stage (main study)" \
   "93" "$QUALITY_DESC_2ND" \
   "95" "Classic multiple-choice attention check" \
   "" "" \
@@ -151,7 +156,7 @@ submit "Bilendi" "144" "2025-11-01" "Two-stage recruitment" "Second stage (main 
   "Typed text pass rate: 100%. Typing speed pass rate: 99%"
 
 # 8. Prolific 1st stage
-submit "Prolific" "900" "2025-08-01" "Two-stage recruitment" "First stage (baseline)" \
+submit "Prolific" "900" "2025" "8" "1" "Two-stage recruitment" "First stage (baseline)" \
   "90" "$QUALITY_DESC" \
   "98" "Classic multiple-choice attention check" \
   "" "" \
@@ -162,7 +167,7 @@ submit "Prolific" "900" "2025-08-01" "Two-stage recruitment" "First stage (basel
   "Typed text pass rate: 95%. Typing speed pass rate: 94%"
 
 # 9. Prolific 2nd stage
-submit "Prolific" "300" "2025-09-01" "Two-stage recruitment" "Second stage (main study)" \
+submit "Prolific" "300" "2025" "9" "1" "Two-stage recruitment" "Second stage (main study)" \
   "93" "$QUALITY_DESC_2ND" \
   "97" "Classic multiple-choice attention check" \
   "" "" \
