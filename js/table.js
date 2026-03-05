@@ -134,14 +134,14 @@ window.DQH.table = {
 
   renderColumnHeader() {
     var html = '<div class="study-col-header">';
-    html += '<div></div>'; // chevron column
-    html += '<div>Platform</div>';
-    html += '<div>N</div>';
-    html += '<div>Date</div>';
-    html += '<div>Pass Rate</div>';
-    html += '<div>Attention</div>';
-    html += '<div>AI Detect</div>';
-    html += '<div>Design</div>';
+    html += '<div class="col-chevron"></div>';
+    html += '<div class="col-platform">Platform</div>';
+    html += '<div class="col-n">N</div>';
+    html += '<div class="col-date">Date</div>';
+    html += '<div class="col-rate">Pass Rate</div>';
+    html += '<div class="col-attention">Attention</div>';
+    html += '<div class="col-ai">AI Detect</div>';
+    html += '<div class="col-design">Design</div>';
     html += '</div>';
     return html;
   },

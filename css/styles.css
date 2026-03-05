@@ -552,10 +552,11 @@ a:hover { text-decoration: underline; }
 
 /* --- Studies Tree --- */
 
-/* Column header row */
+/* Column header row — must match .study-l2 grid exactly */
 .study-col-header {
   display: grid;
   grid-template-columns: 24px 130px 70px 100px 80px 80px 80px 1fr;
+  align-items: center;
   gap: 8px;
   padding: 8px 16px 8px 24px;
   font-size: 0.7rem;
@@ -565,6 +566,10 @@ a:hover { text-decoration: underline; }
   letter-spacing: 0.05em;
   border-bottom: 1px solid var(--border);
   min-width: 600px;
+}
+
+.col-n, .col-rate, .col-attention, .col-ai {
+  text-align: right;
 }
 
 .table-controls {
