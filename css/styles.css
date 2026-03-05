@@ -555,9 +555,9 @@ a:hover { text-decoration: underline; }
 /* Column header row — must match .study-l2 grid exactly */
 .study-col-header {
   display: grid;
-  grid-template-columns: 20px 100px 60px 80px 75px 75px 75px 1fr;
+  grid-template-columns: 20px 80px 50px 76px 68px 68px 68px 1fr;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding: 8px 16px 8px 24px;
   font-size: 0.7rem;
   font-weight: 600;
@@ -565,7 +565,6 @@ a:hover { text-decoration: underline; }
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom: 1px solid var(--border);
-  min-width: 600px;
 }
 
 .col-n, .col-rate, .col-attention, .col-ai {
@@ -607,7 +606,6 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   border-bottom: 1px solid var(--border);
   transition: background 0.15s;
-  min-width: 600px;
 }
 
 .study-l1:last-child {
@@ -735,13 +733,12 @@ a:hover { text-decoration: underline; }
 
 .study-l2 {
   display: grid;
-  grid-template-columns: 20px 100px 60px 80px 75px 75px 75px 1fr;
+  grid-template-columns: 20px 80px 50px 76px 68px 68px 68px 1fr;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding: 10px 16px 10px 24px;
   font-size: 0.875rem;
   border-bottom: 1px solid rgba(46, 51, 72, 0.4);
-  min-width: 600px;
   transition: background 0.15s;
 }
 
@@ -786,14 +783,13 @@ a:hover { text-decoration: underline; }
 
 .study-l3 {
   display: grid;
-  grid-template-columns: 20px 100px 60px 80px 75px 75px 75px 1fr;
+  grid-template-columns: 20px 80px 50px 76px 68px 68px 68px 1fr;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding: 8px 16px 8px 48px;
   font-size: 0.85rem;
   background: rgba(108, 142, 255, 0.03);
   border-bottom: 1px solid rgba(46, 51, 72, 0.3);
-  min-width: 600px;
 }
 
 .l3-label {
@@ -979,17 +975,19 @@ a:hover { text-decoration: underline; }
     flex-wrap: wrap;
   }
 
-  .study-col-header,
-  .study-l2 {
-    grid-template-columns: 18px 90px 55px 72px 68px 68px 68px 1fr;
-    gap: 4px;
-    font-size: 0.8rem;
+  /* Hide AI Detect and Design columns on tablet */
+  .col-ai, .col-design,
+  .l2-ai, .l2-design,
+  .l3-ai, .l3-design {
+    display: none;
   }
 
+  .study-col-header,
+  .study-l2,
   .study-l3 {
-    grid-template-columns: 18px 90px 55px 72px 68px 68px 68px 1fr;
+    grid-template-columns: 18px 75px 45px 68px 62px 62px;
     gap: 4px;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
   }
 
   .footer-inner {
@@ -1028,5 +1026,35 @@ a:hover { text-decoration: underline; }
   .l1-researcher,
   .l1-meta {
     display: none;
+  }
+
+  /* Also hide Date and Attention on phone — keep Platform, N, Pass Rate */
+  .col-date, .col-attention,
+  .l2-date, .l2-attention,
+  .l3-date, .l3-attention {
+    display: none;
+  }
+
+  .study-col-header,
+  .study-l2,
+  .study-l3 {
+    grid-template-columns: 16px 70px 42px 58px;
+    gap: 4px;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 0.78rem;
+  }
+
+  .study-l3 {
+    padding-left: 28px;
+  }
+
+  .study-l1 {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .l1-info-popup.expanded {
+    padding: 10px 12px;
   }
 }
