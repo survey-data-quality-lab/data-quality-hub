@@ -7,8 +7,14 @@ window.DQH = window.DQH || {};
 window.DQH.dataStore = {
   studies: [],
 
+  // Platforms to exclude (non-human data pools)
+  excludedPlatforms: ['AI Agents'],
+
   init(csvData) {
-    this.studies = csvData || [];
+    var excluded = this.excludedPlatforms;
+    this.studies = (csvData || []).filter(function(s) {
+      return excluded.indexOf(s.platform) === -1;
+    });
   },
 
   /**

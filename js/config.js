@@ -80,7 +80,6 @@ window.DQH.config = {
     'MTurk': '#F87171',
     'Moblab': '#FBBF24',
     'Lab': '#34D399',
-    'AI Agents': '#9BA1B5',
     'Other': '#6B7185'
   },
 

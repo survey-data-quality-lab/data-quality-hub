@@ -78,18 +78,7 @@ submit() {
 echo "Submitting Mission Possible paper data..."
 echo ""
 
-# 1. AI Agents
-submit "AI Agents" "240" "2025" "10" "1" "Other" "" \
-  "0" "$QUALITY_DESC" \
-  "99" "Classic multiple-choice attention check" \
-  "" "" \
-  "" "" \
-  "Video Attention Check" "17" "Correctly answered video attention check" \
-  "Typed Text (not pasted)" "45" "Typed open-ended responses rather than pasting" \
-  "AI agents (GPT-4, Claude, Gemini) completing surveys to benchmark detection methods" \
-  "Typing speed pass rate: 8%"
-
-# 2. Lab
+# 1. Lab
 submit "Lab" "314" "2025" "8" "1" "Other" "" \
   "80" "$QUALITY_DESC" \
   "84" "Classic multiple-choice attention check" \
@@ -178,5 +167,5 @@ submit "Prolific" "300" "2025" "9" "1" "Two-stage recruitment" "Second stage (ma
   "Typed text pass rate: 98%. Typing speed pass rate: 98%"
 
 echo ""
-echo "Done! 9 entries submitted."
+echo "Done! 8 entries submitted."
 echo "Now go to your Google Sheet and type '1' in the Approved column for the new entries."
