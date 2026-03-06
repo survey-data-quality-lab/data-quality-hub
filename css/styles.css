@@ -844,6 +844,7 @@ a:hover { text-decoration: underline; }
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
+  text-decoration: none;
 }
 
 /* --- Rate Coloring --- */

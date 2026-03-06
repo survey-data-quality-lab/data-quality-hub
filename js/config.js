@@ -83,5 +83,13 @@ window.DQH.config = {
     'Other': '#6B7185'
   },
 
-  defaultColor: '#6B7185'
+  defaultColor: '#6B7185',
+
+  // Platform URLs for linking platform tags
+  platformUrls: {
+    'Prolific': 'https://www.prolific.com',
+    'MTurk': 'https://www.mturk.com',
+    'Bilendi': 'https://www.bilendi.com',
+    'Moblab': 'https://www.moblab.com'
+  }
 };
