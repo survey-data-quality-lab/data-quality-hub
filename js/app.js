@@ -3,6 +3,10 @@
  */
 window.DQH = window.DQH || {};
 
+// Selected metric state for 2-level selector
+var _selectedConcernId = null;
+var _selectedMetricField = null;
+
 document.addEventListener('DOMContentLoaded', async function() {
   var loading = document.getElementById('loading');
   var dashboard = document.getElementById('dashboard');
@@ -25,12 +29,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   if (dashboard) dashboard.style.display = 'block';
 
   initThemeToggle();
-  initAboutToggle();
-  initMoreToggle();
   initFilterToggles();
   initFilterEvents();
   initDownloadCSV();
-  bindChange('metric-select', renderMetricCharts);
 });
 
 // --- Stats (inline in header) ---
@@ -104,41 +105,85 @@ function renderTrendChart() {
 
 // --- Metric section ---
 function renderMetricSection() {
-  var select = document.getElementById('metric-select');
-  if (!select) return;
+  var concerns = window.DQH.config.metricConcerns;
+  if (!concerns || !concerns.length) return;
 
-  if (select.options.length === 0) {
-    var allOptions = window.DQH.config.metricOptions;
-    var available = window.DQH.dataStore.getAvailableMetrics();
-    for (var i = 0; i < allOptions.length; i++) {
-      var opt = document.createElement('option');
-      opt.value = allOptions[i].field;
-      opt.textContent = allOptions[i].label;
-      var hasData = available.some(function(a) { return a.field === allOptions[i].field; });
-      if (!hasData) {
-        opt.disabled = true;
-        opt.textContent += ' (no data)';
-      }
-      select.appendChild(opt);
-    }
-    select.value = 'aiDetectionRate';
-    if (select.selectedIndex === -1 || select.options[select.selectedIndex].disabled) {
-      for (var j = 0; j < select.options.length; j++) {
-        if (!select.options[j].disabled) { select.selectedIndex = j; break; }
-      }
-    }
+  // Default to first concern and its first metric
+  if (!_selectedConcernId) {
+    _selectedConcernId = concerns[0].id;
+    _selectedMetricField = concerns[0].metrics[0].field;
   }
 
+  renderConcernSelector();
+  renderMetricSelector();
   renderMetricCharts();
 }
 
-function renderMetricCharts() {
-  var select = document.getElementById('metric-select');
-  if (!select) return;
-  var field = select.value;
-  var filter = getFilterState('metric');
+function renderConcernSelector() {
+  var container = document.getElementById('metric-selector-l1');
+  if (!container) return;
+  var concerns = window.DQH.config.metricConcerns;
+  var html = '';
+  for (var i = 0; i < concerns.length; i++) {
+    var c = concerns[i];
+    var active = (c.id === _selectedConcernId) ? ' active' : '';
+    html += '<button class="concern-btn' + active + '" data-concern="' + esc(c.id) + '" type="button">' + esc(c.label) + '</button>';
+  }
+  container.innerHTML = html;
 
-  window.DQH.charts.renderTrendChart('chart-metric-trend', field, filter.stage, filter.platforms);
+  var btns = container.querySelectorAll('.concern-btn');
+  for (var j = 0; j < btns.length; j++) {
+    btns[j].addEventListener('click', function() {
+      _selectedConcernId = this.getAttribute('data-concern');
+      var concerns = window.DQH.config.metricConcerns;
+      for (var k = 0; k < concerns.length; k++) {
+        if (concerns[k].id === _selectedConcernId) {
+          _selectedMetricField = concerns[k].metrics[0].field;
+          break;
+        }
+      }
+      renderConcernSelector();
+      renderMetricSelector();
+      renderMetricCharts();
+    });
+  }
+}
+
+function renderMetricSelector() {
+  var container = document.getElementById('metric-selector-l2');
+  if (!container) return;
+  var concerns = window.DQH.config.metricConcerns;
+  var concern = null;
+  for (var i = 0; i < concerns.length; i++) {
+    if (concerns[i].id === _selectedConcernId) { concern = concerns[i]; break; }
+  }
+  if (!concern) return;
+
+  var available = window.DQH.dataStore.getAvailableMetrics();
+  var html = '';
+  for (var j = 0; j < concern.metrics.length; j++) {
+    var m = concern.metrics[j];
+    var active = (m.field === _selectedMetricField) ? ' active' : '';
+    var hasData = available.some(function(a) { return a.field === m.field; });
+    var label = hasData ? esc(m.label) : esc(m.label) + ' <span class="metric-no-data">(no data)</span>';
+    html += '<button class="metric-btn' + active + '" data-field="' + esc(m.field) + '" type="button"' + (hasData ? '' : ' disabled') + '>' + label + '</button>';
+  }
+  container.innerHTML = html;
+
+  var btns = container.querySelectorAll('.metric-btn:not([disabled])');
+  for (var k = 0; k < btns.length; k++) {
+    btns[k].addEventListener('click', function() {
+      _selectedMetricField = this.getAttribute('data-field');
+      renderMetricSelector();
+      renderMetricCharts();
+    });
+  }
+}
+
+function renderMetricCharts() {
+  if (!_selectedMetricField) return;
+  var filter = getFilterState('metric');
+  window.DQH.charts.renderTrendChart('chart-metric-trend', _selectedMetricField, filter.stage, filter.platforms);
   renderDefinitionsPanel();
 }
 
@@ -163,39 +208,7 @@ function initThemeToggle() {
     }
     // Re-render charts with new theme colors
     renderTrendChart();
-    var moreBody = document.getElementById('more-body');
-    if (moreBody && moreBody.classList.contains('expanded')) {
-      renderMetricCharts();
-    }
-  });
-}
-
-// --- About "Read more" toggle ---
-function initAboutToggle() {
-  var btn = document.getElementById('about-more-btn');
-  if (!btn) return;
-  btn.addEventListener('click', function() {
-    var expanded = document.getElementById('about-expanded');
-    if (!expanded) return;
-    if (expanded.classList.contains('collapsed')) {
-      expanded.classList.remove('collapsed');
-      expanded.classList.add('expanded');
-      btn.textContent = 'Show less';
-    } else {
-      expanded.classList.remove('expanded');
-      expanded.classList.add('collapsed');
-      btn.textContent = 'Read more';
-    }
-  });
-}
-
-// --- "More" toggle ---
-function initMoreToggle() {
-  bindToggleBtn('more-toggle', 'more-body', function() {
-    // Resize charts after expand
-    setTimeout(function() {
-      window.dispatchEvent(new Event('resize'));
-    }, 450);
+    renderMetricCharts();
   });
 }
 
@@ -257,9 +270,8 @@ function renderDefinitionsPanel() {
   var list = document.getElementById('definitions-list');
   if (!list) return;
 
-  var select = document.getElementById('metric-select');
-  if (!select) return;
-  var field = select.value;
+  var field = _selectedMetricField;
+  if (!field) return;
 
   var definitions = window.DQH.dataStore.getMetricDefinitions(field);
 
@@ -390,11 +402,6 @@ function initDownloadCSV() {
 function setText(id, val) {
   var el = document.getElementById(id);
   if (el) el.textContent = val;
-}
-
-function bindChange(id, fn) {
-  var el = document.getElementById(id);
-  if (el) el.addEventListener('change', fn);
 }
 
 function esc(str) {

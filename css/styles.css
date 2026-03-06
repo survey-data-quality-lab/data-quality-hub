@@ -120,34 +120,9 @@ a:hover { text-decoration: underline; }
   max-width: 720px;
 }
 
-.header-more-btn {
-  display: inline-block;
-  margin-top: 8px;
-  padding: 4px 0;
-  background: transparent;
-  border: none;
-  color: var(--accent);
-  font-size: 0.85rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-}
-
-.header-more-btn:hover {
-  text-decoration: underline;
-}
-
 .header-expanded {
   overflow: hidden;
   transition: max-height 0.4s ease;
-}
-
-.header-expanded.collapsed {
-  max-height: 0;
-}
-
-.header-expanded.expanded {
-  max-height: 2000px;
 }
 
 .header-expanded .about-content {
@@ -178,6 +153,10 @@ a:hover { text-decoration: underline; }
 
 .about-block li {
   margin-bottom: 4px;
+}
+
+.about-block-full {
+  grid-column: 1 / -1;
 }
 
 .header-stats {
@@ -273,20 +252,79 @@ a:hover { text-decoration: underline; }
   color: var(--text-secondary);
 }
 
-.metric-select {
-  padding: 7px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 0.85rem;
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  cursor: pointer;
-  font-family: inherit;
+/* --- 2-Level Metric Selector --- */
+.metric-selector {
+  margin-bottom: 12px;
 }
 
-.metric-select:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
+.metric-selector-l1 {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.concern-btn {
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.concern-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.concern-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.metric-selector-l2 {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.metric-btn {
+  padding: 4px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.metric-btn:hover:not([disabled]) {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.metric-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.metric-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.metric-no-data {
+  font-size: 0.75em;
+  opacity: 0.7;
 }
 
 .chart-wrap {
@@ -503,35 +541,16 @@ a:hover { text-decoration: underline; }
   padding: 8px 0 24px;
 }
 
-.more-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 0;
-  background: transparent;
-  border: none;
+.section-more-title {
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--text-tertiary);
-  font-size: 0.85rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 0.15s;
-}
-
-.more-toggle:hover {
-  color: var(--accent);
-}
-
-.more-toggle.expanded .toggle-chevron {
-  transform: rotate(180deg);
+  padding: 6px 0 12px;
+  letter-spacing: -0.01em;
 }
 
 .more-body {
   transition: max-height 0.4s ease;
-}
-
-.more-body.expanded {
-  max-height: 10000px;
 }
 
 .more-section {
@@ -555,7 +574,7 @@ a:hover { text-decoration: underline; }
 /* Column header row — must match .study-l2 grid exactly */
 .study-col-header {
   display: grid;
-  grid-template-columns: 20px 80px 50px 76px 68px 68px 68px 1fr;
+  grid-template-columns: 20px 80px 55px 76px 68px 88px 68px 68px 1fr;
   align-items: center;
   gap: 4px;
   padding: 8px 16px 8px 24px;
@@ -567,7 +586,11 @@ a:hover { text-decoration: underline; }
   border-bottom: 1px solid var(--border);
 }
 
-.col-n, .col-rate, .col-attention, .col-ai {
+.col-n {
+  text-align: center;
+}
+
+.col-rate, .col-attention, .col-ai, .col-fraud {
   text-align: right;
 }
 
@@ -756,7 +779,7 @@ a:hover { text-decoration: underline; }
 
 .study-l2 {
   display: grid;
-  grid-template-columns: 20px 80px 50px 76px 68px 68px 68px 1fr;
+  grid-template-columns: 20px 80px 55px 76px 68px 88px 68px 68px 1fr;
   align-items: center;
   gap: 4px;
   padding: 10px 16px 10px 24px;
@@ -786,7 +809,12 @@ a:hover { text-decoration: underline; }
   width: 14px;
 }
 
-.l2-n, .l2-rate, .l2-attention, .l2-ai {
+.l2-n {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.l2-rate, .l2-attention, .l2-ai, .l2-fraud {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -806,7 +834,7 @@ a:hover { text-decoration: underline; }
 
 .study-l3 {
   display: grid;
-  grid-template-columns: 20px 80px 50px 76px 68px 68px 68px 1fr;
+  grid-template-columns: 20px 80px 55px 76px 68px 88px 68px 68px 1fr;
   align-items: center;
   gap: 4px;
   padding: 8px 16px 8px 48px;
@@ -821,7 +849,12 @@ a:hover { text-decoration: underline; }
   font-style: italic;
 }
 
-.l3-n, .l3-rate, .l3-attention, .l3-ai {
+.l3-n {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.l3-rate, .l3-attention, .l3-ai, .l3-fraud {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -999,17 +1032,17 @@ a:hover { text-decoration: underline; }
     flex-wrap: wrap;
   }
 
-  /* Hide AI Detect and Design columns on tablet */
-  .col-ai, .col-design,
-  .l2-ai, .l2-design,
-  .l3-ai, .l3-design {
+  /* Hide AI Detect, Fraud and Design columns on tablet */
+  .col-ai, .col-fraud, .col-design,
+  .l2-ai, .l2-fraud, .l2-design,
+  .l3-ai, .l3-fraud, .l3-design {
     display: none;
   }
 
   .study-col-header,
   .study-l2,
   .study-l3 {
-    grid-template-columns: 18px 75px 45px 68px 62px 62px;
+    grid-template-columns: 18px 75px 48px 68px 62px 80px;
     gap: 4px;
     font-size: 0.8rem;
   }
@@ -1052,10 +1085,10 @@ a:hover { text-decoration: underline; }
     display: none;
   }
 
-  /* Also hide Attention on phone — keep Platform, N, Date, Pass Rate */
-  .col-attention,
-  .l2-attention,
-  .l3-attention {
+  /* Also hide Attention and Fraud on phone — keep Platform, N, Date, Pass Rate */
+  .col-attention, .col-fraud,
+  .l2-attention, .l2-fraud,
+  .l3-attention, .l3-fraud {
     display: none;
   }
 

@@ -139,8 +139,9 @@ window.DQH.table = {
     html += '<div class="col-n">N</div>';
     html += '<div class="col-date">Date</div>';
     html += '<div class="col-rate">Pass Rate</div>';
-    html += '<div class="col-attention">Attention</div>';
+    html += '<div class="col-attention">Attn Check</div>';
     html += '<div class="col-ai">AI Detect</div>';
+    html += '<div class="col-fraud">Fraud</div>';
     html += '<div class="col-design">Design</div>';
     html += '</div>';
     return html;
@@ -230,11 +231,31 @@ window.DQH.table = {
     if (qualDesc) {
       html += '<div class="study-info-row"><strong>Pass rate measure:</strong> ' + this.esc(qualDesc) + '</div>';
     }
+
+    // New metadata fields (shown if present in any entry)
+    var dataAvail = '';
+    var prereg = '';
+    var pubStatus = '';
+    for (var ka = 0; ka < entries.length; ka++) {
+      if (!dataAvail && entries[ka].dataAvailability) dataAvail = entries[ka].dataAvailability;
+      if (!prereg && entries[ka].preregistration) prereg = entries[ka].preregistration;
+      if (!pubStatus && entries[ka].publicationStatus) pubStatus = entries[ka].publicationStatus;
+    }
+    if (dataAvail) {
+      html += '<div class="study-info-row"><strong>Data Availability:</strong> ' + this.esc(dataAvail) + '</div>';
+    }
+    if (prereg) {
+      html += '<div class="study-info-row"><strong>Pre-registration:</strong> ' + this.esc(prereg) + '</div>';
+    }
+    if (pubStatus) {
+      html += '<div class="study-info-row"><strong>Publication Status:</strong> ' + this.esc(pubStatus) + '</div>';
+    }
+
     if (notesList.length) {
       html += '<div class="study-info-row"><strong>Details:</strong> ' + this.esc(notesList.join(' | ')) + '</div>';
     }
 
-    if (!desc && !qualDesc && !studyLink) {
+    if (!desc && !qualDesc && !studyLink && !dataAvail && !prereg && !pubStatus) {
       html += '<div class="study-info-row" style="color:var(--text-tertiary);font-style:italic">No additional details available for this study.</div>';
     }
 
@@ -262,6 +283,7 @@ window.DQH.table = {
     html += '<div class="l2-rate">' + this.rateCell(s.overallPassRate) + '</div>';
     html += '<div class="l2-attention">' + this.rateCell(s.attentionCheckRate) + '</div>';
     html += '<div class="l2-ai">' + this.rateCell(s.aiDetectionRate) + '</div>';
+    html += '<div class="l2-fraud">' + this.rateCell(s.accountFraudRate) + '</div>';
     html += '<div class="l2-design">' + this.esc(design) + '</div>';
     html += '</div>';
     return html;
@@ -276,6 +298,7 @@ window.DQH.table = {
     html += '<div class="l3-rate">' + this.rateCell(s.overallPassRate) + '</div>';
     html += '<div class="l3-attention">' + this.rateCell(s.attentionCheckRate) + '</div>';
     html += '<div class="l3-ai">' + this.rateCell(s.aiDetectionRate) + '</div>';
+    html += '<div class="l3-fraud">' + this.rateCell(s.accountFraudRate) + '</div>';
     html += '<div class="l3-design"></div>';
     html += '</div>';
     return html;

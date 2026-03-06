@@ -33,6 +33,9 @@ window.DQH.config = {
     'AI/LLM Detection Description': 'aiDetectionDescription',
     'Account Fraud Detection Rate (%)': 'accountFraudRate',
     'Account Fraud Description': 'accountFraudDescription',
+    'Data Availability': 'dataAvailability',
+    'Pre-registration': 'preregistration',
+    'Publication Status': 'publicationStatus',
     'Other Metric 1 Name': 'otherMetric1Name',
     'Other Metric 1 Rate (%)': 'otherMetric1Rate',
     'Other Metric 1 Description': 'otherMetric1Description',
@@ -63,11 +66,35 @@ window.DQH.config = {
     'otherMetric2Rate'
   ],
 
-  // Metrics available in the dropdown selector
-  // key = internal field name, label = display name
+  // Two-level metric selection: concerns → specific metrics
+  metricConcerns: [
+    {
+      id: 'inattention',
+      label: 'Inattention',
+      metrics: [
+        { field: 'attentionCheckRate', label: 'Attention Check Rate' }
+      ]
+    },
+    {
+      id: 'ai',
+      label: 'AI / Nonhuman',
+      metrics: [
+        { field: 'aiDetectionRate', label: 'AI/LLM Detection Rate' }
+      ]
+    },
+    {
+      id: 'fraud',
+      label: 'Account Fraud',
+      metrics: [
+        { field: 'accountFraudRate', label: 'Account Fraud Rate' }
+      ]
+    }
+  ],
+
+  // Flat metric list (for CSV download and other uses)
   metricOptions: [
-    { field: 'aiDetectionRate', label: 'AI/LLM Detection Rate' },
     { field: 'attentionCheckRate', label: 'Attention Check Rate' },
+    { field: 'aiDetectionRate', label: 'AI/LLM Detection Rate' },
     { field: 'accountFraudRate', label: 'Account Fraud Rate' },
     { field: 'otherMetric1Rate', label: 'Other Metric 1' },
     { field: 'otherMetric2Rate', label: 'Other Metric 2' }
