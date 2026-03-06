@@ -333,7 +333,13 @@ window.DQH.table = {
 
   platformTag(platform) {
     var color = window.DQH.dataStore.getColor(platform);
-    return '<span class="platform-tag" style="background:' + color + '20;color:' + color + ';border:1px solid ' + color + '40">' + this.esc(platform) + '</span>';
+    var style = 'background:' + color + '20;color:' + color + ';border:1px solid ' + color + '40';
+    var urls = window.DQH.config.platformUrls || {};
+    var url = urls[platform];
+    if (url) {
+      return '<a href="' + this.esc(url) + '" target="_blank" rel="noopener" class="platform-tag" style="' + style + '">' + this.esc(platform) + '</a>';
+    }
+    return '<span class="platform-tag" style="' + style + '">' + this.esc(platform) + '</span>';
   },
 
   rateCell(val) {

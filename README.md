@@ -40,10 +40,10 @@ The dashboard currently aggregates data from:
 
 ## 🌐 Platforms Covered
 
-- **Prolific Academic**
-- **Amazon Mechanical Turk**
-- **Moblab**
-- **Bilendi**
+- **[Prolific Academic](https://www.prolific.com)**
+- **[Amazon Mechanical Turk](https://www.mturk.com)**
+- **[Moblab](https://www.moblab.com)**
+- **[Bilendi](https://www.bilendi.com)**
 - **Lab**
 - **Other** - Additional platforms as contributed
 
