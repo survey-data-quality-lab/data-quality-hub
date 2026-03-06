@@ -20,10 +20,10 @@ Online survey platforms vary dramatically in data quality. This project aims to:
 
 ## 🚀 Quick Links
 
-- **[📈 View Live Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/)** - Interactive visualizations of all submitted data
-- **[💬 Join Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)** - Ask questions, share experiences, and connect with researchers
-- **📝 Submit via Google Form** - Easy online form for data submission (recommended for most researchers)
-- **📖 Metric Definitions** - Detailed explanations of all tracked metrics
+- **[📈 View Live Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/)**
+- **[💬 Join Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)**
+- **[📝 Submit Data via Google Form](https://docs.google.com/forms/d/e/1FAIpQLSfhwduzGfQl-vvU59Jm8R-U8QAGhR7PsE0XApvJLtC1tURObQ/viewform)**
+- **📖 Metric Definitions**
 
 
 ## 📈 Current Statistics
@@ -58,7 +58,7 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 
 ### Option 1: Google Form (Recommended) 📝
 
-**No technical skills required!** The form guides you through each field with examples and help text.
+**No technical skills required!** The Google form guides you through each field with examples and help text. Click [here](https://docs.google.com/forms/d/e/1FAIpQLSfhwduzGfQl-vvU59Jm8R-U8QAGhR7PsE0XApvJLtC1tURObQ/viewform)
 
 ### Option 2: CSV Upload (Advanced - Coming Soon) 📤
 
@@ -66,7 +66,7 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 
 ### Why Contribute?
 
-- **Help the community**: Share your experiences to help others
+- **Help the community**: Share your data to help others
 - **Transparency**: Build collective knowledge about platform quality
 - **Recognition**: Contributors acknowledged in dashboard
 
