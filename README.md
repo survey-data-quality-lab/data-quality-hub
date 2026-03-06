@@ -3,8 +3,6 @@
 [![Dashboard](https://img.shields.io/badge/Dashboard-Live-blue?style=for-the-badge)](https://sharrs.github.io/dashboard-test/)
 [![Discussions](https://img.shields.io/badge/Discussions-Join-orange?style=for-the-badge)](https://github.com/sharrs/dashboard-test/discussions)
 [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=for-the-badge)](docs/CONTRIBUTING.md)
-[![Google Forms](https://img.shields.io/badge/Submit_via-Google_Forms-34A853?style=for-the-badge&logo=google)](docs/GOOGLE_FORMS_SETUP.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 > A community-driven, open-source dashboard tracking data quality metrics across major online survey platforms. Help researchers make informed decisions about where to collect their data.
 
