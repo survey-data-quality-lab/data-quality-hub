@@ -23,7 +23,6 @@ Online survey platforms vary dramatically in data quality. This project aims to:
 - **[📈 View Live Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/)** - Interactive visualizations of all submitted data
 - **[💬 Join Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)** - Ask questions, share experiences, and connect with researchers
 - **📝 Submit via Google Form** - Easy online form for data submission (recommended for most researchers)
-- **📤 Submit via CSV** - Advanced option: manually create and upload CSV files
 - **📖 Metric Definitions** - Detailed explanations of all tracked metrics
 
 
