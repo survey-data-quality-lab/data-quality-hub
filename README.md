@@ -26,6 +26,7 @@ Online survey platforms vary dramatically in data quality. This project aims to:
 - **📤 Submit via CSV** - Advanced option: manually create and upload CSV files
 - **📖 Metric Definitions** - Detailed explanations of all tracked metrics
 
+
 ## 📈 Current Statistics
 
 The dashboard currently aggregates data from:
@@ -39,16 +40,18 @@ The dashboard currently aggregates data from:
 
 ## 🌐 Platforms Covered
 
-- **Prolific** - Academic research platform
-- **MTurk** - Amazon Mechanical Turk
-- **Moblab** - 
-- **Bilendi** -
-- **Lab** - Controlled laboratory settings
+- **Prolific Academic**
+- **Amazon Mechanical Turk**
+- **Moblab**
+- **Bilendi**
+- **Lab**
 - **Other** - Additional platforms as contributed
+
 
 ## 📊 Metrics Tracked
 
 The main metrics are based on our paper "Mission Possible: The Collection of High Quality Data"
+
 
 ## 🤝 How to Contribute
 
@@ -58,11 +61,9 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 
 **No technical skills required!** The form guides you through each field with examples and help text.
 
-### Option 2: CSV Upload (Advanced) 📤
+### Option 2: CSV Upload (Advanced - Coming Soon) 📤
 
 **Automated contribution** You or your AI agent makes a pull request to add your data, which is automatically reviewed. 
-
-📚 **Full guides**: Coming soon
 
 
 ## 🎓 For Researchers
@@ -79,9 +80,6 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 - **Open Data**: All submissions are public
 - **Attribution**: Your name/affiliation will be visible
 
-## 📜 License
-
-This project is licensed under the MIT License.
 
 ## 📞 Contact & Support
 
