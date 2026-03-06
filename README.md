@@ -1,8 +1,8 @@
 # 📊 Data Quality Hub for Online Surveys
 
-[![Dashboard](https://img.shields.io/badge/Dashboard-Live-blue?style=for-the-badge)](https://sharrs.github.io/dashboard-test/)
-[![Discussions](https://img.shields.io/badge/Discussions-Join-orange?style=for-the-badge)](https://github.com/sharrs/dashboard-test/discussions)
-[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=for-the-badge)](docs/CONTRIBUTING.md)
+[![Dashboard](https://img.shields.io/badge/Dashboard-Live-blue?style=for-the-badge)](https://survey-data-quality-lab.github.io/data-quality-hub/)
+[![Discussions](https://img.shields.io/badge/Discussions-Join-orange?style=for-the-badge)](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)
+![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=for-the-badge)
 
 > A community-driven, open-source dashboard tracking data quality metrics across major online survey platforms. Help researchers make informed decisions about where to collect their data.
 
@@ -20,11 +20,11 @@ Online survey platforms vary dramatically in data quality. This project aims to:
 
 ## 🚀 Quick Links
 
-- **[📈 View Live Dashboard](https://sharrs.github.io/dashboard-test/)** - Interactive visualizations of all submitted data
-- **[💬 Join Discussions](https://github.com/sharrs/dashboard-test/discussions)** - Ask questions, share experiences, and connect with researchers
-- **[📝 Submit via Google Form](docs/GOOGLE_FORMS_SETUP.md#for-researchers)** - Easy online form for data submission (recommended for most researchers)
-- **[📤 Submit via CSV](docs/CONTRIBUTING.md)** - Advanced option: manually create and upload CSV files
-- **[📖 Metric Definitions](docs/METRICS.md)** - Detailed explanations of all tracked metrics
+- **[📈 View Live Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/)** - Interactive visualizations of all submitted data
+- **[💬 Join Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)** - Ask questions, share experiences, and connect with researchers
+- **📝 Submit via Google Form** - Easy online form for data submission (recommended for most researchers)
+- **📤 Submit via CSV** - Advanced option: manually create and upload CSV files
+- **📖 Metric Definitions** - Detailed explanations of all tracked metrics
 
 ## 📈 Current Statistics
 
@@ -62,9 +62,7 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 
 **Automated contribution** You or your AI agent makes a pull request to add your data, which is automatically reviewed. 
 
-📚 **Full guides**: 
-- [Google Form Setup & Usage](docs/GOOGLE_FORMS_SETUP.md)
-- [CSV Contribution Guide](docs/CONTRIBUTING.md)
+📚 **Full guides**: Coming soon
 
 
 ## 🎓 For Researchers
@@ -83,29 +81,23 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 
 ## 📜 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 📞 Contact & Support
 
 ### Have Questions?
 
-- **[💬 Discussions](https://github.com/sharrs/dashboard-test/discussions)** - Ask questions, share experiences, and get help from the community
+- **[💬 Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)** - Ask questions, share experiences, and get help from the community
 
 ### Report Issues
 
-- **[🐛 Issues](https://github.com/sharrs/dashboard-test/issues)** - Report bugs or request features
-
-### Learn More
-
-- **[📚 Discussion Guidelines](docs/DISCUSSIONS.md)** - How to use the community forum
-- **[🤝 Contributing Guide](docs/CONTRIBUTING.md)** - How to contribute data
-- **[📖 Documentation](docs/METRICS.md)** - Understanding our metrics
+- **[🐛 Issues](https://github.com/survey-data-quality-lab/data-quality-hub/issues)** - Report bugs or request features
 
 ### Direct Contact
 
 - **Email**: Contact maintainers through GitHub profiles
 
 ---
-[View Dashboard](https://sharrs.github.io/dashboard-test/) • [Join Discussions](https://github.com/sharrs/dashboard-test/discussions) • [Contribute](docs/CONTRIBUTING.md) • [Documentation](docs/METRICS.md)
+[View Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/) • [Join Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)
 
 </div>
