@@ -65,9 +65,6 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 
 **Automated contribution** You or your AI agent makes a pull request to add your data, which is automatically reviewed. 
 
-
-## 🎓 For Researchers
-
 ### Why Contribute?
 
 - **Help the community**: Share your experiences to help others
