@@ -76,7 +76,7 @@ You or your AI agent makes a pull request to add your data, which is automatical
 
 ### Have Questions?
 
-- **[💬 Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)** - Ask questions, share experiences, and get help from the community
+- **[💬 Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)** - Ask questions, share experiences, and propose new data quality checks.
 
 ### Report Issues
 
