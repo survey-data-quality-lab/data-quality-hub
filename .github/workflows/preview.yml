@@ -1,0 +1,42 @@
+name: Preview Branch on GitHub Pages
+
+# Deploy the PR branch to GitHub Pages so changes can be reviewed live.
+# The site will be visible at https://survey-data-quality-lab.github.io/data-quality-hub/
+# Once the PR is merged, the main deploy workflow will restore the production build.
+
+on:
+  push:
+    branches:
+      - 'copilot/**'
+      - 'feature/**'
+      - 'preview/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Use a separate concurrency group from the main deploy so the two workflows
+# do not cancel each other's queued runs.
+concurrency:
+  group: pages-preview
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
