@@ -12,7 +12,7 @@
 
 Online survey platforms vary dramatically in data quality. This project aims to:
 
-1. **Aggregate data** from researchers using various platforms
+1. **Aggregate data** from researchers worldwide
 2. **Provide transparent comparisons** of data quality metrics
 3. **Help researchers choose** the best platform for their needs
 4. **Track quality trends** over time
@@ -31,11 +31,9 @@ Online survey platforms vary dramatically in data quality. This project aims to:
 The dashboard currently aggregates data from:
 - **4** online platforms
 - **1** laboratory
-- **10** research studies with comprehensive quality metrics
-- **2,800+** total survey responses across all sources
+- **1** research studies
+- **3,000+** total survey responses across all sources
 - Studies conducted in **2025-2026**
-
-*Statistics update automatically as new data is contributed.*
 
 ## 🌐 Platforms Covered
 
@@ -43,13 +41,13 @@ The dashboard currently aggregates data from:
 - **[Amazon Mechanical Turk](https://www.mturk.com)**
 - **[Moblab](https://www.moblab.com)**
 - **[Bilendi](https://www.bilendi.com)**
-- **Lab**
+- **Labs**
 - **Other** - Additional platforms as contributed
 
 
 ## 📊 Metrics Tracked
 
-The main metrics are based on our paper "Mission Possible: The Collection of High Quality Data"
+The initial set of data quality metrics is based on our companion paper "[Mission Possible: The Collection of High Quality Data](https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf)". Additional metrics as contributed.
 
 
 ## 🤝 How to Contribute
@@ -66,15 +64,12 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 
 ### Why Contribute?
 
-- **Help the community**: Share your data to help others
-- **Transparency**: Build collective knowledge about platform quality
-- **Recognition**: Contributors acknowledged in dashboard
+- **Help the community**: Build collective knowledge about platform quality
 
 ### Privacy & Ethics
 
-- **No PII**: Only submit aggregate, anonymized metrics
-- **Open Data**: All submissions are public
-- **Attribution**: Your name/affiliation will be visible
+- **No Personally Identifiable Data**: You only submit aggregate, anonymized metrics
+- **Attribution**: Your name and affiliation will be visible
 
 
 ## 📞 Contact & Support
@@ -89,7 +84,7 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 
 ### Direct Contact
 
-- **Email**: Contact maintainers through GitHub profiles
+- **Email**: Contact the maintainers, [Can Celebi](mailto:can.celebi@univie.ac.at) (Vienna Center for Experimental Economics) or [Sören Harrs](mailto:soeren.harrs@univie.ac.at) (Vienna University and Vienna Center for Experimental Economics), via email.
 
 ---
 [View Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/) • [Join Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)
