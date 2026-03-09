@@ -1,56 +1,39 @@
 # Proposed Changes for Data Quality Hub Dashboard
 
-1. Keep key dropdown sections expanded by default.
-   - The content under `Data Quality Hub` and `Explore Metrics and Studies` should be open at all times (not click-to-expand).
+1. Integrate data quality Figure 1 (overall) into the second figure.
+   - In the second figure, incorporate the overall data quality summary at the level of the three concern areas:
+     - Account Fraud
+     - AI and Bots
+     - Attention
 
-2. Update the `What is data quality?` section to use a general concern plus three specific concerns.
+2. Move the contribution opportunity higher and make it more prominent.
+   - Place the contribution opportunity directly below the top-line numbers (e.g., number of studies tracked, etc.).
+   - Make the call-to-action more visually prominent than it is currently.
+
+3. Update the header/intro section of the dashboard.
+   - Integrate the “why” into the first 2–4 sentences introducing the dashboard.
+   - Add icons to the section headers to make the page more lively:
+     - Attention: eyes icon
+     - AI and Bots: robot icon
+     - Account Fraud: a fitting fraud/identity icon (e.g., ID card / user-shield).
+
+4. Update the `What is data quality?` section to use a general concern plus three specific concerns.
    - General concern: whether an observation represents one attentive human participant.
-   - Concern 1: inattention.
-   - Concern 2: AI/nonhuman responses (AI/LLM-generated responses or bots).
-   - Concern 3: account fraud (duplicate submissions by the same participant).
-   - Mention that multiple checks can be used for each concern.
-   - Mention that the companion paper proposes a simple set of five main checks.
+   - Concern 1: Attention / inattention.
+   - Concern 2: AI and Bots (AI/LLM-generated responses or other nonhuman/bot responses).
+   - Concern 3: Account Fraud (duplicate or ineligible submissions by the same participant).
+   - Remove the repeated “many checks can…” language after each item; instead, end the section with one sentence noting that, in principle, many checks can be used to address each concern, and that in the companion paper we propose and validate a set of five simple checks plus a new method for improving data quality called the two-stage approach.
 
-3. Shorten the `Why Data Quality Hub?` text.
-   - Keep the explanation concise and practical.
-
-5. Update references area.
-   - Let the reference section span full width.
-   - Add a link to the `mission-possible` GitHub repository.
-
-6. Keep figure filters expanded by default.
-   - For all main figures, users should immediately see available choices for filtering.
-
-7. Make metric selection for specific data quality metrics more prominent using a 2-level selection structure.
-   - Level 1: choose one of the three data-quality concerns.
-   - Level 2: choose a specific metric within that concern.
-
-8. Initialize the metric list with current paper measures.
-   - Start with measures used in the paper.
-   - Keep structure extensible so additional checks can be added later.
-
-9. Expand study metadata shown in `Explore Metrics and Studies`.
-   - Add `Data Availability` with these values:
-     - Publicly available
-     - Available upon request
-     - Will be publicly available upon publication
-     - Not publicly available
-   - Add `Pre-registration` status (available or not).
-   - Add `Publication status` with these values:
-     - Paper not yet available
-     - Working paper available
-     - Published
-
-10. Expand per-sample/per-paper quality summaries.
-    - Show pass rates for attention checks.
-    - Show pass rates for AI/LLM bot checks.
-    - Show pass rates for account-fraud checks.
-
-11. Fix clipping of `Attention check` text.
-    - Widen the relevant display area so the full text is visible.
-
-12. Fix alignment of `N`.
-    - Change `N` from right-aligned to left-aligned or centered.
-    - Ensure it is visually separated from the date field.
+5. Expand study metadata shown in `Explore Metrics and Studies` (credibility fields).
+   - When showing study details, add credibility-related metadata:
+     - `Data Availability` with one of these values:
+       - Publicly available
+       - Available upon request
+       - Not publicly available
+     - `Pre-registration` (available or not).
+     - `Paper Status` with these values:
+       - Paper not yet available
+       - Working paper available
+       - Published
 
 Everything else can remain unchanged.
