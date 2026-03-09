@@ -47,7 +47,7 @@ The dashboard currently aggregates data from:
 
 ## 📊 Metrics Tracked
 
-The initial set of data quality metrics is based on our companion paper "[Mission Possible: The Collection of High Quality Data](https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf)". Additional metrics as contributed.
+The initial set of data quality metrics is based on our companion paper "[Mission Possible: The Collection of High Quality Data](https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf)". Additional metrics are reported as contributed.
 
 
 ## 🤝 How to Contribute
@@ -56,15 +56,15 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 
 ### Option 1: Google Form (Recommended) 📝
 
-**No technical skills required!** The Google form guides you through each field with examples and help text. Click [here](https://docs.google.com/forms/d/e/1FAIpQLSfhwduzGfQl-vvU59Jm8R-U8QAGhR7PsE0XApvJLtC1tURObQ/viewform)
+No technical skills required. The Google form guides you through each field with examples and help text. Click [here](https://docs.google.com/forms/d/e/1FAIpQLSfhwduzGfQl-vvU59Jm8R-U8QAGhR7PsE0XApvJLtC1tURObQ/viewform)
 
 ### Option 2: CSV Upload (Advanced - Coming Soon) 📤
 
-**Automated contribution** You or your AI agent makes a pull request to add your data, which is automatically reviewed. 
+You or your AI agent makes a pull request to add your data, which is automatically reviewed. 
 
 ### Why Contribute?
 
-- **Help the community**: Build collective knowledge about platform quality
+- **Help the community**: Build collective knowledge about data quality
 
 ### Privacy & Ethics
 
@@ -84,7 +84,7 @@ We welcome data from researchers worldwide! Choose your preferred submission met
 
 ### Direct Contact
 
-- **Email**: Contact the maintainers, [Can Celebi](mailto:can.celebi@univie.ac.at) (Vienna Center for Experimental Economics) or [Sören Harrs](mailto:soeren.harrs@univie.ac.at) (Vienna University and Vienna Center for Experimental Economics), via email.
+- **Email**: Contact the maintainers, [Can Celebi](https://can-celebi.github.io/) ([Vienna Center for Experimental Economics](https://vcee.univie.ac.at/)) or [Sören Harrs](https://sites.google.com/view/sorenharrs-econ) ([University of Vienna](https://econ.univie.ac.at/)), via email.
 
 ---
 [View Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/) • [Join Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)
