@@ -123,11 +123,17 @@ function renderConcernSelector() {
   var container = document.getElementById('metric-selector-l1');
   if (!container) return;
   var concerns = window.DQH.config.metricConcerns;
+  var icons = {
+    'inattention': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+    'ai': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>',
+    'fraud': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>'
+  };
   var html = '';
   for (var i = 0; i < concerns.length; i++) {
     var c = concerns[i];
     var active = (c.id === _selectedConcernId) ? ' active' : '';
-    html += '<button class="concern-btn' + active + '" data-concern="' + esc(c.id) + '" type="button">' + esc(c.label) + '</button>';
+    var icon = icons[c.id] || '';
+    html += '<button class="concern-btn' + active + '" data-concern="' + esc(c.id) + '" type="button">' + icon + esc(c.label) + '</button>';
   }
   container.innerHTML = html;
 
@@ -183,7 +189,7 @@ function renderMetricSelector() {
 function renderMetricCharts() {
   if (!_selectedMetricField) return;
   var filter = getFilterState('metric');
-  window.DQH.charts.renderTrendChart('chart-metric-trend', _selectedMetricField, filter.stage, filter.platforms);
+  window.DQH.charts.renderMetricWithOverall('chart-metric-trend', _selectedMetricField, filter.stage, filter.platforms);
   renderDefinitionsPanel();
 }
 
@@ -208,7 +214,7 @@ function initThemeToggle() {
     }
     // Re-render charts with new theme colors
     renderTrendChart();
-    renderMetricCharts();
+    if (_selectedMetricField) renderMetricCharts();
   });
 }
 

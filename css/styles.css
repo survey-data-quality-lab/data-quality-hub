@@ -153,6 +153,16 @@ a:hover { text-decoration: underline; }
 
 .about-block li {
   margin-bottom: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.about-icon {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  position: relative;
+  top: 1px;
 }
 
 .about-block-full {
@@ -265,6 +275,9 @@ a:hover { text-decoration: underline; }
 }
 
 .concern-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   padding: 6px 16px;
   background: transparent;
   border: 1px solid var(--border);
@@ -495,29 +508,68 @@ a:hover { text-decoration: underline; }
   accent-color: var(--accent);
 }
 
-/* --- Submit Bar --- */
-.submit-bar {
-  padding: 14px 0;
+/* --- Submit / Contribute Bar --- */
+.contribute-bar {
+  padding: 18px 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
-.submit-bar-inner {
+.contribute-bar-inner {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
-.submit-text {
-  color: var(--text-tertiary);
-  font-size: 0.85rem;
+.contribute-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.contribute-heading {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.contribute-subtext {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
 }
 
 .submit-actions {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
+.btn-contribute {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 22px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.btn-contribute:hover {
+  opacity: 0.85;
+  text-decoration: none;
+}
+
+/* Legacy alias — keep for any remaining references */
 .btn-submit {
   display: inline-block;
   padding: 7px 18px;
@@ -1028,8 +1080,10 @@ a:hover { text-decoration: underline; }
     height: 320px;
   }
 
-  .submit-bar-inner {
-    flex-wrap: wrap;
+  .contribute-bar-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 
   /* Hide AI Detect, Fraud and Design columns on tablet */

@@ -246,6 +246,97 @@ window.DQH.charts = {
     };
   },
 
+  /**
+   * Metric trend with overall pass rate as a reference.
+   * Shows the selected metric (solid lines per platform) plus the overall
+   * pass rate (dashed, semi-transparent lines) for context.
+   * Handles "both" stage filter by delegating to renderBothStagesTrend.
+   */
+  renderMetricWithOverall(canvasId, field, stageFilter, platforms) {
+    this.destroy(canvasId);
+    applyChartTheme();
+    if (stageFilter === 'both') {
+      return this.renderBothStagesTrend(canvasId, field, platforms);
+    }
+
+    var store = window.DQH.dataStore;
+    var stage = stageFilter || '1st';
+    var metricData = store.getTrendData(field, stage, platforms);
+    var overallData = store.getTrendData('overallPassRate', stage, platforms);
+
+    if (!metricData.length && !overallData.length) return this.showEmpty(canvasId);
+    this.clearEmpty(canvasId);
+
+    var dateRange = store.getDateRange(field, stage, platforms);
+    var mobile = isMobile();
+    var datasets = [];
+
+    // Primary metric datasets — solid lines
+    for (var i = 0; i < metricData.length; i++) {
+      var d = metricData[i];
+      datasets.push({
+        label: d.platform,
+        data: d.points.map(function(p) {
+          return { x: p.date.getTime(), y: p.rate, _meta: p };
+        }),
+        borderColor: d.color,
+        backgroundColor: d.color,
+        pointRadius: mobile ? 5 : 6,
+        pointHoverRadius: mobile ? 7 : 9,
+        borderWidth: 2,
+        fill: false,
+        tension: 0,
+        showLine: true,
+        _isOverall: false
+      });
+    }
+
+    // Overall pass rate — dashed reference lines per platform
+    // Append '70' hex suffix (~44% opacity) to visually distinguish from primary metric lines
+    for (var j = 0; j < overallData.length; j++) {
+      var od = overallData[j];
+      var refColor = od.color + '70';
+      datasets.push({
+        label: od.platform + ' (Overall)',
+        data: od.points.map(function(p) {
+          return { x: p.date.getTime(), y: p.rate, _meta: p };
+        }),
+        borderColor: refColor,
+        backgroundColor: refColor,
+        pointRadius: mobile ? 3 : 4,
+        pointHoverRadius: mobile ? 5 : 6,
+        borderWidth: 1.5,
+        borderDash: [5, 4],
+        fill: false,
+        tension: 0,
+        showLine: true,
+        _isOverall: true
+      });
+    }
+
+    var opts = this._layout();
+    opts.scales = { x: this._xScale(dateRange), y: this._yScale() };
+    opts.plugins.tooltip = { callbacks: this._tooltipCallbacks() };
+    // Show all series in the legend; overall ones are visually distinct via dashes
+    opts.plugins.legend.labels.generateLabels = function(chart) {
+      return Chart.defaults.plugins.legend.labels.generateLabels(chart).map(function(item) {
+        var ds = chart.data.datasets[item.datasetIndex];
+        if (ds && ds._isOverall) {
+          item.lineDash = [5, 4];
+          item.fontStyle = 'italic';
+        }
+        return item;
+      });
+    };
+
+    var ctx = document.getElementById(canvasId).getContext('2d');
+    this.instances[canvasId] = new Chart(ctx, {
+      type: 'scatter',
+      data: { datasets: datasets },
+      options: opts
+    });
+  },
+
   showEmpty(canvasId) {
     var canvas = document.getElementById(canvasId);
     if (!canvas) return;

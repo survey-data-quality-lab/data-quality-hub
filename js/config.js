@@ -70,14 +70,14 @@ window.DQH.config = {
   metricConcerns: [
     {
       id: 'inattention',
-      label: 'Inattention',
+      label: 'Attention',
       metrics: [
         { field: 'attentionCheckRate', label: 'Attention Check Rate' }
       ]
     },
     {
       id: 'ai',
-      label: 'AI / Nonhuman',
+      label: 'AI and Bots',
       metrics: [
         { field: 'aiDetectionRate', label: 'AI/LLM Detection Rate' }
       ]
