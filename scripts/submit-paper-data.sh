@@ -2,7 +2,7 @@
 # Data Quality Hub — Submit Mission Possible paper data
 # Usage: bash scripts/submit-paper-data.sh
 #
-# Submits 9 entries from "Mission Possible: The Collection of High-Quality Data"
+# Submits 9 entries from "Mission Possible: The Collection of High Quality Online Data"
 # by Çelebi, Exley, Harrs, Kivimaki, Serra-Garcia & Yusof (2026)
 #
 # ANSWER IDs (the inner IDs used for POST, not the question IDs)
@@ -12,7 +12,7 @@ FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSfhwduzGfQl-vvU59Jm8R-U8QAGhR
 
 RESEARCHER="Çelebi, Exley, Harrs, Kivimaki, Serra-Garcia & Yusof"
 AFFILIATION="University of Vienna, University of Michigan, UC San Diego, University of Stuttgart"
-STUDY_TITLE="Mission Possible: The Collection of High-Quality Data"
+STUDY_TITLE="Mission Possible: The Collection of High Quality Online Data"
 STUDY_LINK=""
 STUDY_DESC="Evidence-based assessment of data quality across five online survey platforms and laboratory benchmarks, comparing attention checks, video comprehension, typed text analysis, typing speed, and unique IP detection."
 QUALITY_DESC="Combined pass rate for all five data quality checks (classic attention, video attention, typed text, typing speed, unique IP)"

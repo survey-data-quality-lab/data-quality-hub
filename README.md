@@ -47,7 +47,7 @@ The dashboard currently aggregates data from:
 
 ## 📊 Metrics Tracked
 
-The initial set of data quality metrics is based on our companion paper "[Mission Possible: The Collection of High Quality Data](https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf)". Additional metrics are reported as contributed.
+The initial set of data quality metrics is based on our companion paper "[Mission Possible: The Collection of High Quality Online Data](https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf)". Additional metrics are reported as contributed.
 
 
 ## 🤝 How to Contribute

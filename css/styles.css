@@ -301,6 +301,107 @@ a:hover { text-decoration: underline; }
   margin-top: 0;
 }
 
+/* --- Header CTA row --- */
+.header-cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* --- Header CTA buttons --- */
+.header-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.header-cta:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+.header-cta-submit {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.header-cta-submit:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+.header-cta-discuss {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.header-cta-discuss:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+/* --- Custom chart legend --- */
+.chart-custom-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 4px 8px;
+  font-size: 0.82rem;
+}
+.legend-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.legend-section + .legend-section {
+  padding-left: 0;
+  border-left: none;
+  padding-top: 5px;
+  border-top: 1px solid var(--border);
+}
+.legend-section-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  min-width: 90px;
+  margin-right: 2px;
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.legend-item svg {
+  flex-shrink: 0;
+}
+.legend-item-text {
+  line-height: 1;
+}
+.legend-item-italic {
+  font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .chart-custom-legend {
+    font-size: 0.76rem;
+    gap: 5px;
+  }
+  .legend-section-label {
+    min-width: 80px;
+  }
+}
+
 /* --- Live inline stat (inside stats pill) --- */
 .header-live-inline {
   display: inline-flex;
@@ -1372,6 +1473,12 @@ a:hover { text-decoration: underline; }
 }
 
 /* --- Metrics List --- */
+.metrics-list-intro {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 4px 0 10px;
+}
+
 .metrics-list {
   border: 1px solid var(--border);
   border-radius: 8px;

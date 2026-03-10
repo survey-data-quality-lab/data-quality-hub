@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20260310-9">
+  <link rel="stylesheet" href="css/styles.css?v=20260310-21">
   <script>if(localStorage.getItem('dqh-theme')!=='dark')document.documentElement.setAttribute('data-theme','light');</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -37,6 +37,16 @@
       <div class="header-desc">
         <p>Track and compare data quality across online survey platforms.</p>
         <p>Researchers submit their study results — the dashboard updates as new studies are added.</p>
+      </div>
+      <div class="header-cta-row">
+        <a href="#submit" class="header-cta header-cta-submit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Submit Results
+        </a>
+        <a href="https://github.com/survey-data-quality-lab/data-quality-hub/discussions" target="_blank" rel="noopener" class="header-cta header-cta-discuss">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Join Discussions
+        </a>
       </div>
       <div class="header-stats-row">
         <div class="header-stats">
@@ -103,22 +113,22 @@
                 </button>
                 <div class="filter-body expanded" id="metric-filter-body">
                   <div class="filter-group">
-                    <div class="filter-group-label">Stage</div>
+                    <div class="filter-group-label">Recruitment</div>
                     <div class="filter-stage-row">
                       <div class="filter-radios">
                         <label class="filter-radio"><input type="radio" name="metric-stage" value="both" checked> All</label>
-                        <label class="filter-radio"><input type="radio" name="metric-stage" value="1st"> Single</label>
+                        <label class="filter-radio"><input type="radio" name="metric-stage" value="1st"> Standard</label>
                         <label class="filter-radio"><input type="radio" name="metric-stage" value="2nd"> 2-Stage</label>
                       </div>
                       <button class="info-btn" id="metric-info-btn" type="button">
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
-                        <span>About stages</span>
+                        <span>Info</span>
                       </button>
                     </div>
                     <div class="info-popup collapsed" id="metric-info-popup">
-                      <p><strong>Single</strong> — Studies with a single stage or the first stage of a multi-stage design.</p>
+                      <p><strong>Standard</strong> — Studies with a single stage or the first stage of a multi-stage design.</p>
                       <p><strong>2-Stage</strong> — The second stage of studies that use a two-stage screening design.</p>
-                      <p><strong>All</strong> — Shows both stages. Dashed lines connect first and second stages within the same study.</p>
+                      <p><strong>All</strong> — Shows both stages. Dashed lines connect standard and 2-stage entries within the same study.</p>
                     </div>
                   </div>
                   <div class="filter-group">
@@ -154,8 +164,8 @@
             <div class="explanations-body expanded" id="explanations-body">
               <div class="about-content">
                 <div class="about-intro">
-                  <p>A relevant concern with online studies is whether each response was submitted by a single attentive human participant.</p>
-                  <p>This breaks down into three specific concerns:</p>
+                  <p>A central concern with online studies is whether each response was submitted by a single attentive human participant.</p>
+                  <p>This breaks down into three specific data quality concerns:</p>
                   <div class="concern-cards">
                     <div class="concern-card concern-card-attention">
                       <div class="concern-card-header">
@@ -189,7 +199,7 @@
                 </div>
                 <div class="about-references">
                   <h3>References</h3>
-                  <p>Builds on <a href="https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf" target="_blank" rel="noopener"><em>&ldquo;Mission Possible: The Collection of High-Quality Data&rdquo;</em></a> by &Ccedil;elebi, Exley, Harrs, Kivimaki, Serra-Garcia &amp; Yusof (2026). The paper provides an evidence-based assessment of data quality across online survey platforms, laboratory benchmarks, and AI agent responses. Materials are available in the companion <a href="https://github.com/survey-data-quality-lab/mission-possible" target="_blank" rel="noopener">GitHub repository</a>.</p>
+                  <p>Builds on <a href="https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf" target="_blank" rel="noopener"><em>&ldquo;Mission Possible: The Collection of High Quality Online Data&rdquo;</em></a> by &Ccedil;elebi, Exley, Harrs, Kivimaki, Serra-Garcia &amp; Yusof (2026). The paper provides an evidence-based assessment of data quality across online survey platforms, laboratory benchmarks, and AI agent responses. Materials are available in the companion <a href="https://github.com/survey-data-quality-lab/mission-possible" target="_blank" rel="noopener">GitHub repository</a>.</p>
                 </div>
               </div>
             </div>
@@ -209,62 +219,178 @@
                 <option value="fraud">Account Fraud</option>
               </select>
             </div>
+            <p class="metrics-list-intro">Each metric is an indicator equal to 1 if the check passes. Higher pass rates are better across all metrics.</p>
             <div class="metrics-list" id="metrics-list">
 
-              <!-- Attention Check Rate -->
+              <!-- ATTENTION -->
               <div class="metric-item" data-concern="inattention">
                 <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
-                  <span class="metric-concern-icon concern-icon-inattention" aria-hidden="true">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </span>
-                  <span class="metric-item-name">Attention Check Rate</span>
-                  <span class="metric-concern-tag concern-tag-inattention">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    Attention
-                  </span>
+                  <span class="metric-concern-icon concern-icon-inattention" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                  <span class="metric-item-name">Attention Check</span>
+                  <span class="metric-concern-tag concern-tag-inattention"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Attention</span>
                   <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
                 </div>
                 <div class="metric-item-body collapsed">
-                  <p>The share of participants who pass attention checks embedded in the survey — such as instructed response items (e.g., &ldquo;Please select &lsquo;Strongly disagree&rsquo; for this question&rdquo;), infrequency probes, or reading comprehension questions.</p>
-                  <div class="metric-item-note metric-note-good">Higher is better &mdash; higher pass rates indicate more attentive participants.</div>
+                  <p>Passes instructional attention check. For example, equal to 1 if respondents correctly select the option furthest to the &ldquo;left&rdquo; and &ldquo;right&rdquo; when asked to do so in a 5-point Likert question.</p>
+                  <div class="metric-item-note metric-note-good">Higher pass rates indicate more attentive participants.</div>
                 </div>
               </div>
 
-              <!-- AI / LLM Detection Rate -->
+              <!-- AI AND BOTS -->
               <div class="metric-item" data-concern="ai">
                 <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
-                  <span class="metric-concern-icon concern-icon-ai" aria-hidden="true">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>
-                  </span>
-                  <span class="metric-item-name">AI / LLM Detection Rate</span>
-                  <span class="metric-concern-tag concern-tag-ai">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>
-                    AI and Bots
-                  </span>
+                  <span class="metric-concern-icon concern-icon-ai" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg></span>
+                  <span class="metric-item-name">Video Check</span>
+                  <span class="metric-concern-tag concern-tag-ai"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg> AI and Bots</span>
                   <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
                 </div>
                 <div class="metric-item-body collapsed">
-                  <p>The share of responses identified as likely generated by an AI system (e.g., large language models or chatbots) rather than a genuine human participant. Detection relies on behavioral fingerprinting, text analysis, and platform-specific tools.</p>
-                  <div class="metric-item-note metric-note-low">Lower is better &mdash; lower rates indicate more authentic human responses.</div>
+                  <p>Equal to 1 if the respondent correctly types four numbers shown sequentially in a short video.</p>
+                  <div class="metric-item-note metric-note-good">AI agents typically take infrequent screenshots and may miss numbers shown in a video.</div>
                 </div>
               </div>
 
-              <!-- Account Fraud Detection Rate -->
-              <div class="metric-item" data-concern="fraud">
+              <div class="metric-item" data-concern="ai">
                 <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
-                  <span class="metric-concern-icon concern-icon-fraud" aria-hidden="true">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-                  </span>
-                  <span class="metric-item-name">Account Fraud Detection Rate</span>
-                  <span class="metric-concern-tag concern-tag-fraud">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-                    Account Fraud
-                  </span>
+                  <span class="metric-concern-icon concern-icon-ai" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg></span>
+                  <span class="metric-item-name">Typed Text</span>
+                  <span class="metric-concern-tag concern-tag-ai"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg> AI and Bots</span>
                   <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
                 </div>
                 <div class="metric-item-body collapsed">
-                  <p>The share of responses linked to fake accounts, duplicate submissions, or coordinated inauthentic behavior &mdash; cases where a single person submits multiple responses under different accounts, or where accounts are created fraudulently.</p>
-                  <div class="metric-item-note metric-note-low">Lower is better &mdash; lower rates indicate more genuine participants.</div>
+                  <p>Equal to 1 if the open-text response was entered through manual typing.<br>Three conditions must hold: (i) no paste event recorded; (ii) no large discrete jump in text length without corresponding keystrokes (&gt;50 characters); and (iii) at least one keystroke recorded. Together these detect copy&ndash;paste, drag-and-drop, and fully automated insertion.</p>
+                  <div class="metric-item-note metric-note-good">Higher rates indicate typed responses, rather than copy-and-pasting from an LLM.</div>
+                </div>
+              </div>
+
+              <div class="metric-item" data-concern="ai">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-ai" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg></span>
+                  <span class="metric-item-name">Typed with Typical Speed</span>
+                  <span class="metric-concern-tag concern-tag-ai"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg> AI and Bots</span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>Equal to 1 if the respondent typed the open-text response and the median inter-keystroke interval exceeds 75 milliseconds.</p>
+                  <div class="metric-item-note metric-note-good">Human typists naturally fall within a speed range; very fast input suggests automation.</div>
+                </div>
+              </div>
+
+              <div class="metric-item" data-concern="ai">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-ai" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg></span>
+                  <span class="metric-item-name">ReCAPTCHA Score</span>
+                  <span class="metric-concern-tag concern-tag-ai"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg> AI and Bots</span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>Equal to 1 if Google&rsquo;s reCAPTCHA score is at least 0.5. The score aggregates behavioral and contextual signals during the respondent&rsquo;s interaction with the survey interface; lower scores indicate a higher likelihood of bot activity.</p>
+                  <div class="metric-item-note metric-note-good">Scores &ge; 0.5 indicate human-like interaction patterns.</div>
+                </div>
+              </div>
+
+              <div class="metric-item" data-concern="ai">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-ai" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg></span>
+                  <span class="metric-item-name">Pangram AI Detector</span>
+                  <span class="metric-concern-tag concern-tag-ai"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg> AI and Bots</span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>Equal to 1 if the Pangram AI likelihood score for the open-text response is below 0.5. The score reflects the estimated probability that the text was generated by a large language model rather than a human.</p>
+                  <div class="metric-item-note metric-note-good">Scores below 0.5 indicate likely human-authored text.</div>
+                </div>
+              </div>
+
+              <div class="metric-item" data-concern="ai">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-ai" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg></span>
+                  <span class="metric-item-name">Mouse Clicks</span>
+                  <span class="metric-concern-tag concern-tag-ai"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg> AI and Bots</span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>Equal to 1 if the respondent clicked on the screen at least once during the questionnaire.</p>
+                  <div class="metric-item-note metric-note-good">Mouse clicks are expected from human participants navigating the survey.</div>
+                </div>
+              </div>
+
+              <div class="metric-item" data-concern="ai">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-ai" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg></span>
+                  <span class="metric-item-name">Mouse Movements</span>
+                  <span class="metric-concern-tag concern-tag-ai"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg> AI and Bots</span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>Equal to 1 if the respondent moved the mouse at least once within the questionnaire page.</p>
+                  <div class="metric-item-note metric-note-good">Mouse movements are expected from human participants navigating the survey.</div>
+                </div>
+              </div>
+
+              <!-- ACCOUNT FRAUD -->
+              <div class="metric-item" data-concern="fraud">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-fraud" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+                  <span class="metric-item-name">Unique IP Address</span>
+                  <span class="metric-concern-tag concern-tag-fraud"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Account Fraud</span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>Equal to 1 if the IP address is unique within the sample.</p>
+                  <div class="metric-item-note metric-note-good">Duplicate IPs indicate submissions from the same device and/or network.</div>
+                </div>
+              </div>
+
+              <div class="metric-item" data-concern="fraud">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-fraud" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+                  <span class="metric-item-name">No Foreign IP Address</span>
+                  <span class="metric-concern-tag concern-tag-fraud"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Account Fraud</span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>Equal to 1 if the IP address is not located outside the targeted country, as determined by an IP intelligence service (e.g., MaxMind).</p>
+                  <div class="metric-item-note metric-note-good">A foreign IP address may indicate misrepresented or fraudulent participation.</div>
+                </div>
+              </div>
+
+              <div class="metric-item" data-concern="fraud">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-fraud" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+                  <span class="metric-item-name">Not in a Geolocation Cluster</span>
+                  <span class="metric-concern-tag concern-tag-fraud"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Account Fraud</span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>Equal to 1 if fewer than five responses in the sample share the same geographic latitude&ndash;longitude coordinates, as reported by the survey platform (e.g., Qualtrics) or an IP intelligence service (e.g., MaxMind).</p>
+                  <div class="metric-item-note metric-note-good">Geolocation clusters indicate submissions from the same server or geo-location.</div>
+                </div>
+              </div>
+
+              <div class="metric-item" data-concern="fraud">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-fraud" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+                  <span class="metric-item-name">No Duplicate Submission</span>
+                  <span class="metric-concern-tag concern-tag-fraud"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Account Fraud</span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>Equal to 1 if the submission is not flagged as a duplicate by the survey platform (e.g., Qualtrics), which identifies repeated submissions using browser cookies.</p>
+                  <div class="metric-item-note metric-note-good">Duplicate submissions indicate submissions from the same browser.</div>
+                </div>
+              </div>
+
+              <div class="metric-item" data-concern="fraud">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-fraud" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+                  <span class="metric-item-name">No Duplicate Device Fingerprint</span>
+                  <span class="metric-concern-tag concern-tag-fraud"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> Account Fraud</span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>Equal to 1 if no other response in the sample shares the same device fingerprint, as provided by a device fingerprinting service (e.g., Fingerprint.com). Unlike cookies, device fingerprints persist across IP changes and browser resets, making them more robust for detecting repeated submissions from the same device.</p>
+                  <div class="metric-item-note metric-note-good">Duplicate device fingerprints indicate submissions from the same device.</div>
                 </div>
               </div>
 
@@ -358,11 +484,11 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/config.js?v=20260310-9"></script>
-  <script src="js/csv-parser.js?v=20260310-9"></script>
-  <script src="js/data-store.js?v=20260310-9"></script>
-  <script src="js/charts.js?v=20260310-9"></script>
-  <script src="js/table.js?v=20260310-9"></script>
-  <script src="js/app.js?v=20260310-9"></script>
+  <script src="js/config.js?v=20260310-21"></script>
+  <script src="js/csv-parser.js?v=20260310-21"></script>
+  <script src="js/data-store.js?v=20260310-21"></script>
+  <script src="js/charts.js?v=20260310-21"></script>
+  <script src="js/table.js?v=20260310-21"></script>
+  <script src="js/app.js?v=20260310-21"></script>
 </body>
 </html>

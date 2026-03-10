@@ -77,7 +77,14 @@ function populateFilterPanels() {
     var p = studies[i].platform;
     if (!seen[p]) { seen[p] = true; platforms.push(p); }
   }
-  platforms.sort();
+  var PLATFORM_ORDER = ['Lab', 'MTurk', 'Moblab', 'Bilendi', 'Prolific'];
+  platforms.sort(function(a, b) {
+    var ai = PLATFORM_ORDER.indexOf(a), bi = PLATFORM_ORDER.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
 
   populateCheckboxes('metric-platform-checks', platforms);
 }

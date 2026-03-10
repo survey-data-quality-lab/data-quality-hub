@@ -81,6 +81,9 @@ function formatCitation(researcher, timestamp) {
 
 applyChartTheme();
 
+// Canonical platform order for the legend
+var LEGEND_PLATFORM_ORDER = ['Lab', 'MTurk', 'Moblab', 'Bilendi', 'Prolific'];
+
 window.DQH.charts = {
   instances: {},
 
@@ -88,6 +91,12 @@ window.DQH.charts = {
     if (this.instances[id]) {
       this.instances[id].destroy();
       delete this.instances[id];
+    }
+    // Remove custom legend (lives as sibling of .chart-wrap, inside .chart-card)
+    var canvas = document.getElementById(id);
+    if (canvas) {
+      var old = canvas.parentElement.parentElement.querySelector('.chart-custom-legend');
+      if (old) old.parentNode.removeChild(old);
     }
   },
 
@@ -100,7 +109,7 @@ window.DQH.charts = {
         unit: 'month',
         displayFormats: { month: mobile ? 'MMM yy' : 'MMM yyyy' }
       },
-      title: { display: !mobile, text: 'Study Date' },
+      title: { display: !mobile, text: 'Study Date', font: { size: mobile ? 11 : 13 } },
       ticks: { maxRotation: mobile ? 45 : 0, font: { size: mobile ? 10 : 12 } },
       grid: { color: chartGridColor() }
     };
@@ -121,15 +130,15 @@ window.DQH.charts = {
         callback: function(v) { return v <= 100 ? v : ''; },
         font: { size: mobile ? 10 : 12 }
       },
-      title: { display: !mobile, text: 'Pass Rate (%)' },
+      title: { display: !mobile, text: 'Pass Rate (%)', font: { size: mobile ? 11 : 13 } },
       grid: { color: chartGridColor() }
     };
   },
 
-  /** Common layout options */
+  /** Common layout options — built-in legend disabled; custom legend rendered separately */
   _layout() {
-    var mobile = isMobile();
     var self = this;
+    var mobile = isMobile();
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -149,14 +158,7 @@ window.DQH.charts = {
         }
       },
       plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            usePointStyle: true,
-            padding: mobile ? 10 : 16,
-            font: { size: mobile ? 11 : 12 }
-          }
-        }
+        legend: { display: false }
       }
     };
   },
@@ -190,6 +192,138 @@ window.DQH.charts = {
   },
 
   /**
+   * Render a custom two-section HTML legend below the chart canvas.
+   * Section 1 — Platform: colored filled circles, ordered by LEGEND_PLATFORM_ORDER.
+   * Section 2 — Recruitment: neutral shapes (circle = Standard, triangle = 2-Stage).
+   * Section 3 — Reference (optional): dashed line for overall pass rate context.
+   *
+   * Expects datasets to carry:
+   *   _platformName {string}  — canonical platform name
+   *   _is2Stage     {boolean} — true for 2nd-stage points (triangle)
+   *   _isDashed     {boolean} — true for screening connector lines (hidden)
+   *   _isOverall    {boolean} — true for overall-pass-rate reference lines
+   */
+  _renderCustomLegend(canvasId, datasets) {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    var wrapper = canvas.parentElement;       // .chart-wrap (fixed-height)
+    var card    = wrapper.parentElement;      // .chart-card (scrollable white box)
+
+    // Remove any stale legend (it lives as a sibling of .chart-wrap)
+    var old = card.querySelector('.chart-custom-legend');
+    if (old) old.parentNode.removeChild(old);
+
+    var light = isLightTheme();
+    var markerColor = light ? '#4A5068' : '#9BA1B5';
+
+    // Collect unique platforms in canonical order
+    var platformMap = {};
+    var hasStandard = false;
+    var has2Stage   = false;
+    var hasOverall  = false;
+
+    for (var i = 0; i < datasets.length; i++) {
+      var ds = datasets[i];
+      if (ds._isDashed) continue;
+      if (ds._isOverall) { hasOverall = true; continue; }
+      if (ds._platformName && !platformMap[ds._platformName]) {
+        platformMap[ds._platformName] = ds.borderColor;
+      }
+      if (ds._is2Stage) has2Stage = true;
+      else hasStandard = true;
+    }
+
+    // Build ordered platform list
+    var platforms = [];
+    for (var k = 0; k < LEGEND_PLATFORM_ORDER.length; k++) {
+      var pn = LEGEND_PLATFORM_ORDER[k];
+      if (platformMap[pn]) platforms.push({ name: pn, color: platformMap[pn] });
+    }
+    var orderedNames = platforms.map(function(p) { return p.name; });
+    Object.keys(platformMap).forEach(function(p) {
+      if (orderedNames.indexOf(p) === -1) platforms.push({ name: p, color: platformMap[p] });
+    });
+
+    if (!platforms.length && !hasOverall) return;
+
+    var el = document.createElement('div');
+    el.className = 'chart-custom-legend';
+
+    // — Platform section —
+    if (platforms.length) {
+      var pSec = document.createElement('div');
+      pSec.className = 'legend-section';
+      var pLabel = document.createElement('span');
+      pLabel.className = 'legend-section-label';
+      pLabel.textContent = 'Platform';
+      pSec.appendChild(pLabel);
+
+      for (var pi = 0; pi < platforms.length; pi++) {
+        var item = document.createElement('span');
+        item.className = 'legend-item';
+        item.innerHTML =
+          '<svg width="12" height="12" viewBox="0 0 10 10" aria-hidden="true">' +
+          '<circle cx="5" cy="5" r="4.5" fill="' + platforms[pi].color + '"/></svg>' +
+          '<span class="legend-item-text">' + platforms[pi].name + '</span>';
+        pSec.appendChild(item);
+      }
+      el.appendChild(pSec);
+    }
+
+    // — Recruitment section —
+    if (hasStandard || has2Stage) {
+      var sSec = document.createElement('div');
+      sSec.className = 'legend-section';
+      var sLabel = document.createElement('span');
+      sLabel.className = 'legend-section-label';
+      sLabel.textContent = 'Recruitment';
+      sSec.appendChild(sLabel);
+
+      if (hasStandard) {
+        var stdItem = document.createElement('span');
+        stdItem.className = 'legend-item';
+        stdItem.innerHTML =
+          '<svg width="12" height="12" viewBox="0 0 10 10" aria-hidden="true">' +
+          '<circle cx="5" cy="5" r="4.5" fill="' + markerColor + '"/></svg>' +
+          '<span class="legend-item-text">Standard</span>';
+        sSec.appendChild(stdItem);
+      }
+
+      if (has2Stage) {
+        var tsItem = document.createElement('span');
+        tsItem.className = 'legend-item';
+        tsItem.innerHTML =
+          '<svg width="12" height="13" viewBox="0 0 10 11" aria-hidden="true">' +
+          '<polygon points="5,1 9.5,10.5 0.5,10.5" fill="none" stroke="' + markerColor + '" stroke-width="1.5"/></svg>' +
+          '<span class="legend-item-text">2-Stage</span>';
+        sSec.appendChild(tsItem);
+      }
+      el.appendChild(sSec);
+    }
+
+    // — Reference section (overall pass rate) —
+    if (hasOverall) {
+      var rSec = document.createElement('div');
+      rSec.className = 'legend-section';
+      var rLabel = document.createElement('span');
+      rLabel.className = 'legend-section-label';
+      rLabel.textContent = 'Reference';
+      rSec.appendChild(rLabel);
+
+      var refItem = document.createElement('span');
+      refItem.className = 'legend-item';
+      refItem.innerHTML =
+        '<svg width="16" height="4" viewBox="0 0 16 4" aria-hidden="true">' +
+        '<line x1="0" y1="2" x2="16" y2="2" stroke="' + markerColor + '" stroke-width="1.5" stroke-dasharray="4,3"/></svg>' +
+        '<span class="legend-item-text legend-item-italic">Overall Pass Rate</span>';
+      rSec.appendChild(refItem);
+      el.appendChild(rSec);
+    }
+
+    card.appendChild(el);
+  },
+
+  /**
    * Trend line chart: rate over time, one line per platform.
    */
   renderTrendChart(canvasId, field, stageFilter, platforms) {
@@ -205,17 +339,26 @@ window.DQH.charts = {
     this.clearEmpty(canvasId);
     var dateRange = store.getDateRange(field, stageFilter || '1st', platforms);
     var mobile = isMobile();
+    var is2nd = (stageFilter === '2nd');
 
     var datasets = trendData.map(function(d) {
       return {
         label: d.platform,
+        _platformName: d.platform,
+        _is2Stage: is2nd,
+        _isDashed: false,
+        _isOverall: false,
         data: d.points.map(function(p) {
           return { x: p.date.getTime(), y: p.rate, _meta: p };
         }),
         borderColor: d.color,
-        backgroundColor: d.color,
+        backgroundColor: is2nd ? chartHoleFill() : d.color,
+        pointBackgroundColor: is2nd ? chartHoleFill() : d.color,
+        pointBorderColor: d.color,
+        pointBorderWidth: is2nd ? 2 : 1,
         pointRadius: mobile ? 5 : 6,
         pointHoverRadius: mobile ? 7 : 9,
+        pointStyle: is2nd ? 'triangle' : 'circle',
         borderWidth: 2,
         fill: false,
         tension: 0,
@@ -233,6 +376,7 @@ window.DQH.charts = {
       data: { datasets: datasets },
       options: opts
     });
+    this._renderCustomLegend(canvasId, datasets);
   },
 
   /**
@@ -257,6 +401,10 @@ window.DQH.charts = {
 
       datasets.push({
         label: is2nd ? d.platform + ' (2-Stage)' : d.platform,
+        _platformName: d.platform,
+        _is2Stage: is2nd,
+        _isDashed: false,
+        _isOverall: false,
         data: d.points.map(function(p) {
           return { x: p.date.getTime(), y: p.rate, _meta: p };
         }),
@@ -271,8 +419,7 @@ window.DQH.charts = {
         borderWidth: 2,
         fill: false,
         tension: 0,
-        showLine: true,
-        _isDashed: false
+        showLine: true
       });
     }
 
@@ -280,6 +427,10 @@ window.DQH.charts = {
       var c = bothData.dashed[j];
       datasets.push({
         label: c.platform + ' screening',
+        _platformName: c.platform,
+        _is2Stage: false,
+        _isDashed: true,
+        _isOverall: false,
         data: c.points.map(function(p) {
           return { x: p.date.getTime(), y: p.rate, _meta: p };
         }),
@@ -291,15 +442,11 @@ window.DQH.charts = {
         borderDash: [6, 4],
         fill: false,
         tension: 0,
-        showLine: true,
-        _isDashed: true
+        showLine: true
       });
     }
 
     var opts = this._layout();
-    opts.plugins.legend.labels.filter = function(item, chartData) {
-      return !chartData.datasets[item.datasetIndex]._isDashed;
-    };
     opts.plugins.tooltip = { callbacks: this._tooltipCallbacks() };
     opts.scales = { x: this._xScale(dateRange), y: this._yScale() };
 
@@ -309,6 +456,7 @@ window.DQH.charts = {
       data: { datasets: datasets },
       options: opts
     });
+    this._renderCustomLegend(canvasId, datasets);
   },
 
   /** Shared tooltip callbacks */
@@ -319,7 +467,8 @@ window.DQH.charts = {
         var dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
         var m = ctx.raw._meta;
         var nStr = (m && m.sampleSize) ? '  ·  N = ' + m.sampleSize : '';
-        return ctx.dataset.label + ': ' + ctx.raw.y + '%  ·  ' + dateStr + nStr;
+        var pName = ctx.dataset._platformName || ctx.dataset.label;
+        return pName + ': ' + ctx.raw.y + '%  ·  ' + dateStr + nStr;
       },
       afterLabel: function(ctx) {
         var m = ctx.raw._meta;
@@ -343,9 +492,6 @@ window.DQH.charts = {
 
   /**
    * Metric trend with overall pass rate as a reference.
-   * Shows the selected metric (solid lines per platform) plus the overall
-   * pass rate (dashed, semi-transparent lines) for context.
-   * Handles "both" stage filter by delegating to renderBothStagesTrend.
    */
   renderMetricWithOverall(canvasId, field, stageFilter, platforms) {
     this.destroy(canvasId);
@@ -356,6 +502,7 @@ window.DQH.charts = {
 
     var store = window.DQH.dataStore;
     var stage = stageFilter || '1st';
+    var is2nd = (stage === '2nd');
     var metricData = store.getTrendData(field, stage, platforms);
     var overallData = store.getTrendData('overallPassRate', stage, platforms);
 
@@ -371,28 +518,38 @@ window.DQH.charts = {
       var d = metricData[i];
       datasets.push({
         label: d.platform,
+        _platformName: d.platform,
+        _is2Stage: is2nd,
+        _isDashed: false,
+        _isOverall: false,
         data: d.points.map(function(p) {
           return { x: p.date.getTime(), y: p.rate, _meta: p };
         }),
         borderColor: d.color,
-        backgroundColor: d.color,
+        backgroundColor: is2nd ? chartHoleFill() : d.color,
+        pointBackgroundColor: is2nd ? chartHoleFill() : d.color,
+        pointBorderColor: d.color,
+        pointBorderWidth: is2nd ? 2 : 1,
         pointRadius: mobile ? 5 : 6,
         pointHoverRadius: mobile ? 7 : 9,
+        pointStyle: is2nd ? 'triangle' : 'circle',
         borderWidth: 2,
         fill: false,
         tension: 0,
-        showLine: true,
-        _isOverall: false
+        showLine: true
       });
     }
 
     // Overall pass rate — dashed reference lines per platform
-    // Append '70' hex suffix (~44% opacity) to visually distinguish from primary metric lines
     for (var j = 0; j < overallData.length; j++) {
       var od = overallData[j];
       var refColor = od.color + '70';
       datasets.push({
         label: od.platform + ' (Overall)',
+        _platformName: od.platform,
+        _is2Stage: false,
+        _isDashed: false,
+        _isOverall: true,
         data: od.points.map(function(p) {
           return { x: p.date.getTime(), y: p.rate, _meta: p };
         }),
@@ -404,25 +561,13 @@ window.DQH.charts = {
         borderDash: [5, 4],
         fill: false,
         tension: 0,
-        showLine: true,
-        _isOverall: true
+        showLine: true
       });
     }
 
     var opts = this._layout();
     opts.scales = { x: this._xScale(dateRange), y: this._yScale() };
     opts.plugins.tooltip = { callbacks: this._tooltipCallbacks() };
-    // Show all series in the legend; overall ones are visually distinct via dashes
-    opts.plugins.legend.labels.generateLabels = function(chart) {
-      return Chart.defaults.plugins.legend.labels.generateLabels(chart).map(function(item) {
-        var ds = chart.data.datasets[item.datasetIndex];
-        if (ds && ds._isOverall) {
-          item.lineDash = [5, 4];
-          item.fontStyle = 'italic';
-        }
-        return item;
-      });
-    };
 
     var ctx = document.getElementById(canvasId).getContext('2d');
     this.instances[canvasId] = new Chart(ctx, {
@@ -430,6 +575,7 @@ window.DQH.charts = {
       data: { datasets: datasets },
       options: opts
     });
+    this._renderCustomLegend(canvasId, datasets);
   },
 
   showEmpty(canvasId) {
