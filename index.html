@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20260310-1">
+  <link rel="stylesheet" href="css/styles.css?v=20260310-9">
   <script>if(localStorage.getItem('dqh-theme')!=='dark')document.documentElement.setAttribute('data-theme','light');</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -92,7 +92,7 @@
               <div class="metric-selector">
                 <div class="metric-selector-l1-row">
                   <div class="metric-selector-l1" id="metric-selector-l1"></div>
-                  <a class="concern-info-link" href="#explanations" title="Explanations of Metrics" aria-label="Go to Explanations of Metrics">
+                  <a class="concern-info-link" href="#explanations" title="Data Quality Concerns" aria-label="Go to Data Quality Concerns">
                     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
                   </a>
                 </div>
@@ -110,7 +110,7 @@
                       <div class="filter-radios">
                         <label class="filter-radio"><input type="radio" name="metric-stage" value="both" checked> All</label>
                         <label class="filter-radio"><input type="radio" name="metric-stage" value="1st"> Single</label>
-                        <label class="filter-radio"><input type="radio" name="metric-stage" value="2nd"> 2nd Stage</label>
+                        <label class="filter-radio"><input type="radio" name="metric-stage" value="2nd"> 2-Stage</label>
                       </div>
                       <button class="info-btn" id="metric-info-btn" type="button">
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
@@ -119,7 +119,7 @@
                     </div>
                     <div class="info-popup collapsed" id="metric-info-popup">
                       <p><strong>Single</strong> — Studies with a single stage or the first stage of a multi-stage design.</p>
-                      <p><strong>2nd Stage</strong> — The second stage of studies that use a two-stage screening design.</p>
+                      <p><strong>2-Stage</strong> — The second stage of studies that use a two-stage screening design.</p>
                       <p><strong>All</strong> — Shows both stages. Dashed lines connect first and second stages within the same study.</p>
                     </div>
                   </div>
@@ -144,19 +144,19 @@
             </div>
           </div>
 
-          <!-- Explanations of Metrics -->
+          <!-- Data Quality Concerns -->
           <div class="more-section" id="explanations">
             <h3 class="more-section-title">
-              <button class="section-title-toggle" id="explanations-toggle" type="button" aria-expanded="false" aria-controls="explanations-body">
+              <button class="section-title-toggle expanded" id="explanations-toggle" type="button" aria-expanded="true" aria-controls="explanations-body">
                 <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                Explanations of Metrics
+                Data Quality Concerns
                 <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
               </button>
             </h3>
-            <div class="explanations-body collapsed" id="explanations-body">
+            <div class="explanations-body expanded" id="explanations-body">
               <div class="about-content">
                 <div class="about-intro">
-                  <p>The central data quality concern with online studies is whether each response was submitted by a single attentive human participant.</p>
+                  <p>A relevant concern with online studies is whether each response was submitted by a single attentive human participant.</p>
                   <p>This breaks down into three specific concerns:</p>
                   <div class="concern-cards">
                     <div class="concern-card concern-card-attention">
@@ -194,6 +194,82 @@
                   <p>Builds on <a href="https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf" target="_blank" rel="noopener"><em>&ldquo;Mission Possible: The Collection of High-Quality Data&rdquo;</em></a> by &Ccedil;elebi, Exley, Harrs, Kivimaki, Serra-Garcia &amp; Yusof (2026). The paper provides an evidence-based assessment of data quality across online survey platforms, laboratory benchmarks, and AI agent responses. Materials are available in the companion <a href="https://github.com/survey-data-quality-lab/mission-possible" target="_blank" rel="noopener">GitHub repository</a>.</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Data Quality Metrics -->
+          <div class="more-section" id="metric-list">
+            <h3 class="more-section-title">
+              <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+              Data Quality Metrics
+            </h3>
+            <div class="table-controls">
+              <select id="metric-list-filter" class="filter-select" aria-label="Filter by concern">
+                <option value="">All Concerns</option>
+                <option value="inattention">Attention</option>
+                <option value="ai">AI and Bots</option>
+                <option value="fraud">Account Fraud</option>
+              </select>
+            </div>
+            <div class="metrics-list" id="metrics-list">
+
+              <!-- Attention Check Rate -->
+              <div class="metric-item" data-concern="inattention">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-inattention" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </span>
+                  <span class="metric-item-name">Attention Check Rate</span>
+                  <span class="metric-concern-tag concern-tag-inattention">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Attention
+                  </span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>The share of participants who pass attention checks embedded in the survey — such as instructed response items (e.g., &ldquo;Please select &lsquo;Strongly disagree&rsquo; for this question&rdquo;), infrequency probes, or reading comprehension questions.</p>
+                  <div class="metric-item-note metric-note-good">Higher is better &mdash; higher pass rates indicate more attentive participants.</div>
+                </div>
+              </div>
+
+              <!-- AI / LLM Detection Rate -->
+              <div class="metric-item" data-concern="ai">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-ai" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>
+                  </span>
+                  <span class="metric-item-name">AI / LLM Detection Rate</span>
+                  <span class="metric-concern-tag concern-tag-ai">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>
+                    AI and Bots
+                  </span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>The share of responses identified as likely generated by an AI system (e.g., large language models or chatbots) rather than a genuine human participant. Detection relies on behavioral fingerprinting, text analysis, and platform-specific tools.</p>
+                  <div class="metric-item-note metric-note-low">Lower is better &mdash; lower rates indicate more authentic human responses.</div>
+                </div>
+              </div>
+
+              <!-- Account Fraud Detection Rate -->
+              <div class="metric-item" data-concern="fraud">
+                <div class="metric-item-header" role="button" tabindex="0" aria-expanded="false">
+                  <span class="metric-concern-icon concern-icon-fraud" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                  </span>
+                  <span class="metric-item-name">Account Fraud Detection Rate</span>
+                  <span class="metric-concern-tag concern-tag-fraud">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                    Account Fraud
+                  </span>
+                  <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+                </div>
+                <div class="metric-item-body collapsed">
+                  <p>The share of responses linked to fake accounts, duplicate submissions, or coordinated inauthentic behavior &mdash; cases where a single person submits multiple responses under different accounts, or where accounts are created fraudulently.</p>
+                  <div class="metric-item-note metric-note-low">Lower is better &mdash; lower rates indicate more genuine participants.</div>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -284,11 +360,11 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/config.js?v=20260310-1"></script>
-  <script src="js/csv-parser.js?v=20260310-1"></script>
-  <script src="js/data-store.js?v=20260310-1"></script>
-  <script src="js/charts.js?v=20260310-1"></script>
-  <script src="js/table.js?v=20260310-1"></script>
-  <script src="js/app.js?v=20260310-1"></script>
+  <script src="js/config.js?v=20260310-9"></script>
+  <script src="js/csv-parser.js?v=20260310-9"></script>
+  <script src="js/data-store.js?v=20260310-9"></script>
+  <script src="js/charts.js?v=20260310-9"></script>
+  <script src="js/table.js?v=20260310-9"></script>
+  <script src="js/app.js?v=20260310-9"></script>
 </body>
 </html>
