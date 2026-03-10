@@ -32,6 +32,53 @@ function isMobile() {
   return window.innerWidth < 600;
 }
 
+/**
+ * Wrap text into lines of at most maxLen characters (word-boundary split).
+ * Returns an array of strings.
+ */
+function wrapText(text, maxLen) {
+  if (!text) return [];
+  if (text.length <= maxLen) return [text];
+  var words = text.split(' ');
+  var lines = [];
+  var current = '';
+  for (var i = 0; i < words.length; i++) {
+    var word = words[i];
+    if (!current) {
+      current = word;
+    } else if (current.length + 1 + word.length <= maxLen) {
+      current += ' ' + word;
+    } else {
+      lines.push(current);
+      current = word;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+/**
+ * Format a researcher name + year into a short citation.
+ * If more than 2 authors (split by comma/&), abbreviates to "LastName et al. (year)".
+ */
+function formatCitation(researcher, timestamp) {
+  if (!researcher) return '';
+  var year = timestamp ? new Date(timestamp).getFullYear() : '';
+  // Normalize & as delimiter, then split
+  var normalized = researcher.replace(/\s*&\s*/g, ', ').replace(/\s*;\s*/g, ', ');
+  var authors = normalized.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  var nameStr;
+  if (authors.length > 2) {
+    // Use last word of first author's name as their surname
+    var first = authors[0];
+    var parts = first.trim().split(/\s+/);
+    nameStr = parts[parts.length - 1] + ' et al.';
+  } else {
+    nameStr = researcher;
+  }
+  return year ? nameStr + ' (' + year + ')' : nameStr;
+}
+
 applyChartTheme();
 
 window.DQH.charts = {
@@ -82,10 +129,25 @@ window.DQH.charts = {
   /** Common layout options */
   _layout() {
     var mobile = isMobile();
+    var self = this;
     return {
       responsive: true,
       maintainAspectRatio: false,
       layout: { padding: { top: mobile ? 4 : 8 } },
+      onClick: function(event, elements) {
+        if (!elements || !elements.length) return;
+        var el = elements[0];
+        var ds = event.chart.data.datasets[el.datasetIndex];
+        var point = ds && ds.data[el.index];
+        if (point && point._meta && point._meta.paperReference) {
+          self._navigateToStudy(point._meta.paperReference);
+        }
+      },
+      onHover: function(event, elements) {
+        if (event.native) {
+          event.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+        }
+      },
       plugins: {
         legend: {
           position: 'bottom',
@@ -97,6 +159,34 @@ window.DQH.charts = {
         }
       }
     };
+  },
+
+  /** Navigate to and expand a study row in the studies tree */
+  _navigateToStudy(paperRef) {
+    if (!paperRef) return;
+    var tree = document.getElementById('studies-tree');
+    if (!tree) return;
+    var rows = tree.querySelectorAll('.study-l1[data-paper-ref]');
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].getAttribute('data-paper-ref') === paperRef) {
+        var row = rows[i];
+        var idx = row.getAttribute('data-index');
+        // Expand if collapsed
+        var children = tree.querySelector('.l1-children[data-parent="' + idx + '"]');
+        if (children && !children.classList.contains('expanded')) {
+          children.classList.add('expanded');
+          row.classList.add('expanded');
+        }
+        // Scroll into view
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Highlight pulse
+        row.classList.remove('highlight-pulse');
+        // Force reflow so re-adding the class restarts the animation
+        void row.offsetWidth;
+        row.classList.add('highlight-pulse');
+        return;
+      }
+    }
   },
 
   /**
@@ -228,18 +318,24 @@ window.DQH.charts = {
       label: function(ctx) {
         var date = new Date(ctx.raw.x);
         var dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
-        return ctx.dataset.label + ': ' + ctx.raw.y + '% (' + dateStr + ')';
+        var m = ctx.raw._meta;
+        var nStr = (m && m.sampleSize) ? '  ·  N = ' + m.sampleSize : '';
+        return ctx.dataset.label + ': ' + ctx.raw.y + '%  ·  ' + dateStr + nStr;
       },
       afterLabel: function(ctx) {
         var m = ctx.raw._meta;
+        if (!m) return [];
         var lines = [];
-        if (m.sampleSize) lines.push('N = ' + m.sampleSize);
-        if (m.stage) lines.push('Stage: ' + m.stage);
-        if (m.paperReference) lines.push('Study: ' + m.paperReference);
-        if (m.researcher) lines.push('By: ' + m.researcher);
+        // Description first — word-wrapped to ~45 chars per line
         if (m.description) {
-          var desc = m.description.length > 80 ? m.description.substring(0, 77) + '...' : m.description;
-          lines.push('Measure: ' + desc);
+          var descLines = wrapText('Measure: ' + m.description, 45);
+          for (var i = 0; i < descLines.length; i++) lines.push(descLines[i]);
+          lines.push('');
+        }
+        if (m.stage) lines.push('Stage: ' + m.stage);
+        // Citation: format as "LastName et al. (year)" if >2 authors
+        if (m.researcher) {
+          lines.push(formatCitation(m.researcher, ctx.raw.x));
         }
         return lines;
       }

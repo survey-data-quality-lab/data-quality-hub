@@ -148,7 +148,7 @@ window.DQH.table = {
   },
 
   renderL1(study, index) {
-    var html = '<div class="study-l1" data-index="' + index + '">';
+    var html = '<div class="study-l1" data-index="' + index + '" data-paper-ref="' + this.esc(study.label) + '">';
     html += '<svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"></polyline></svg>';
     html += '<div class="l1-paper">' + this.esc(study.label) + '</div>';
     html += '<div class="l1-researcher">' + this.esc(study.researcher) + '</div>';
