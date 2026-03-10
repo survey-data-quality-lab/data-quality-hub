@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     window.DQH.dataStore.init(csvData);
     renderStats();
     populateFilterPanels();
-    renderTrendChart();
     renderMetricSection();
     window.DQH.table.render();
   } catch (err) {
@@ -32,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   initFilterToggles();
   initFilterEvents();
   initDownloadCSV();
+  initExplanationsHashNav();
 });
 
 // --- Stats (inline in header) ---
@@ -78,7 +78,6 @@ function populateFilterPanels() {
   }
   platforms.sort();
 
-  populateCheckboxes('trend-platform-checks', platforms);
   populateCheckboxes('metric-platform-checks', platforms);
 }
 
@@ -97,21 +96,22 @@ function populateCheckboxes(containerId, platforms) {
   container.innerHTML = html;
 }
 
-// --- Trend chart ---
-function renderTrendChart() {
-  var filter = getFilterState('trend');
-  window.DQH.charts.renderTrendChart('chart-trend', 'overallPassRate', filter.stage, filter.platforms);
-}
+// --- Concern icons (shared) ---
+var _concernIcons = {
+  'inattention': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+  'ai': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>',
+  'fraud': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>'
+};
 
 // --- Metric section ---
 function renderMetricSection() {
   var concerns = window.DQH.config.metricConcerns;
   if (!concerns || !concerns.length) return;
 
-  // Default to first concern and its first metric
+  // Default to overall pass rate view
   if (!_selectedConcernId) {
-    _selectedConcernId = concerns[0].id;
-    _selectedMetricField = concerns[0].metrics[0].field;
+    _selectedConcernId = 'overall';
+    _selectedMetricField = null;
   }
 
   renderConcernSelector();
@@ -123,16 +123,15 @@ function renderConcernSelector() {
   var container = document.getElementById('metric-selector-l1');
   if (!container) return;
   var concerns = window.DQH.config.metricConcerns;
-  var icons = {
-    'inattention': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
-    'ai': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 2v3m-3 0h6"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>',
-    'fraud': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>'
-  };
-  var html = '';
+
+  var overallIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>';
+  var overallActive = (_selectedConcernId === 'overall') ? ' active' : '';
+  var html = '<button class="concern-btn' + overallActive + '" data-concern="overall" type="button">' + overallIcon + 'Overall</button>';
+
   for (var i = 0; i < concerns.length; i++) {
     var c = concerns[i];
     var active = (c.id === _selectedConcernId) ? ' active' : '';
-    var icon = icons[c.id] || '';
+    var icon = _concernIcons[c.id] || '';
     html += '<button class="concern-btn' + active + '" data-concern="' + esc(c.id) + '" type="button">' + icon + esc(c.label) + '</button>';
   }
   container.innerHTML = html;
@@ -141,11 +140,15 @@ function renderConcernSelector() {
   for (var j = 0; j < btns.length; j++) {
     btns[j].addEventListener('click', function() {
       _selectedConcernId = this.getAttribute('data-concern');
-      var concerns = window.DQH.config.metricConcerns;
-      for (var k = 0; k < concerns.length; k++) {
-        if (concerns[k].id === _selectedConcernId) {
-          _selectedMetricField = concerns[k].metrics[0].field;
-          break;
+      if (_selectedConcernId === 'overall') {
+        _selectedMetricField = null;
+      } else {
+        var concerns = window.DQH.config.metricConcerns;
+        for (var k = 0; k < concerns.length; k++) {
+          if (concerns[k].id === _selectedConcernId) {
+            _selectedMetricField = concerns[k].metrics[0].field;
+            break;
+          }
         }
       }
       renderConcernSelector();
@@ -158,6 +161,10 @@ function renderConcernSelector() {
 function renderMetricSelector() {
   var container = document.getElementById('metric-selector-l2');
   if (!container) return;
+  if (_selectedConcernId === 'overall') {
+    container.innerHTML = '';
+    return;
+  }
   var concerns = window.DQH.config.metricConcerns;
   var concern = null;
   for (var i = 0; i < concerns.length; i++) {
@@ -187,8 +194,14 @@ function renderMetricSelector() {
 }
 
 function renderMetricCharts() {
-  if (!_selectedMetricField) return;
   var filter = getFilterState('metric');
+  if (_selectedConcernId === 'overall') {
+    window.DQH.charts.renderTrendChart('chart-metric-trend', 'overallPassRate', filter.stage, filter.platforms);
+    var list = document.getElementById('definitions-list');
+    if (list) list.innerHTML = '<p class="definitions-empty">Select a specific metric to see definitions.</p>';
+    return;
+  }
+  if (!_selectedMetricField) return;
   window.DQH.charts.renderMetricWithOverall('chart-metric-trend', _selectedMetricField, filter.stage, filter.platforms);
   renderDefinitionsPanel();
 }
@@ -213,20 +226,16 @@ function initThemeToggle() {
       localStorage.setItem('dqh-theme', 'light');
     }
     // Re-render charts with new theme colors
-    renderTrendChart();
-    if (_selectedMetricField) renderMetricCharts();
+    renderMetricCharts();
   });
 }
 
 // --- Filter panel toggles ---
 function initFilterToggles() {
-  bindToggleBtn('trend-filter-toggle', 'trend-filter-body');
   bindToggleBtn('metric-filter-toggle', 'metric-filter-body');
-  bindToggleBtn('chart-info-btn', 'chart-info-popup');
-  bindToggleBtn('submit-info-btn', 'submit-info-popup');
-  bindToggleBtn('trend-info-btn', 'trend-info-popup');
   bindToggleBtn('metric-info-btn', 'metric-info-popup');
   bindToggleBtn('definitions-toggle', 'definitions-body');
+  bindToggleBtn('explanations-toggle', 'explanations-body');
 }
 
 function bindToggleBtn(btnId, bodyId, onExpand) {
@@ -238,10 +247,12 @@ function bindToggleBtn(btnId, bodyId, onExpand) {
       body.classList.remove('expanded');
       body.classList.add('collapsed');
       btn.classList.remove('expanded');
+      btn.setAttribute('aria-expanded', 'false');
     } else {
       body.classList.remove('collapsed');
       body.classList.add('expanded');
       btn.classList.add('expanded');
+      btn.setAttribute('aria-expanded', 'true');
       if (onExpand) onExpand();
     }
   });
@@ -249,8 +260,6 @@ function bindToggleBtn(btnId, bodyId, onExpand) {
 
 // --- Filter change events ---
 function initFilterEvents() {
-  bindRadioGroup('trend-stage', renderTrendChart);
-  bindCheckboxGroup('trend-platform-checks', renderTrendChart);
   bindRadioGroup('metric-stage', renderMetricCharts);
   bindCheckboxGroup('metric-platform-checks', renderMetricCharts);
 }
@@ -401,6 +410,42 @@ function initDownloadCSV() {
     a.download = 'data-quality-hub.csv';
     a.click();
     URL.revokeObjectURL(url);
+  });
+}
+
+// --- Auto-expand Explanations when navigating via hash link ---
+function initExplanationsHashNav() {
+  function expandIfNeeded() {
+    if (window.location.hash === '#explanations') {
+      var body = document.getElementById('explanations-body');
+      var btn = document.getElementById('explanations-toggle');
+      if (body && body.classList.contains('collapsed')) {
+        body.classList.remove('collapsed');
+        body.classList.add('expanded');
+        if (btn) {
+          btn.classList.add('expanded');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      }
+    }
+  }
+  expandIfNeeded();
+  window.addEventListener('hashchange', expandIfNeeded);
+  // Also handle clicks on links pointing to #explanations
+  document.addEventListener('click', function(e) {
+    var a = e.target.closest('a[href="#explanations"]');
+    if (a) {
+      var body = document.getElementById('explanations-body');
+      var btn = document.getElementById('explanations-toggle');
+      if (body && body.classList.contains('collapsed')) {
+        body.classList.remove('collapsed');
+        body.classList.add('expanded');
+        if (btn) {
+          btn.classList.add('expanded');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      }
+    }
   });
 }
 
