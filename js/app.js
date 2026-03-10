@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   initFilterEvents();
   initDownloadCSV();
   initExplanationsHashNav();
+  initMetricsList();
 });
 
 // --- Stats (inline in header) ---
@@ -447,6 +448,43 @@ function initExplanationsHashNav() {
       }
     }
   });
+}
+
+// --- Metrics List (static, inline HTML) ---
+function initMetricsList() {
+  // Filter by concern
+  var filter = document.getElementById('metric-list-filter');
+  if (filter) {
+    filter.addEventListener('change', function() {
+      var val = this.value;
+      var items = document.querySelectorAll('.metric-item');
+      for (var i = 0; i < items.length; i++) {
+        items[i].style.display = (!val || items[i].getAttribute('data-concern') === val) ? '' : 'none';
+      }
+    });
+  }
+
+  // Expand / collapse metric rows
+  var headers = document.querySelectorAll('.metric-item-header');
+  for (var i = 0; i < headers.length; i++) {
+    headers[i].addEventListener('click', function() {
+      var body = this.parentElement.querySelector('.metric-item-body');
+      if (!body) return;
+      var isExpanded = this.getAttribute('aria-expanded') === 'true';
+      if (isExpanded) {
+        body.classList.remove('expanded');
+        body.classList.add('collapsed');
+        this.setAttribute('aria-expanded', 'false');
+      } else {
+        body.classList.remove('collapsed');
+        body.classList.add('expanded');
+        this.setAttribute('aria-expanded', 'true');
+      }
+    });
+    headers[i].addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
+    });
+  }
 }
 
 // --- Helpers ---

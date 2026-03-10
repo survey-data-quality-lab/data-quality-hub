@@ -253,11 +253,10 @@ window.DQH.charts = {
 
     for (var i = 0; i < bothData.solid.length; i++) {
       var d = bothData.solid[i];
-      var stageLabel = d.stage === '2nd' ? '2nd stage' : 'Single';
       var is2nd = d.stage === '2nd';
 
       datasets.push({
-        label: d.platform + ' (' + stageLabel + ')',
+        label: is2nd ? d.platform + ' (2-Stage)' : d.platform,
         data: d.points.map(function(p) {
           return { x: p.date.getTime(), y: p.rate, _meta: p };
         }),

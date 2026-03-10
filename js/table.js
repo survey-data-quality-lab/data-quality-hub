@@ -154,10 +154,6 @@ window.DQH.table = {
     html += '<div class="l1-researcher">' + this.esc(study.researcher) + '</div>';
     html += '<div class="l1-meta">' + study.platformCount + ' platform' + (study.platformCount !== 1 ? 's' : '') + '</div>';
     html += '<div class="l1-n">N = ' + this.fmtNum(study.totalN) + '</div>';
-    // Info button
-    html += '<button class="l1-info-btn" data-study-index="' + index + '" type="button" onclick="event.stopPropagation()">';
-    html += '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>';
-    html += '</button>';
     html += '</div>';
 
     // Info popup (hidden by default)
@@ -174,24 +170,17 @@ window.DQH.table = {
       var pData = study.platforms[pName];
 
       for (var k = 0; k < pData.primary.length; k++) {
-        var isLast = (k === pData.primary.length - 1);
-        var hasSecondary = pData.secondary.length > 0;
-        var showExpand = isLast && hasSecondary;
-        var l2Id = index + '-' + j + '-' + k;
-        html += this.renderL2(pData.primary[k], showExpand, l2Id);
+        html += this.renderL2(pData.primary[k]);
+      }
 
-        if (showExpand) {
-          html += '<div class="l2-children" data-l2-parent="' + l2Id + '">';
-          for (var m = 0; m < pData.secondary.length; m++) {
-            html += this.renderL3(pData.secondary[m]);
-          }
-          html += '</div>';
-        }
+      // Render secondary (2nd stage) rows immediately, no nested toggle
+      for (var m = 0; m < pData.secondary.length; m++) {
+        html += this.renderL3(pData.secondary[m]);
       }
 
       if (pData.primary.length === 0) {
         for (var n = 0; n < pData.secondary.length; n++) {
-          html += this.renderL2(pData.secondary[n], false, index + '-' + j + '-2nd-' + n);
+          html += this.renderL2(pData.secondary[n]);
         }
       }
     }
@@ -263,7 +252,7 @@ window.DQH.table = {
     return html;
   },
 
-  renderL2(s, hasChild, id) {
+  renderL2(s) {
     var design = '';
     if (s.recruitmentMethod && s.recruitmentMethod.toLowerCase().indexOf('two-stage') !== -1) {
       design = 'Two-stage';
@@ -271,12 +260,8 @@ window.DQH.table = {
       design = 'Single';
     }
 
-    var html = '<div class="study-l2' + (hasChild ? ' has-child' : '') + '" data-l2="' + id + '">';
-    if (hasChild) {
-      html += '<svg class="toggle-chevron l2-chevron" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"></polyline></svg>';
-    } else {
-      html += '<span class="l2-spacer"></span>';
-    }
+    var html = '<div class="study-l2">';
+    html += '<span class="l2-spacer"></span>';
     html += '<div class="l2-platform">' + this.platformTag(s.platform) + '</div>';
     html += '<div class="l2-n">' + this.fmtNum(s.sampleSize) + '</div>';
     html += '<div class="l2-date">' + this.esc(s.studyDate || '') + '</div>';
@@ -290,66 +275,43 @@ window.DQH.table = {
   },
 
   renderL3(s) {
-    var html = '<div class="study-l3">';
-    html += '<div class="l3-label">2nd Stage</div>';
-    html += '<div class="l3-label"></div>';
-    html += '<div class="l3-n">' + this.fmtNum(s.sampleSize) + '</div>';
-    html += '<div class="l3-date">' + this.esc(s.studyDate || '') + '</div>';
-    html += '<div class="l3-rate">' + this.rateCell(s.overallPassRate) + '</div>';
-    html += '<div class="l3-attention">' + this.rateCell(s.attentionCheckRate) + '</div>';
-    html += '<div class="l3-ai">' + this.rateCell(s.aiDetectionRate) + '</div>';
-    html += '<div class="l3-fraud">' + this.rateCell(s.accountFraudRate) + '</div>';
-    html += '<div class="l3-design"></div>';
+    var html = '<div class="study-l2">';
+    html += '<span class="l2-spacer"></span>';
+    html += '<div class="l2-platform">' + this.platformTag(s.platform) + '</div>';
+    html += '<div class="l2-n">' + this.fmtNum(s.sampleSize) + '</div>';
+    html += '<div class="l2-date">' + this.esc(s.studyDate || '') + '</div>';
+    html += '<div class="l2-rate">' + this.rateCell(s.overallPassRate) + '</div>';
+    html += '<div class="l2-attention">' + this.rateCell(s.attentionCheckRate) + '</div>';
+    html += '<div class="l2-ai">' + this.rateCell(s.aiDetectionRate) + '</div>';
+    html += '<div class="l2-fraud">' + this.rateCell(s.accountFraudRate) + '</div>';
+    html += '<div class="l2-design">2-Stage</div>';
     html += '</div>';
     return html;
   },
 
   bindTreeEvents(container) {
-    // L1 click to expand/collapse
+    // L1 click to expand/collapse children + info popup together
     var l1s = container.querySelectorAll('.study-l1');
     for (var i = 0; i < l1s.length; i++) {
       l1s[i].addEventListener('click', function() {
         var idx = this.getAttribute('data-index');
         var children = container.querySelector('.l1-children[data-parent="' + idx + '"]');
-        if (children) {
-          children.classList.toggle('expanded');
-          this.classList.toggle('expanded');
-        }
-      });
-    }
-
-    // L1 info button
-    var infoBtns = container.querySelectorAll('.l1-info-btn');
-    for (var k = 0; k < infoBtns.length; k++) {
-      infoBtns[k].addEventListener('click', function(e) {
-        e.stopPropagation();
-        var idx = this.getAttribute('data-study-index');
         var popup = container.querySelector('.l1-info-popup[data-info-for="' + idx + '"]');
+        var expanding = !this.classList.contains('expanded');
+        this.classList.toggle('expanded');
+        if (children) children.classList.toggle('expanded');
         if (popup) {
-          if (popup.classList.contains('expanded')) {
-            popup.classList.remove('expanded');
-            popup.classList.add('collapsed');
-          } else {
+          if (expanding) {
             popup.classList.remove('collapsed');
             popup.classList.add('expanded');
+          } else {
+            popup.classList.remove('expanded');
+            popup.classList.add('collapsed');
           }
         }
       });
     }
 
-    // L2 click to expand L3
-    var l2s = container.querySelectorAll('.study-l2.has-child');
-    for (var j = 0; j < l2s.length; j++) {
-      l2s[j].addEventListener('click', function(e) {
-        e.stopPropagation();
-        var l2Id = this.getAttribute('data-l2');
-        var children = container.querySelector('.l2-children[data-l2-parent="' + l2Id + '"]');
-        if (children) {
-          children.classList.toggle('expanded');
-          this.classList.toggle('expanded');
-        }
-      });
-    }
   },
 
   // --- Helpers ---
@@ -357,11 +319,6 @@ window.DQH.table = {
   platformTag(platform) {
     var color = window.DQH.dataStore.getColor(platform);
     var style = 'background:' + color + '20;color:' + color + ';border:1px solid ' + color + '40';
-    var urls = window.DQH.config.platformUrls || {};
-    var url = urls[platform];
-    if (url) {
-      return '<a href="' + this.esc(url) + '" target="_blank" rel="noopener" class="platform-tag" style="' + style + '">' + this.esc(platform) + '</a>';
-    }
     return '<span class="platform-tag" style="' + style + '">' + this.esc(platform) + '</span>';
   },
 
