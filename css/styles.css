@@ -1204,6 +1204,33 @@ a:hover { text-decoration: underline; }
   text-decoration: none;
 }
 
+.btn-contribute-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.btn-contribute-edit:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.contribute-desc-edit {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
 /* --- More Section --- */
 .section-more {
   padding: 20px 0 32px;
@@ -1476,6 +1503,17 @@ a:hover { text-decoration: underline; }
 
 [data-theme="dark"] .info-val {
   color: #6C8EFF;
+}
+
+.info-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.info-link:hover {
+  text-decoration: underline;
 }
 
 .l2-recruitment {

@@ -149,7 +149,9 @@ window.DQH.config = {
     'Pre-registration link': 'preRegLink',
     'Paper or study link': 'studyLink',
     'Data Availability': 'dataAvailability',
+    'Data Repository Link': 'dataLink',
     'Publication Status': 'publicationStatus',
+    'Additional Credibility Information': 'credibilityInfo',
     'Submission ID': 'submissionId'
   },
 
@@ -221,10 +223,18 @@ window.DQH.config = {
   ],
 
   // Category IDs for custom metric → concern mapping
+  // Keys are lowercase for case-insensitive lookup
   categoryToConcernId: {
-    'Attention': 'inattention',
-    'AI/Bot': 'ai',
-    'Fraud': 'fraud'
+    'attention': 'inattention',
+    'inattention': 'inattention',
+    'ai/bot': 'ai',
+    'ai/bots': 'ai',
+    'ai and bots': 'ai',
+    'ai & bots': 'ai',
+    'ai': 'ai',
+    'bot': 'ai',
+    'fraud': 'fraud',
+    'account fraud': 'fraud'
   },
 
   // Platform display colors (brightened for dark background)

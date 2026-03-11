@@ -7,15 +7,17 @@
 /* ── Container & Progress ───────────────────────────────────────── */
 
 .sf-container {
-  max-width: 640px;
+  max-width: 780px;
   margin: 0 auto;
 }
 
 .sf-progress {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
+  justify-content: center;
 }
 
 .sf-progress-step {
@@ -53,10 +55,11 @@
 }
 
 .sf-progress-line {
-  flex: 1;
+  flex: 1 1 8px;
   height: 1px;
   background: var(--border);
   min-width: 8px;
+  max-width: 32px;
 }
 
 /* ── Step Panels ────────────────────────────────────────────────── */

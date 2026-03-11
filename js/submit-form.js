@@ -53,7 +53,8 @@ window.DQH.submitForm = (function () {
     platformData: {},
     // Metadata
     preRegistered: '', preRegLink: '', paperLink: '',
-    dataAvailability: '', publicationStatus: ''
+    dataAvailability: '', dataLink: '', publicationStatus: '',
+    credibilityInfo: ''
   };
 
   // ── Helpers ────────────────────────────────────────────────────
@@ -283,10 +284,11 @@ window.DQH.submitForm = (function () {
 
     // Country, approval, min studies — only for stage 0 and stage 1 (NOT stage 2)
     if (stage !== 2) {
-      html += textField('sf-country-' + pfx, 'Country', pd.country, true, 'e.g., United States');
-      html += textField('sf-approval-' + pfx, 'Participant Quality / Approval Score', pd.approvalScore, true, 'e.g., 95% approval rate');
+      html += textField('sf-country-' + pfx, 'Country', pd.country, false, 'e.g., United States');
+      html += textField('sf-approval-' + pfx, 'Participant Quality / Approval Score', pd.approvalScore, false, 'e.g., 95% approval rate');
       html += '<div class="sf-hint" style="margin-top:-0.5rem;margin-bottom:1rem;">For MTurk: HIT approval rate. For Prolific: approval rate. Open text \u2014 describe as applicable.</div>';
-      html += textField('sf-minStudies-' + pfx, 'Minimum Completed Studies/HITs', pd.minStudies, false, 'e.g., 100');
+      html += textField('sf-minStudies-' + pfx, 'Other Screening Criteria', pd.minStudies, false, 'e.g., filtered for age > 18, required specific country, etc.');
+      html += '<div class="sf-hint" style="margin-top:-0.5rem;margin-bottom:1rem;">Please describe in detail your method of initial filtering of the subject pool.</div>';
     }
 
     // ── Metrics ──
@@ -385,38 +387,56 @@ window.DQH.submitForm = (function () {
 
   function renderMetadataStep() {
     var html = '<h3 class="sf-step-title">Study Metadata</h3>';
-    html += '<p class="sf-step-desc">Optional details about your study\'s publication and data availability.</p>';
+    html += '<p class="sf-step-desc">Details about your study\'s publication and data availability.</p>';
 
-    // Pre-registered
-    html += '<div class="sf-field"><label class="sf-label">Is this study pre-registered?</label><div class="sf-radio-group">';
+    // Pre-registered (required)
+    html += '<div class="sf-field"><label class="sf-label">Is this study pre-registered? <span class="sf-required">*</span></label><div class="sf-radio-group" id="sf-prereg-group">';
     ['Yes', 'No'].forEach(function (v) {
       html += '<label class="sf-radio-option"><input type="radio" name="sf-prereg" value="' + v + '"' + (state.preRegistered === v ? ' checked' : '') + '>';
       html += '<span class="sf-option-label">' + v + '</span></label>';
     });
-    html += '</div></div>';
+    html += '</div><div class="sf-error-msg" id="sf-prereg-error"></div></div>';
 
     var preVis = state.preRegistered === 'Yes' ? ' visible' : '';
     html += '<div class="sf-conditional' + preVis + '" id="sf-prereg-link-section">';
     html += textField('sf-preRegLink', 'Pre-registration Link', state.preRegLink, false, 'https://osf.io/...');
     html += '</div>';
 
-    html += textField('sf-paperLink', 'Paper or Study Link', state.paperLink, false, 'https://doi.org/...');
-
-    // Data availability
-    html += '<div class="sf-field"><label class="sf-label">Data Availability</label><div class="sf-radio-group">';
+    // Data availability (required)
+    html += '<div class="sf-field"><label class="sf-label">Data Availability <span class="sf-required">*</span></label><div class="sf-radio-group" id="sf-dataAvail-group">';
     ['Publicly available', 'Available upon request', 'Will be publicly available upon publication', 'Not publicly available'].forEach(function (v) {
       html += '<label class="sf-radio-option"><input type="radio" name="sf-dataAvail" value="' + esc(v) + '"' + (state.dataAvailability === v ? ' checked' : '') + '>';
       html += '<span class="sf-option-label">' + esc(v) + '</span></label>';
     });
-    html += '</div></div>';
+    html += '</div><div class="sf-error-msg" id="sf-dataAvail-error"></div></div>';
 
-    // Publication status
-    html += '<div class="sf-field"><label class="sf-label">Publication Status</label><div class="sf-radio-group">';
+    // Data link — shown only when "Publicly available" is selected
+    var dataLinkVis = state.dataAvailability === 'Publicly available' ? ' visible' : '';
+    html += '<div class="sf-conditional' + dataLinkVis + '" id="sf-dataLink-section">';
+    html += textField('sf-dataLink', 'Data Repository Link', state.dataLink, false, 'https://osf.io/... or https://dataverse.harvard.edu/...');
+    html += '</div>';
+
+    // Publication status (required)
+    html += '<div class="sf-field"><label class="sf-label">Publication Status <span class="sf-required">*</span></label><div class="sf-radio-group" id="sf-pubStatus-group">';
     ['Published', 'Working paper available', 'Paper not yet available'].forEach(function (v) {
       html += '<label class="sf-radio-option"><input type="radio" name="sf-pubStatus" value="' + esc(v) + '"' + (state.publicationStatus === v ? ' checked' : '') + '>';
       html += '<span class="sf-option-label">' + esc(v) + '</span></label>';
     });
-    html += '</div></div>';
+    html += '</div><div class="sf-error-msg" id="sf-pubStatus-error"></div></div>';
+
+    // Paper link — shown only when "Published" or "Working paper available" is selected
+    var paperLinkVis = (state.publicationStatus === 'Published' || state.publicationStatus === 'Working paper available') ? ' visible' : '';
+    html += '<div class="sf-conditional' + paperLinkVis + '" id="sf-paperLink-section">';
+    html += textField('sf-paperLink', 'Paper or Study Link', state.paperLink, false, 'https://doi.org/...');
+    html += '</div>';
+
+    // Credibility justification
+    html += '<hr class="sf-section-divider">';
+    html += '<div class="sf-field">';
+    html += '<label class="sf-label" for="sf-credibility">Additional Credibility Information</label>';
+    html += '<div class="sf-hint" style="margin-bottom:0.4rem;">Please provide any additional information that increases the credibility of your results (e.g., data quality procedures, verification methods, replication details).</div>';
+    html += '<textarea id="sf-credibility" class="sf-textarea" rows="4" placeholder="e.g., We used Qualtrics fraud detection, verified responses with Fingerprint.com, pre-registered our analysis plan...">' + esc(state.credibilityInfo) + '</textarea>';
+    html += '</div>';
 
     return html;
   }
@@ -454,8 +474,11 @@ window.DQH.submitForm = (function () {
       state.paperLink = gv('sf-paperLink');
       var da = document.querySelector('input[name="sf-dataAvail"]:checked');
       state.dataAvailability = da ? da.value : '';
+      state.dataLink = gv('sf-dataLink');
       var ps = document.querySelector('input[name="sf-pubStatus"]:checked');
       state.publicationStatus = ps ? ps.value : '';
+      var credEl = document.getElementById('sf-credibility');
+      state.credibilityInfo = credEl ? credEl.value.trim() : '';
     } else if (step.platformIndex !== undefined) {
       savePlatformStep(step.platformIndex, step.stage);
     }
@@ -522,7 +545,7 @@ window.DQH.submitForm = (function () {
     if (step.id === 'researcher') return validateResearcher();
     if (step.id === 'recruitment') return validateRecruitment();
     if (step.id === 'platforms') return validatePlatforms();
-    if (step.id === 'metadata') return true;
+    if (step.id === 'metadata') return validateMetadata();
     if (step.platformIndex !== undefined) return validatePlatformDetail(step.platformIndex, step.stage);
     return true;
   }
@@ -544,6 +567,24 @@ window.DQH.submitForm = (function () {
       return false;
     }
     return true;
+  }
+
+  function validateMetadata() {
+    var ok = true;
+    if (!document.querySelector('input[name="sf-prereg"]:checked')) {
+      showError('sf-prereg', 'Please indicate whether the study is pre-registered');
+      ok = false;
+    }
+    if (!document.querySelector('input[name="sf-dataAvail"]:checked')) {
+      showError('sf-dataAvail', 'Please select a data availability option');
+      ok = false;
+    }
+    if (!document.querySelector('input[name="sf-pubStatus"]:checked')) {
+      showError('sf-pubStatus', 'Please select a publication status');
+      ok = false;
+    }
+    if (!ok) scrollToFirstError();
+    return ok;
   }
 
   function validatePlatforms() {
@@ -576,11 +617,7 @@ window.DQH.submitForm = (function () {
     if (!gv('sf-month-' + pfx)) { showError('sf-month-' + pfx, 'Month is required'); ok = false; }
     if (!gv('sf-year-' + pfx)) { showError('sf-year-' + pfx, 'Year is required'); ok = false; }
 
-    // Country & approval score (stage 0 & 1 only)
-    if (stage !== 2) {
-      if (!gv('sf-country-' + pfx)) { showError('sf-country-' + pfx, 'Country is required'); ok = false; }
-      if (!gv('sf-approval-' + pfx)) { showError('sf-approval-' + pfx, 'Approval score is required'); ok = false; }
-    }
+    // Country and Approval Score are optional — no validation needed
 
     // Metric rates
     var mKeys = Object.keys(pd.metrics);
@@ -720,6 +757,31 @@ window.DQH.submitForm = (function () {
       radio.addEventListener('change', function () {
         var sec = document.getElementById('sf-prereg-link-section');
         if (sec) sec.classList.toggle('visible', radio.value === 'Yes' && radio.checked);
+        // Clear validation error
+        var errEl = document.getElementById('sf-prereg-error');
+        if (errEl) { errEl.classList.remove('visible'); errEl.textContent = ''; }
+      });
+    });
+
+    // Publication status conditional — show paper link when Published or Working paper
+    root.querySelectorAll('input[name="sf-pubStatus"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        var sec = document.getElementById('sf-paperLink-section');
+        var show = (radio.value === 'Published' || radio.value === 'Working paper available') && radio.checked;
+        if (sec) sec.classList.toggle('visible', show);
+        var errEl = document.getElementById('sf-pubStatus-error');
+        if (errEl) { errEl.classList.remove('visible'); errEl.textContent = ''; }
+      });
+    });
+
+    // Data availability conditional — show data link when Publicly available
+    root.querySelectorAll('input[name="sf-dataAvail"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        var sec = document.getElementById('sf-dataLink-section');
+        var show = radio.value === 'Publicly available' && radio.checked;
+        if (sec) sec.classList.toggle('visible', show);
+        var errEl = document.getElementById('sf-dataAvail-error');
+        if (errEl) { errEl.classList.remove('visible'); errEl.textContent = ''; }
       });
     });
 
@@ -874,13 +936,15 @@ window.DQH.submitForm = (function () {
     // 88-89: Overall quality
     row.push(entry.overallRate || '');
     row.push(entry.overallDescription || '');
-    // 90-94: Metadata
+    // 90-96: Metadata
     row.push(metadata.preRegistered || '');
     row.push(metadata.preRegLink || '');
     row.push(metadata.paperLink || '');
     row.push(metadata.dataAvailability || '');
+    row.push(metadata.dataLink || '');
     row.push(metadata.publicationStatus || '');
-    // 95: Submission ID
+    row.push(metadata.credibilityInfo || '');
+    // 97: Submission ID
     row.push(submissionId);
     return row;
   }
@@ -913,7 +977,9 @@ window.DQH.submitForm = (function () {
     CSV_HEADERS.push('Pre-registration link');
     CSV_HEADERS.push('Paper or study link');
     CSV_HEADERS.push('Data Availability');
+    CSV_HEADERS.push('Data Repository Link');
     CSV_HEADERS.push('Publication Status');
+    CSV_HEADERS.push('Additional Credibility Information');
     CSV_HEADERS.push('Submission ID');
   })();
 
@@ -970,7 +1036,8 @@ window.DQH.submitForm = (function () {
       metadata: {
         preRegistered: state.preRegistered, preRegLink: state.preRegLink,
         paperLink: state.paperLink, dataAvailability: state.dataAvailability,
-        publicationStatus: state.publicationStatus
+        dataLink: state.dataLink, publicationStatus: state.publicationStatus,
+        credibilityInfo: state.credibilityInfo
       },
       recruitmentMethod: state.recruitmentMethod,
       submissionId: submissionId,
@@ -1045,7 +1112,8 @@ window.DQH.submitForm = (function () {
     state.recruitmentMethod = '';
     state.platforms = []; state.customPlatformInput = ''; state.platformData = {};
     state.preRegistered = ''; state.preRegLink = ''; state.paperLink = '';
-    state.dataAvailability = ''; state.publicationStatus = '';
+    state.dataAvailability = ''; state.dataLink = ''; state.publicationStatus = '';
+    state.credibilityInfo = '';
   }
 
   // ── Edit Existing Entry ────────────────────────────────────────
@@ -1228,7 +1296,30 @@ window.DQH.submitForm = (function () {
     bindEditEvents();
   }
 
-  function init() { render(); }
+  function showForm() {
+    var landing = document.getElementById('sf-landing');
+    var wrapper = document.getElementById('sf-form-wrapper');
+    if (landing) landing.style.display = 'none';
+    if (wrapper) wrapper.style.display = '';
+    render();
+  }
+
+  function showLanding() {
+    var landing = document.getElementById('sf-landing');
+    var wrapper = document.getElementById('sf-form-wrapper');
+    if (wrapper) wrapper.style.display = 'none';
+    if (landing) landing.style.display = '';
+  }
+
+  function init() {
+    var openNewBtn = document.getElementById('sf-open-new');
+    var openEditBtn = document.getElementById('sf-open-edit');
+    var backBtn = document.getElementById('sf-back-to-landing');
+
+    if (openNewBtn) openNewBtn.addEventListener('click', function() { showForm(); });
+    if (openEditBtn) openEditBtn.addEventListener('click', function() { showForm(); });
+    if (backBtn) backBtn.addEventListener('click', function() { showLanding(); });
+  }
 
   return { init: init };
 })();

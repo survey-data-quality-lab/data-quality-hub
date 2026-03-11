@@ -109,8 +109,10 @@ var HEADERS = [
   'Pre-registration link',                                             // 91
   'Paper or study link',                                               // 92
   'Data Availability',                                                 // 93
-  'Publication Status',                                                // 94
-  'Submission ID'                                                      // 95
+  'Data Repository Link',                                              // 94
+  'Publication Status',                                                // 95
+  'Additional Credibility Information',                                // 96
+  'Submission ID'                                                      // 97
 ];
 
 var METRIC_COLUMNS = {
@@ -296,8 +298,10 @@ function buildRow(researcher, metadata, recruitmentMethod, entry, submissionId) 
   row[91] = metadata.preRegLink || '';
   row[92] = metadata.paperLink || '';
   row[93] = metadata.dataAvailability || '';
-  row[94] = metadata.publicationStatus || '';
-  row[95] = submissionId || '';
+  row[94] = metadata.dataLink || '';
+  row[95] = metadata.publicationStatus || '';
+  row[96] = metadata.credibilityInfo || '';
+  row[97] = submissionId || '';
 
   return row;
 }

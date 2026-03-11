@@ -491,7 +491,9 @@ function initDownloadCSV() {
       { key: 'preRegLink', label: 'Pre-registration Link' },
       { key: 'studyLink', label: 'Study Link' },
       { key: 'dataAvailability', label: 'Data Availability' },
-      { key: 'publicationStatus', label: 'Publication Status' }
+      { key: 'dataLink', label: 'Data Repository Link' },
+      { key: 'publicationStatus', label: 'Publication Status' },
+      { key: 'credibilityInfo', label: 'Additional Credibility Information' }
     ];
 
     var csvVal = function(v) {

@@ -37,7 +37,12 @@ window.DQH.dataStore = {
 
         var label = s[base + '_Label'] || base;
         var category = s[base + '_Category'] || '';
-        var concernId = config.categoryToConcernId[category] || 'inattention';
+        var labelLower = label.toLowerCase();
+        // Override: mouse-based metrics belong under AI/Bot, not Attention
+        if (labelLower.indexOf('mouse') !== -1 || labelLower.indexOf('click') !== -1) {
+          category = 'ai';
+        }
+        var concernId = config.categoryToConcernId[category.toLowerCase().trim()] || 'inattention';
 
         // Add to numericFields
         if (config.numericFields.indexOf(k) === -1) {

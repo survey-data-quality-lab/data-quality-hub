@@ -202,6 +202,10 @@ window.DQH.table = {
     var dataAvail = '';
     var prereg = '';
     var pubStatus = '';
+    var studyLink = '';
+    var preRegLink = '';
+    var dataLink = '';
+    var credibility = '';
     var metricFields = ['overallPassRate', 'classicChecksRate', 'videoCheckRate',
       'typedTextRate', 'typicalSpeedRate', 'recaptchaRate', 'pangramRate', 'uniqueIpRate'];
     var metricSeen = {};
@@ -209,6 +213,10 @@ window.DQH.table = {
       if (!dataAvail && entries[i].dataAvailability) dataAvail = entries[i].dataAvailability;
       if (!prereg   && entries[i].preregistration)  prereg    = entries[i].preregistration;
       if (!pubStatus && entries[i].publicationStatus) pubStatus = entries[i].publicationStatus;
+      if (!studyLink && entries[i].studyLink)  studyLink  = entries[i].studyLink;
+      if (!preRegLink && entries[i].preRegLink) preRegLink = entries[i].preRegLink;
+      if (!dataLink && entries[i].dataLink) dataLink = entries[i].dataLink;
+      if (!credibility && entries[i].credibilityInfo) credibility = entries[i].credibilityInfo;
       for (var m = 0; m < metricFields.length; m++) {
         var f = metricFields[m];
         if (entries[i][f] !== null && entries[i][f] !== undefined) metricSeen[f] = true;
@@ -226,6 +234,14 @@ window.DQH.table = {
     var metricCount = Object.keys(metricSeen).length;
     var na = '<span style="color:var(--text-tertiary)">\u2014</span>';
     var v = ' class="info-val"';
+    var self = this;
+
+    function linkHtml(url) {
+      if (!url) return na;
+      var safeUrl = self.esc(url);
+      var display = url.length > 50 ? url.substring(0, 47) + '...' : url;
+      return '<a href="' + safeUrl + '" target="_blank" rel="noopener" class="info-link">' + self.esc(display) + '</a>';
+    }
 
     html += '<div class="study-info-bg">';
     html += '<div class="study-info-row">';
@@ -241,6 +257,23 @@ window.DQH.table = {
     html += '<div><strong>Data availability:</strong> ' + (dataAvail ? '<span' + v + '>' + this.esc(dataAvail) + '</span>' : na) + '</div>';
     html += '<div><strong>Paper status:</strong> '      + (pubStatus ? '<span' + v + '>' + this.esc(pubStatus) + '</span>' : na) + '</div>';
     html += '</div>';
+
+    // Links row
+    if (studyLink || preRegLink || dataLink) {
+      html += '<div class="study-info-row">';
+      if (studyLink) html += '<div><strong>Paper link:</strong> ' + linkHtml(studyLink) + '</div>';
+      if (preRegLink) html += '<div><strong>Pre-reg link:</strong> ' + linkHtml(preRegLink) + '</div>';
+      if (dataLink) html += '<div><strong>Data link:</strong> ' + linkHtml(dataLink) + '</div>';
+      html += '</div>';
+    }
+
+    // Credibility info
+    if (credibility) {
+      html += '<div class="study-info-row">';
+      html += '<div style="flex-basis:100%"><strong>Credibility:</strong> <span' + v + '>' + this.esc(credibility) + '</span></div>';
+      html += '</div>';
+    }
+
     html += '</div>';
 
     html += '</div>';
