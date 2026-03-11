@@ -206,8 +206,7 @@ window.DQH.charts = {
   _renderCustomLegend(canvasId, datasets) {
     var canvas = document.getElementById(canvasId);
     if (!canvas) return;
-    var wrapper = canvas.parentElement;       // .chart-wrap (fixed-height)
-    var card    = wrapper.parentElement;      // .chart-card (scrollable white box)
+    var card = canvas.closest('.chart-card') || canvas.parentElement.parentElement;
 
     // Remove any stale legend (it lives as a sibling of .chart-wrap)
     var old = card.querySelector('.chart-custom-legend');
@@ -576,6 +575,169 @@ window.DQH.charts = {
       options: opts
     });
     this._renderCustomLegend(canvasId, datasets);
+  },
+
+  /**
+   * Means by Study bar chart: one bar per study row, grouped by platform.
+   */
+  renderStudyMeansChart(canvasId, field, stageFilter, platforms) {
+    this.destroy(canvasId);
+    applyChartTheme();
+
+    var store = window.DQH.dataStore;
+    var studyData = store.getStudyMeansData(field, stageFilter, platforms);
+    if (!studyData.length) return this.showEmpty(canvasId);
+    this.clearEmpty(canvasId);
+
+    var mobile = isMobile();
+    var is2nd = (stageFilter === '2nd');
+    var labels = [];
+    var values = [];
+    var bgColors = [];
+    var borderColors = [];
+    var metaArr = [];
+    var lastPlatform = null;
+
+    for (var i = 0; i < studyData.length; i++) {
+      var s = studyData[i];
+
+      // Insert a blank gap between platform groups
+      if (lastPlatform !== null && s.platform !== lastPlatform) {
+        labels.push('');
+        values.push(null);
+        bgColors.push('transparent');
+        borderColors.push('transparent');
+        metaArr.push(null);
+      }
+
+      // Short x-axis label: "Aug '25"
+      var shortLabel = '';
+      if (s.studyDate) {
+        shortLabel = s.studyDate.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      } else {
+        shortLabel = (s.studyId || '').slice(0, 10);
+      }
+      labels.push(shortLabel);
+      values.push(s.rate);
+
+      var baseColor = store.getColor(s.platform);
+      bgColors.push(baseColor + (is2nd ? '99' : 'CC'));
+      borderColors.push(baseColor);
+      metaArr.push(s);
+      lastPlatform = s.platform;
+    }
+
+    var datasets = [{
+      data: values,
+      backgroundColor: bgColors,
+      borderColor: borderColors,
+      borderWidth: 1.5,
+      borderRadius: 3,
+      _metaArr: metaArr
+    }];
+
+    // Explicit canvas dimensions for horizontal scroll chart
+    var CHART_HEIGHT = 340;
+    var chartWidth = Math.max(labels.length * 54 + 60, 400);
+    var scrollEl = document.getElementById('chart-means-scroll');
+    if (scrollEl) scrollEl.style.minWidth = chartWidth + 'px';
+    var canvasEl = document.getElementById(canvasId);
+    if (canvasEl) {
+      canvasEl.width = chartWidth;
+      canvasEl.height = CHART_HEIGHT;
+    }
+
+    var self = this;
+    var opts = this._layout();
+    opts.responsive = false;
+
+    // Override onClick for bar chart (data points are plain values, metadata in _metaArr)
+    opts.onClick = function(event, elements) {
+      if (!elements || !elements.length) return;
+      var el = elements[0];
+      var ds = event.chart.data.datasets[el.datasetIndex];
+      var m = ds._metaArr && ds._metaArr[el.index];
+      if (m && m.paperReference) {
+        self._navigateToStudy(m.paperReference);
+      }
+    };
+
+    opts.scales = {
+      x: {
+        grid: { color: chartGridColor(), drawOnChartArea: false },
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45,
+          font: { size: mobile ? 9 : 10 },
+          autoSkip: false,
+          color: function(ctx) {
+            // Dim the empty gap labels
+            return (ctx.tick && ctx.tick.label === '') ? 'transparent' : undefined;
+          }
+        }
+      },
+      y: this._yScale()
+    };
+
+    opts.plugins.tooltip = {
+      filter: function(item) { return item.raw !== null; },
+      callbacks: {
+        title: function(items) {
+          if (!items.length) return '';
+          var m = items[0].dataset._metaArr && items[0].dataset._metaArr[items[0].dataIndex];
+          return m ? m.platform : '';
+        },
+        label: function(ctx) {
+          var m = ctx.dataset._metaArr && ctx.dataset._metaArr[ctx.dataIndex];
+          if (!m) return '';
+          var dateStr = m.studyDate
+            ? m.studyDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
+            : m.studyDateStr;
+          var nStr = m.sampleSize ? '  ·  N = ' + m.sampleSize : '';
+          return m.platform + ': ' + ctx.raw + '%  ·  ' + dateStr + nStr;
+        },
+        afterLabel: function(ctx) {
+          var m = ctx.dataset._metaArr && ctx.dataset._metaArr[ctx.dataIndex];
+          if (!m) return [];
+          var lines = [];
+          if (m.description) {
+            var descLines = wrapText('Measure: ' + m.description, 45);
+            for (var i = 0; i < descLines.length; i++) lines.push(descLines[i]);
+            lines.push('');
+          }
+          if (m.stage) lines.push('Stage: ' + m.stage);
+          if (m.researcher) {
+            lines.push(formatCitation(m.researcher, m.studyDate ? m.studyDate.getTime() : null));
+          }
+          return lines;
+        }
+      }
+    };
+
+    // Build legend pseudo-datasets (one per visible platform)
+    var legendDatasets = [];
+    var seenPlatforms = {};
+    for (var j = 0; j < studyData.length; j++) {
+      var p = studyData[j].platform;
+      if (!seenPlatforms[p]) {
+        seenPlatforms[p] = true;
+        legendDatasets.push({
+          _platformName: p,
+          _is2Stage: is2nd,
+          _isDashed: false,
+          _isOverall: false,
+          borderColor: store.getColor(p)
+        });
+      }
+    }
+
+    var ctx = document.getElementById(canvasId).getContext('2d');
+    this.instances[canvasId] = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: labels, datasets: datasets },
+      options: opts
+    });
+    this._renderCustomLegend(canvasId, legendDatasets);
   },
 
   showEmpty(canvasId) {

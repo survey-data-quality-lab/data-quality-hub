@@ -345,6 +345,15 @@ a:hover { text-decoration: underline; }
   color: var(--text-primary);
   border-color: var(--text-secondary);
 }
+.header-cta-github {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.header-cta-github:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
 
 /* --- Custom chart legend --- */
 .chart-custom-legend {
@@ -532,6 +541,19 @@ a:hover { text-decoration: underline; }
 
 .explanations-body.expanded {
   max-height: 1800px;
+}
+
+.metric-list-body {
+  overflow: hidden;
+  transition: max-height 0.45s ease;
+}
+
+.metric-list-body.collapsed {
+  max-height: 0;
+}
+
+.metric-list-body.expanded {
+  max-height: 4000px;
 }
 
 /* --- Concern card header row (icon + title inline) --- */
@@ -740,6 +762,58 @@ a:hover { text-decoration: underline; }
 .chart-wrap-trend {
   height: 380px;
 }
+
+/* Chart type toggle (Trend / Means) */
+.chart-type-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chart-type-btn {
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  font-family: inherit;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1.4;
+}
+
+.chart-type-btn:last-child {
+  border-right: none;
+}
+
+.chart-type-btn:hover:not(.active) {
+  background: var(--bg-hover, rgba(128,128,128,0.08));
+  color: var(--text-primary);
+}
+
+.chart-type-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Means by Study scrollable chart */
+.chart-wrap-means-outer {
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 380px;
+  position: relative;
+}
+
+.chart-means-scroll {
+  height: 100%;
+  min-width: 100%;
+  position: relative;
+}
+
 
 .chart-empty {
   display: flex;
@@ -1725,7 +1799,8 @@ a:hover { text-decoration: underline; }
   }
 
   .chart-wrap,
-  .chart-wrap-trend {
+  .chart-wrap-trend,
+  .chart-wrap-means-outer {
     height: 320px;
   }
 
@@ -1778,7 +1853,8 @@ a:hover { text-decoration: underline; }
   .header-stat strong { font-size: 0.95rem; }
 
   .chart-wrap,
-  .chart-wrap-trend {
+  .chart-wrap-trend,
+  .chart-wrap-means-outer {
     height: 300px;
   }
 

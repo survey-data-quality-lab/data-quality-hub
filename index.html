@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20260310-21">
+  <link rel="stylesheet" href="css/styles.css?v=20260311-03">
   <script>if(localStorage.getItem('dqh-theme')!=='dark')document.documentElement.setAttribute('data-theme','light');</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -42,6 +42,10 @@
         <a href="#submit" class="header-cta header-cta-submit">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           Submit Results
+        </a>
+        <a href="https://github.com/survey-data-quality-lab/data-quality-hub" target="_blank" rel="noopener" class="header-cta header-cta-github">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          GitHub
         </a>
         <a href="https://github.com/survey-data-quality-lab/data-quality-hub/discussions" target="_blank" rel="noopener" class="header-cta header-cta-discuss">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -95,7 +99,10 @@
             </h3>
             <div class="chart-card">
               <div class="chart-header">
-                <h4 class="chart-title">Trend Over Time</h4>
+                <div class="chart-type-toggle" id="chart-type-toggle">
+                  <button class="chart-type-btn active" data-type="trend" type="button">Trend Over Time</button>
+                  <button class="chart-type-btn" data-type="means" type="button">Means by Study</button>
+                </div>
               </div>
               <div class="metric-selector">
                 <div class="metric-selector-l1-row">
@@ -126,9 +133,9 @@
                       </button>
                     </div>
                     <div class="info-popup collapsed" id="metric-info-popup">
-                      <p><strong>Standard</strong> — Studies with a single stage or the first stage of a multi-stage design.</p>
-                      <p><strong>2-Stage</strong> — The second stage of studies that use a two-stage screening design.</p>
-                      <p><strong>All</strong> — Shows both stages. Dashed lines connect standard and 2-stage entries within the same study.</p>
+                      <p><strong>Standard</strong> — Screeners for e.g. country, socio-demographics, previous experience, &hellip;</p>
+                      <p><strong>2-Stage</strong> — Run a screening study and then limit recruitment to the subset of &ldquo;high quality&rdquo; subjects.</p>
+                      <p><strong>All</strong> — Show both.</p>
                     </div>
                   </div>
                   <div class="filter-group">
@@ -137,8 +144,13 @@
                   </div>
                 </div>
               </div>
-              <div class="chart-wrap chart-wrap-trend">
+              <div class="chart-wrap chart-wrap-trend" id="chart-wrap-trend">
                 <canvas id="chart-metric-trend"></canvas>
+              </div>
+              <div class="chart-wrap-means-outer" id="chart-wrap-means-outer" style="display:none;">
+                <div class="chart-means-scroll" id="chart-means-scroll">
+                  <canvas id="chart-metric-means"></canvas>
+                </div>
               </div>
             </div>
             <div class="definitions-panel">
@@ -195,11 +207,11 @@
                       <p class="concern-card-desc">Whether multiple responses were submitted by the same human using multiple accounts or fake accounts</p>
                     </div>
                   </div>
-                  <p>Each of these concerns can be addressed with targeted quality checks. This dashboard tracks the checks introduced and validated in our companion paper — and will expand as researchers contribute new metrics.</p>
+                  <p>Each of these concerns can be addressed with targeted quality checks, which may evolve over time. As a starting point, this dashboard tracks the checks introduced and validated in our companion paper — and will expand as researchers contribute new metrics.</p>
                 </div>
                 <div class="about-references">
                   <h3>References</h3>
-                  <p>Builds on <a href="https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf" target="_blank" rel="noopener"><em>&ldquo;Mission Possible: The Collection of High Quality Online Data&rdquo;</em></a> by &Ccedil;elebi, Exley, Harrs, Kivimaki, Serra-Garcia &amp; Yusof (2026). The paper provides an evidence-based assessment of data quality across online survey platforms, laboratory benchmarks, and AI agent responses. Materials are available in the companion <a href="https://github.com/survey-data-quality-lab/mission-possible" target="_blank" rel="noopener">GitHub repository</a>.</p>
+                  <p>Builds on <a href="https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf" target="_blank" rel="noopener"><em>&ldquo;Mission Possible: The Collection of High Quality Online Data&rdquo;</em></a> by &Ccedil;elebi, Exley, Harrs, Kivimaki, Serra-Garcia &amp; Yusof (2026). The paper provides an evidence-based assessment of data quality across online survey platforms, using laboratory and AI agent responses as benchmarks. It also proposes a new <em>two-stage recruitment method</em> to ensure high-quality online data in an evolving landscape. Materials are available in the companion <a href="https://github.com/survey-data-quality-lab/mission-possible" target="_blank" rel="noopener">GitHub repository</a>.</p>
                 </div>
               </div>
             </div>
@@ -208,9 +220,13 @@
           <!-- Data Quality Metrics -->
           <div class="more-section" id="metric-list">
             <h3 class="more-section-title">
-              <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-              Data Quality Metrics
+              <button class="section-title-toggle" id="metric-list-toggle" type="button" aria-expanded="false" aria-controls="metric-list-body">
+                <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                Data Quality Metrics
+                <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
+              </button>
             </h3>
+            <div class="metric-list-body collapsed" id="metric-list-body">
             <div class="table-controls">
               <select id="metric-list-filter" class="filter-select" aria-label="Filter by concern">
                 <option value="">All Concerns</option>
@@ -395,6 +411,7 @@
               </div>
 
             </div>
+            </div><!-- /metric-list-body -->
           </div>
 
           <!-- Submitted Studies -->
@@ -484,11 +501,11 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/config.js?v=20260310-21"></script>
-  <script src="js/csv-parser.js?v=20260310-21"></script>
-  <script src="js/data-store.js?v=20260310-21"></script>
-  <script src="js/charts.js?v=20260310-21"></script>
-  <script src="js/table.js?v=20260310-21"></script>
-  <script src="js/app.js?v=20260310-21"></script>
+  <script src="js/config.js?v=20260311-03"></script>
+  <script src="js/csv-parser.js?v=20260311-03"></script>
+  <script src="js/data-store.js?v=20260311-03"></script>
+  <script src="js/charts.js?v=20260311-03"></script>
+  <script src="js/table.js?v=20260311-03"></script>
+  <script src="js/app.js?v=20260311-03"></script>
 </body>
 </html>

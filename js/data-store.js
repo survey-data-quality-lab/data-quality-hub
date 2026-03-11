@@ -330,6 +330,56 @@ window.DQH.dataStore = {
     return results;
   },
 
+  /**
+   * Get per-study data for the Means by Study bar chart.
+   * Returns one entry per study row (no aggregation), sorted by:
+   *   platform order → study date → study id.
+   */
+  getStudyMeansData(field, stageFilter, platforms) {
+    var PLATFORM_ORDER = ['Lab', 'MTurk', 'Moblab', 'Bilendi', 'Prolific'];
+    var studies = this.filterByStage(stageFilter || '1st');
+    if (platforms) {
+      studies = studies.filter(function(s) { return platforms.indexOf(s.platform) !== -1; });
+    }
+    var descField = field === 'overallPassRate' ? 'qualityDescription' : field.replace('Rate', 'Description');
+    var self = this;
+    var result = [];
+
+    for (var i = 0; i < studies.length; i++) {
+      var s = studies[i];
+      var val = s[field];
+      if (val === null || val === undefined) continue;
+      var date = this.parseDate(s.studyDate);
+      var studyId = s.paperReference || (s.researcherName + '||' + s.platform);
+      result.push({
+        platform: s.platform,
+        studyDate: date,
+        studyDateStr: s.studyDate || '',
+        studyId: studyId,
+        rate: val,
+        researcher: s.researcherName,
+        sampleSize: s.sampleSize,
+        stage: s.stage || '',
+        paperReference: s.paperReference || '',
+        description: s[descField] || ''
+      });
+    }
+
+    result.sort(function(a, b) {
+      var ai = PLATFORM_ORDER.indexOf(a.platform);
+      var bi = PLATFORM_ORDER.indexOf(b.platform);
+      if (ai === -1) ai = PLATFORM_ORDER.length;
+      if (bi === -1) bi = PLATFORM_ORDER.length;
+      if (ai !== bi) return ai - bi;
+      var da = a.studyDate ? a.studyDate.getTime() : 0;
+      var db = b.studyDate ? b.studyDate.getTime() : 0;
+      if (da !== db) return da - db;
+      return a.studyId.localeCompare(b.studyId);
+    });
+
+    return result;
+  },
+
   getColor(platform) {
     return window.DQH.config.platformColors[platform] || window.DQH.config.defaultColor;
   }

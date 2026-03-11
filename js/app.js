@@ -7,6 +7,9 @@ window.DQH = window.DQH || {};
 var _selectedConcernId = null;
 var _selectedMetricField = null;
 
+// Chart type: 'trend' | 'means'
+var _selectedChartType = 'trend';
+
 document.addEventListener('DOMContentLoaded', async function() {
   var loading = document.getElementById('loading');
   var dashboard = document.getElementById('dashboard');
@@ -30,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   initThemeToggle();
   initFilterToggles();
   initFilterEvents();
+  initChartTypeToggle();
   initDownloadCSV();
   initExplanationsHashNav();
   initMetricsList();
@@ -203,15 +207,56 @@ function renderMetricSelector() {
 
 function renderMetricCharts() {
   var filter = getFilterState('metric');
+  var field = (_selectedConcernId === 'overall') ? 'overallPassRate' : _selectedMetricField;
+  if (!field) return;
+
+  // Show/hide the two chart containers
+  var trendWrap = document.getElementById('chart-wrap-trend');
+  var meansWrap = document.getElementById('chart-wrap-means-outer');
+  if (trendWrap) trendWrap.style.display = _selectedChartType === 'trend' ? '' : 'none';
+  if (meansWrap) meansWrap.style.display = _selectedChartType === 'means' ? '' : 'none';
+
+  if (_selectedChartType === 'means') {
+    window.DQH.charts.renderStudyMeansChart('chart-metric-means', field, filter.stage, filter.platforms);
+    // Definitions only relevant for specific metrics
+    if (_selectedConcernId !== 'overall') {
+      renderDefinitionsPanel();
+    } else {
+      var list = document.getElementById('definitions-list');
+      if (list) list.innerHTML = '<p class="definitions-empty">Select a specific metric to see definitions.</p>';
+    }
+    return;
+  }
+
+  // Trend view
   if (_selectedConcernId === 'overall') {
     window.DQH.charts.renderTrendChart('chart-metric-trend', 'overallPassRate', filter.stage, filter.platforms);
     var list = document.getElementById('definitions-list');
     if (list) list.innerHTML = '<p class="definitions-empty">Select a specific metric to see definitions.</p>';
     return;
   }
-  if (!_selectedMetricField) return;
   window.DQH.charts.renderMetricWithOverall('chart-metric-trend', _selectedMetricField, filter.stage, filter.platforms);
   renderDefinitionsPanel();
+}
+
+// --- Chart type toggle ---
+function initChartTypeToggle() {
+  var toggle = document.getElementById('chart-type-toggle');
+  if (!toggle) return;
+  var btns = toggle.querySelectorAll('.chart-type-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener('click', function() {
+      var type = this.getAttribute('data-type');
+      if (type === _selectedChartType) return;
+      _selectedChartType = type;
+      // Update active state
+      var all = toggle.querySelectorAll('.chart-type-btn');
+      for (var j = 0; j < all.length; j++) {
+        all[j].classList.toggle('active', all[j].getAttribute('data-type') === type);
+      }
+      renderMetricCharts();
+    });
+  }
 }
 
 // --- Theme toggle ---
@@ -244,6 +289,7 @@ function initFilterToggles() {
   bindToggleBtn('metric-info-btn', 'metric-info-popup');
   bindToggleBtn('definitions-toggle', 'definitions-body');
   bindToggleBtn('explanations-toggle', 'explanations-body');
+  bindToggleBtn('metric-list-toggle', 'metric-list-body');
 }
 
 function bindToggleBtn(btnId, bodyId, onExpand) {
