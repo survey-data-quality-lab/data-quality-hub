@@ -81,6 +81,12 @@ function formatCitation(researcher, timestamp) {
 
 applyChartTheme();
 
+function escHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
 // Canonical platform order for the legend
 var LEGEND_PLATFORM_ORDER = ['Lab', 'MTurk', 'Moblab', 'Bilendi', 'Prolific'];
 
@@ -92,11 +98,21 @@ window.DQH.charts = {
       this.instances[id].destroy();
       delete this.instances[id];
     }
-    // Remove custom legend (lives as sibling of .chart-wrap, inside .chart-card)
+    // Remove custom legend — use closest so it works for deeply-nested canvases too
     var canvas = document.getElementById(id);
     if (canvas) {
-      var old = canvas.parentElement.parentElement.querySelector('.chart-custom-legend');
+      var card = canvas.closest('.chart-card') || canvas.parentElement.parentElement;
+      var old = card.querySelector('.chart-custom-legend');
       if (old) old.parentNode.removeChild(old);
+    }
+    // Hide external tooltips on chart change
+    if (this._meansTooltipEl) {
+      clearTimeout(this._meansTooltipHideTimer);
+      this._meansTooltipEl.style.display = 'none';
+    }
+    if (this._trendTooltipEl) {
+      clearTimeout(this._trendTooltipHideTimer);
+      this._trendTooltipEl.style.display = 'none';
     }
   },
 
@@ -203,7 +219,7 @@ window.DQH.charts = {
    *   _isDashed     {boolean} — true for screening connector lines (hidden)
    *   _isOverall    {boolean} — true for overall-pass-rate reference lines
    */
-  _renderCustomLegend(canvasId, datasets) {
+  _renderCustomLegend(canvasId, datasets, isMeansChart) {
     var canvas = document.getElementById(canvasId);
     if (!canvas) return;
     var card = canvas.closest('.chart-card') || canvas.parentElement.parentElement;
@@ -228,8 +244,10 @@ window.DQH.charts = {
       if (ds._platformName && !platformMap[ds._platformName]) {
         platformMap[ds._platformName] = ds.borderColor;
       }
-      if (ds._is2Stage) has2Stage = true;
-      else hasStandard = true;
+      if (!ds._skipRecruit) {
+        if (ds._is2Stage) has2Stage = true;
+        else hasStandard = true;
+      }
     }
 
     // Build ordered platform list
@@ -243,7 +261,7 @@ window.DQH.charts = {
       if (orderedNames.indexOf(p) === -1) platforms.push({ name: p, color: platformMap[p] });
     });
 
-    if (!platforms.length && !hasOverall) return;
+    if (!platforms.length && !hasOverall && !hasStandard && !has2Stage) return;
 
     var el = document.createElement('div');
     el.className = 'chart-custom-legend';
@@ -281,20 +299,32 @@ window.DQH.charts = {
       if (hasStandard) {
         var stdItem = document.createElement('span');
         stdItem.className = 'legend-item';
-        stdItem.innerHTML =
-          '<svg width="12" height="12" viewBox="0 0 10 10" aria-hidden="true">' +
-          '<circle cx="5" cy="5" r="4.5" fill="' + markerColor + '"/></svg>' +
-          '<span class="legend-item-text">Standard</span>';
+        if (isMeansChart) {
+          stdItem.innerHTML =
+            '<span style="display:inline-block;width:14px;height:10px;background:' + markerColor + 'CC;border:1px solid ' + markerColor + ';border-radius:2px;vertical-align:middle;" aria-hidden="true"></span>' +
+            '<span class="legend-item-text">Standard</span>';
+        } else {
+          stdItem.innerHTML =
+            '<svg width="12" height="12" viewBox="0 0 10 10" aria-hidden="true">' +
+            '<circle cx="5" cy="5" r="4.5" fill="' + markerColor + '"/></svg>' +
+            '<span class="legend-item-text">Standard</span>';
+        }
         sSec.appendChild(stdItem);
       }
 
       if (has2Stage) {
         var tsItem = document.createElement('span');
         tsItem.className = 'legend-item';
-        tsItem.innerHTML =
-          '<svg width="12" height="13" viewBox="0 0 10 11" aria-hidden="true">' +
-          '<polygon points="5,1 9.5,10.5 0.5,10.5" fill="none" stroke="' + markerColor + '" stroke-width="1.5"/></svg>' +
-          '<span class="legend-item-text">2-Stage</span>';
+        if (isMeansChart) {
+          tsItem.innerHTML =
+            '<span style="display:inline-block;width:14px;height:10px;background:repeating-linear-gradient(45deg,' + markerColor + 'CC,' + markerColor + 'CC 3px,rgba(255,255,255,0.45) 3px,rgba(255,255,255,0.45) 6px);border:1px solid ' + markerColor + ';border-radius:2px;vertical-align:middle;" aria-hidden="true"></span>' +
+            '<span class="legend-item-text">2-Stage</span>';
+        } else {
+          tsItem.innerHTML =
+            '<svg width="12" height="13" viewBox="0 0 10 11" aria-hidden="true">' +
+            '<polygon points="5,1 9.5,10.5 0.5,10.5" fill="none" stroke="' + markerColor + '" stroke-width="1.5"/></svg>' +
+            '<span class="legend-item-text">2-Stage</span>';
+        }
         sSec.appendChild(tsItem);
       }
       el.appendChild(sSec);
@@ -367,7 +397,7 @@ window.DQH.charts = {
 
     var opts = this._layout();
     opts.scales = { x: this._xScale(dateRange), y: this._yScale() };
-    opts.plugins.tooltip = { callbacks: this._tooltipCallbacks() };
+    opts.plugins.tooltip = this._getTrendTooltipConfig(store);
 
     var ctx = document.getElementById(canvasId).getContext('2d');
     this.instances[canvasId] = new Chart(ctx, {
@@ -446,7 +476,7 @@ window.DQH.charts = {
     }
 
     var opts = this._layout();
-    opts.plugins.tooltip = { callbacks: this._tooltipCallbacks() };
+    opts.plugins.tooltip = this._getTrendTooltipConfig(store);
     opts.scales = { x: this._xScale(dateRange), y: this._yScale() };
 
     var ctx = document.getElementById(canvasId).getContext('2d');
@@ -458,33 +488,123 @@ window.DQH.charts = {
     this._renderCustomLegend(canvasId, datasets);
   },
 
-  /** Shared tooltip callbacks */
-  _tooltipCallbacks() {
+  /**
+   * External HTML tooltip config for trend charts (scatter/line).
+   * Creates/reuses a persistent DOM element so the tooltip floats above the canvas,
+   * supports clickable author links, and shows a colored dot in the title row.
+   */
+  _getTrendTooltipConfig(store) {
+    var self = this;
+    if (!self._trendTooltipEl) {
+      var ttEl = document.createElement('div');
+      ttEl.className = 'dqh-means-tt'; // reuses the same CSS
+      document.body.appendChild(ttEl);
+      self._trendTooltipEl = ttEl;
+      self._trendTooltipHideTimer = null;
+      ttEl.addEventListener('mouseenter', function() {
+        clearTimeout(self._trendTooltipHideTimer);
+        self._trendTooltipHideTimer = null;
+      });
+      ttEl.addEventListener('mouseleave', function() {
+        ttEl.style.display = 'none';
+      });
+      ttEl.addEventListener('click', function(e) {
+        var a = e.target.closest('[data-paper-ref]');
+        if (a) {
+          e.preventDefault();
+          self._navigateToStudy(a.getAttribute('data-paper-ref'));
+          ttEl.style.display = 'none';
+        }
+      });
+    }
+    var tooltipEl = self._trendTooltipEl;
+
     return {
-      label: function(ctx) {
-        var date = new Date(ctx.raw.x);
-        var dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
-        var m = ctx.raw._meta;
-        var nStr = (m && m.sampleSize) ? '  ·  N = ' + m.sampleSize : '';
-        var pName = ctx.dataset._platformName || ctx.dataset.label;
-        return pName + ': ' + ctx.raw.y + '%  ·  ' + dateStr + nStr;
-      },
-      afterLabel: function(ctx) {
-        var m = ctx.raw._meta;
-        if (!m) return [];
-        var lines = [];
-        // Description first — word-wrapped to ~45 chars per line
+      enabled: false,
+      external: function(context) {
+        var tooltip = context.tooltip;
+        if (tooltip.opacity === 0) {
+          self._trendTooltipHideTimer = setTimeout(function() {
+            tooltipEl.style.display = 'none';
+          }, 120);
+          return;
+        }
+        clearTimeout(self._trendTooltipHideTimer);
+        self._trendTooltipHideTimer = null;
+
+        var dataPoints = tooltip.dataPoints;
+        if (!dataPoints || !dataPoints.length) return;
+
+        // Pick the first non-dashed, non-overall data point
+        var item = null;
+        for (var k = 0; k < dataPoints.length; k++) {
+          if (!dataPoints[k].dataset._isDashed && !dataPoints[k].dataset._isOverall) {
+            item = dataPoints[k]; break;
+          }
+        }
+        if (!item || item.raw == null) { tooltipEl.style.display = 'none'; return; }
+
+        var m = item.raw._meta;
+        if (!m) return;
+
+        var platform = item.dataset._platformName || '';
+        var baseColor = store.getColor(platform);
+        var dateStr = m.date
+          ? m.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
+          : '';
+        var citation = m.researcher
+          ? formatCitation(m.researcher, m.date ? m.date.getTime() : null)
+          : '';
+        var stageDisplay = '';
+        if (m.stage) {
+          var sl = m.stage.toLowerCase();
+          if (sl.indexOf('second') !== -1) stageDisplay = '2-Stage';
+          else if (sl.indexOf('first') !== -1) stageDisplay = 'Standard';
+          else stageDisplay = m.stage;
+        }
+
+        var authorHtml = citation
+          ? '<span class="dqh-means-tt-sep">\u2022</span>' +
+            (m.paperReference
+              ? '<a href="#studies" data-paper-ref="' + escHtml(m.paperReference) + '">' + escHtml(citation) + '</a>'
+              : '<span style="font-weight:400">' + escHtml(citation) + '</span>')
+          : '';
+
+        var measureHtml = '';
         if (m.description) {
-          var descLines = wrapText('Measure: ' + m.description, 45);
-          for (var i = 0; i < descLines.length; i++) lines.push(descLines[i]);
-          lines.push('');
+          var descLines = wrapText(m.description, 42);
+          measureHtml =
+            '<div style="height:4px"></div>' +
+            '<div class="dqh-means-tt-measure-lbl">Measure:</div>' +
+            '<div>' + descLines.map(function(l) { return escHtml(l); }).join('<br>') + '</div>';
         }
-        if (m.stage) lines.push('Stage: ' + m.stage);
-        // Citation: format as "LastName et al. (year)" if >2 authors
-        if (m.researcher) {
-          lines.push(formatCitation(m.researcher, ctx.raw.x));
-        }
-        return lines;
+
+        tooltipEl.innerHTML =
+          '<div class="dqh-means-tt-title">' +
+            '<span class="dqh-means-tt-dot" style="background:' + baseColor + '"></span>' +
+            '<span>' + escHtml(platform) + '</span>' +
+            authorHtml +
+          '</div>' +
+          '<div class="dqh-means-tt-passrate">Pass Rate: ' + item.raw.y + '%</div>' +
+          (dateStr ? '<div>Date: ' + escHtml(dateStr) + '</div>' : '') +
+          (m.sampleSize ? '<div>Sample Size: N\u00A0=\u00A0' + m.sampleSize + '</div>' : '') +
+          '<div>Screening: ' + escHtml(stageDisplay) + '</div>' +
+          measureHtml;
+
+        // Position: above the caret, shift left if near right viewport edge
+        var canvas = context.chart.canvas;
+        var rect = canvas.getBoundingClientRect();
+        tooltipEl.style.display = 'block';
+        var ttW = tooltipEl.offsetWidth;
+        var ttH = tooltipEl.offsetHeight;
+        var absX = rect.left + window.scrollX + tooltip.caretX;
+        var absY = rect.top + window.scrollY + tooltip.caretY;
+        var left = absX + 12;
+        var top  = absY - ttH - 10;
+        if (left + ttW > window.scrollX + window.innerWidth - 10) left = absX - ttW - 12;
+        if (top < window.scrollY + 10) top = absY + 20;
+        tooltipEl.style.left = left + 'px';
+        tooltipEl.style.top  = top  + 'px';
       }
     };
   },
@@ -566,7 +686,7 @@ window.DQH.charts = {
 
     var opts = this._layout();
     opts.scales = { x: this._xScale(dateRange), y: this._yScale() };
-    opts.plugins.tooltip = { callbacks: this._tooltipCallbacks() };
+    opts.plugins.tooltip = this._getTrendTooltipConfig(store);
 
     var ctx = document.getElementById(canvasId).getContext('2d');
     this.instances[canvasId] = new Chart(ctx, {
@@ -578,7 +698,9 @@ window.DQH.charts = {
   },
 
   /**
-   * Means by Study bar chart: one bar per study row, grouped by platform.
+   * Means by Platform bar chart: one bar per study row, grouped by platform.
+   * 2-stage bars use a diagonal stripe pattern; standard bars are solid.
+   * Platform names are centered over each group; value % labels appear above each bar.
    */
   renderStudyMeansChart(canvasId, field, stageFilter, platforms) {
     this.destroy(canvasId);
@@ -590,13 +712,40 @@ window.DQH.charts = {
     this.clearEmpty(canvasId);
 
     var mobile = isMobile();
-    var is2nd = (stageFilter === '2nd');
     var labels = [];
     var values = [];
     var bgColors = [];
     var borderColors = [];
     var metaArr = [];
     var lastPlatform = null;
+    var hasStandard = false;
+    var has2Stage = false;
+
+    // Get canvas context early — needed for CanvasPattern creation
+    var canvasEl = document.getElementById(canvasId);
+    var ctx = canvasEl.getContext('2d');
+
+    // Create diagonal-stripe CanvasPattern for a given hex color (cached per color)
+    var stripeCache = {};
+    function makeStripePattern(hexColor) {
+      if (stripeCache[hexColor]) return stripeCache[hexColor];
+      var sz = 8;
+      var pc = document.createElement('canvas');
+      pc.width = sz; pc.height = sz;
+      var pctx = pc.getContext('2d');
+      pctx.fillStyle = hexColor + 'CC';
+      pctx.fillRect(0, 0, sz, sz);
+      pctx.strokeStyle = 'rgba(255,255,255,0.38)';
+      pctx.lineWidth = 2.5;
+      pctx.beginPath();
+      pctx.moveTo(-sz, 0); pctx.lineTo(0, sz);
+      pctx.moveTo(0, 0);   pctx.lineTo(sz, sz);
+      pctx.moveTo(sz, 0);  pctx.lineTo(sz * 2, sz);
+      pctx.stroke();
+      var pat = ctx.createPattern(pc, 'repeat');
+      stripeCache[hexColor] = pat;
+      return pat;
+    }
 
     for (var i = 0; i < studyData.length; i++) {
       var s = studyData[i];
@@ -621,7 +770,14 @@ window.DQH.charts = {
       values.push(s.rate);
 
       var baseColor = store.getColor(s.platform);
-      bgColors.push(baseColor + (is2nd ? '99' : 'CC'));
+      var barIs2Stage = s.stage && s.stage.toLowerCase().indexOf('second') !== -1;
+      if (barIs2Stage) {
+        has2Stage = true;
+        bgColors.push(makeStripePattern(baseColor));
+      } else {
+        hasStandard = true;
+        bgColors.push(baseColor + 'CC');
+      }
       borderColors.push(baseColor);
       metaArr.push(s);
       lastPlatform = s.platform;
@@ -636,12 +792,14 @@ window.DQH.charts = {
       _metaArr: metaArr
     }];
 
-    // Explicit canvas dimensions for horizontal scroll chart
-    var CHART_HEIGHT = 340;
-    var chartWidth = Math.max(labels.length * 54 + 60, 400);
+    // Canvas height: derived from CSS breakpoints (avoids clientHeight = 0 when parent is hidden on first render)
+    // Matches .chart-wrap-means-outer heights: 420px (desktop), 350px (@768), 310px (@480)
+    var vw = window.innerWidth;
+    var CHART_HEIGHT = (vw <= 480 ? 310 : vw <= 768 ? 350 : 420) - 40;
+    var barWidth = mobile ? 40 : 60;
+    var chartWidth = Math.max(labels.length * barWidth + 80, mobile ? 340 : 460);
     var scrollEl = document.getElementById('chart-means-scroll');
     if (scrollEl) scrollEl.style.minWidth = chartWidth + 'px';
-    var canvasEl = document.getElementById(canvasId);
     if (canvasEl) {
       canvasEl.width = chartWidth;
       canvasEl.height = CHART_HEIGHT;
@@ -650,8 +808,10 @@ window.DQH.charts = {
     var self = this;
     var opts = this._layout();
     opts.responsive = false;
+    // Top padding: room for platform name label (above chart area) + value labels (just below)
+    opts.layout = { padding: { top: mobile ? 36 : 42 } };
 
-    // Override onClick for bar chart (data points are plain values, metadata in _metaArr)
+    // Override onClick for bar chart
     opts.onClick = function(event, elements) {
       if (!elements || !elements.length) return;
       var el = elements[0];
@@ -668,10 +828,9 @@ window.DQH.charts = {
         ticks: {
           maxRotation: 45,
           minRotation: 45,
-          font: { size: mobile ? 9 : 10 },
+          font: { size: mobile ? 10 : 12 },
           autoSkip: false,
           color: function(ctx) {
-            // Dim the empty gap labels
             return (ctx.tick && ctx.tick.label === '') ? 'transparent' : undefined;
           }
         }
@@ -679,42 +838,176 @@ window.DQH.charts = {
       y: this._yScale()
     };
 
-    opts.plugins.tooltip = {
-      filter: function(item) { return item.raw !== null; },
-      callbacks: {
-        title: function(items) {
-          if (!items.length) return '';
-          var m = items[0].dataset._metaArr && items[0].dataset._metaArr[items[0].dataIndex];
-          return m ? m.platform : '';
-        },
-        label: function(ctx) {
-          var m = ctx.dataset._metaArr && ctx.dataset._metaArr[ctx.dataIndex];
-          if (!m) return '';
-          var dateStr = m.studyDate
-            ? m.studyDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
-            : m.studyDateStr;
-          var nStr = m.sampleSize ? '  ·  N = ' + m.sampleSize : '';
-          return m.platform + ': ' + ctx.raw + '%  ·  ' + dateStr + nStr;
-        },
-        afterLabel: function(ctx) {
-          var m = ctx.dataset._metaArr && ctx.dataset._metaArr[ctx.dataIndex];
-          if (!m) return [];
-          var lines = [];
-          if (m.description) {
-            var descLines = wrapText('Measure: ' + m.description, 45);
-            for (var i = 0; i < descLines.length; i++) lines.push(descLines[i]);
-            lines.push('');
-          }
-          if (m.stage) lines.push('Stage: ' + m.stage);
-          if (m.researcher) {
-            lines.push(formatCitation(m.researcher, m.studyDate ? m.studyDate.getTime() : null));
-          }
-          return lines;
+    // External HTML tooltip — renders as a DOM element so it's always above canvas content
+    // and supports clickable author links and a colored dot in the title row.
+    if (!self._meansTooltipEl) {
+      var ttEl = document.createElement('div');
+      ttEl.className = 'dqh-means-tt';
+      document.body.appendChild(ttEl);
+      self._meansTooltipEl = ttEl;
+      self._meansTooltipHideTimer = null;
+      ttEl.addEventListener('mouseenter', function() {
+        clearTimeout(self._meansTooltipHideTimer);
+        self._meansTooltipHideTimer = null;
+      });
+      ttEl.addEventListener('mouseleave', function() {
+        ttEl.style.display = 'none';
+      });
+      // Clicking an author link navigates to the study
+      ttEl.addEventListener('click', function(e) {
+        var a = e.target.closest('[data-paper-ref]');
+        if (a) {
+          e.preventDefault();
+          self._navigateToStudy(a.getAttribute('data-paper-ref'));
+          ttEl.style.display = 'none';
         }
+      });
+    }
+    var meansTooltipEl = self._meansTooltipEl;
+
+    opts.plugins.tooltip = {
+      enabled: false,
+      external: function(context) {
+        var tooltip = context.tooltip;
+        if (tooltip.opacity === 0) {
+          self._meansTooltipHideTimer = setTimeout(function() {
+            meansTooltipEl.style.display = 'none';
+          }, 120);
+          return;
+        }
+        clearTimeout(self._meansTooltipHideTimer);
+        self._meansTooltipHideTimer = null;
+
+        var dataPoints = tooltip.dataPoints;
+        if (!dataPoints || !dataPoints.length) return;
+        var item = dataPoints[0];
+        if (item.raw === null || item.raw === undefined) return;
+        var m = item.dataset._metaArr && item.dataset._metaArr[item.dataIndex];
+        if (!m) return;
+
+        var baseColor = store.getColor(m.platform);
+        var dateStr = m.studyDate
+          ? m.studyDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
+          : (m.studyDateStr || '');
+        var citation = m.researcher
+          ? formatCitation(m.researcher, m.studyDate ? m.studyDate.getTime() : null)
+          : '';
+        var stageDisplay = '';
+        if (m.stage) {
+          var sl = m.stage.toLowerCase();
+          if (sl.indexOf('second') !== -1) stageDisplay = '2-Stage';
+          else if (sl.indexOf('first') !== -1) stageDisplay = 'Standard';
+          else stageDisplay = m.stage;
+        }
+
+        var authorHtml = citation
+          ? '<span class="dqh-means-tt-sep">\u2022</span>' +
+            (m.paperReference
+              ? '<a href="#studies" data-paper-ref="' + escHtml(m.paperReference) + '">' + escHtml(citation) + '</a>'
+              : '<span style="font-weight:400">' + escHtml(citation) + '</span>')
+          : '';
+
+        var measureHtml = '';
+        if (m.description) {
+          var descLines = wrapText(m.description, 42);
+          measureHtml =
+            '<div style="height:4px"></div>' +
+            '<div class="dqh-means-tt-measure-lbl">Measure:</div>' +
+            '<div>' + descLines.map(function(l) { return escHtml(l); }).join('<br>') + '</div>';
+        }
+
+        meansTooltipEl.innerHTML =
+          '<div class="dqh-means-tt-title">' +
+            '<span class="dqh-means-tt-dot" style="background:' + baseColor + '"></span>' +
+            '<span>' + escHtml(m.platform) + '</span>' +
+            authorHtml +
+          '</div>' +
+          '<div class="dqh-means-tt-passrate">Pass Rate: ' + item.raw + '%</div>' +
+          (dateStr ? '<div>Date: ' + escHtml(dateStr) + '</div>' : '') +
+          (m.sampleSize ? '<div>Sample Size: N\u00A0=\u00A0' + m.sampleSize + '</div>' : '') +
+          '<div>Screening: ' + escHtml(stageDisplay) + '</div>' +
+          measureHtml;
+
+        // Position: above the caret, shift left if near right viewport edge
+        var canvas = context.chart.canvas;
+        var rect = canvas.getBoundingClientRect();
+        meansTooltipEl.style.display = 'block';
+        var ttW = meansTooltipEl.offsetWidth;
+        var ttH = meansTooltipEl.offsetHeight;
+        var absX = rect.left + window.scrollX + tooltip.caretX;
+        var absY = rect.top + window.scrollY + tooltip.caretY;
+        var left = absX + 12;
+        var top  = absY - ttH - 10;
+        if (left + ttW > window.scrollX + window.innerWidth - 10) left = absX - ttW - 12;
+        if (top < window.scrollY + 10) top = absY + 20;
+        meansTooltipEl.style.left = left + 'px';
+        meansTooltipEl.style.top  = top  + 'px';
       }
     };
 
-    // Build legend pseudo-datasets (one per visible platform)
+    // Inline plugin: draw platform name centered over each group + value % above each bar
+    var platformLabelPlugin = {
+      id: 'platformLabels',
+      afterDraw: function(chart) {
+        var cctx = chart.ctx;
+        var ds = chart.data.datasets[0];
+        var chartMeta = chart.getDatasetMeta(0);
+        var light = isLightTheme();
+        var chartTop = chart.chartArea ? chart.chartArea.top : 0;
+
+        // Build per-platform: track first and last bar index for centering
+        var groups = {};
+        for (var gi = 0; gi < ds._metaArr.length; gi++) {
+          var gm = ds._metaArr[gi];
+          if (!gm) continue;
+          var gp = gm.platform;
+          if (!groups[gp]) groups[gp] = { minIdx: gi, maxIdx: gi };
+          else if (gi > groups[gp].maxIdx) groups[gp].maxIdx = gi;
+        }
+
+        // Platform name labels: centered above each group, in top-padding area
+        cctx.save();
+        cctx.textAlign = 'center';
+        cctx.textBaseline = 'middle';
+        cctx.font = (mobile ? 12 : 14) + 'px Inter, sans-serif';
+        cctx.fillStyle = light ? '#1A1D27' : '#E8EAF0';
+
+        var groupKeys = Object.keys(groups);
+        for (var gi2 = 0; gi2 < groupKeys.length; gi2++) {
+          var gName = groupKeys[gi2];
+          var g = groups[gName];
+          var firstEl = chartMeta.data[g.minIdx];
+          var lastEl  = chartMeta.data[g.maxIdx];
+          if (!firstEl || !lastEl) continue;
+          var centerX = (firstEl.x + lastEl.x) / 2;
+          var nameY = chartTop - (mobile ? 14 : 16);
+          cctx.fillText(gName, centerX, nameY);
+        }
+        cctx.restore();
+
+        // Value % labels: just above each individual bar
+        cctx.save();
+        cctx.textAlign = 'center';
+        cctx.textBaseline = 'bottom';
+        cctx.font = 'bold ' + (mobile ? 11 : 13) + 'px Inter, sans-serif';
+        cctx.fillStyle = light ? '#4A5068' : '#9BA1B5';
+
+        for (var vi = 0; vi < ds._metaArr.length; vi++) {
+          var vm = ds._metaArr[vi];
+          if (!vm) continue;
+          var val = ds.data[vi];
+          if (val === null || val === undefined) continue;
+          var vEl = chartMeta.data[vi];
+          if (!vEl) continue;
+          // Clamp so value label doesn't overlap the platform name
+          var valY = Math.max(vEl.y - 3, chartTop + (mobile ? 14 : 16));
+          cctx.fillText(val + '%', vEl.x, valY);
+        }
+        cctx.restore();
+      }
+    };
+
+    // Build legend datasets: platforms (with _skipRecruit) + explicit recruitment entries
     var legendDatasets = [];
     var seenPlatforms = {};
     for (var j = 0; j < studyData.length; j++) {
@@ -723,21 +1016,24 @@ window.DQH.charts = {
         seenPlatforms[p] = true;
         legendDatasets.push({
           _platformName: p,
-          _is2Stage: is2nd,
+          _is2Stage: false,
           _isDashed: false,
           _isOverall: false,
+          _skipRecruit: true,
           borderColor: store.getColor(p)
         });
       }
     }
+    if (hasStandard) legendDatasets.push({ _platformName: null, _is2Stage: false, _isDashed: false, _isOverall: false, borderColor: '' });
+    if (has2Stage)   legendDatasets.push({ _platformName: null, _is2Stage: true,  _isDashed: false, _isOverall: false, borderColor: '' });
 
-    var ctx = document.getElementById(canvasId).getContext('2d');
     this.instances[canvasId] = new Chart(ctx, {
       type: 'bar',
       data: { labels: labels, datasets: datasets },
-      options: opts
+      options: opts,
+      plugins: [platformLabelPlugin]
     });
-    this._renderCustomLegend(canvasId, legendDatasets);
+    this._renderCustomLegend(canvasId, legendDatasets, true);
   },
 
   showEmpty(canvasId) {

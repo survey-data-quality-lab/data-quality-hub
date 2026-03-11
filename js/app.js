@@ -8,7 +8,7 @@ var _selectedConcernId = null;
 var _selectedMetricField = null;
 
 // Chart type: 'trend' | 'means'
-var _selectedChartType = 'trend';
+var _selectedChartType = 'means';
 
 document.addEventListener('DOMContentLoaded', async function() {
   var loading = document.getElementById('loading');

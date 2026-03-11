@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20260311-03">
+  <link rel="stylesheet" href="css/styles.css?v=20260311-15">
   <script>if(localStorage.getItem('dqh-theme')!=='dark')document.documentElement.setAttribute('data-theme','light');</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -27,7 +27,7 @@
       <div class="header-top">
         <div class="header-brand">
           <div class="header-icon" aria-hidden="true">📊</div>
-          <h1 class="header-title">Data Quality Hub</h1>
+          <h1 class="header-title">Data Quality Hub for Online Surveys</h1>
         </div>
         <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode">
           <svg class="theme-icon theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -100,8 +100,8 @@
             <div class="chart-card">
               <div class="chart-header">
                 <div class="chart-type-toggle" id="chart-type-toggle">
-                  <button class="chart-type-btn active" data-type="trend" type="button">Trend Over Time</button>
-                  <button class="chart-type-btn" data-type="means" type="button">Means by Study</button>
+                  <button class="chart-type-btn active" data-type="means" type="button">Means by Platform</button>
+                  <button class="chart-type-btn" data-type="trend" type="button">Trends</button>
                 </div>
               </div>
               <div class="metric-selector">
@@ -114,11 +114,11 @@
                 <div class="metric-selector-l2" id="metric-selector-l2"></div>
               </div>
               <div class="filter-panel">
-                <button class="filter-toggle expanded" id="metric-filter-toggle" type="button">
+                <button class="filter-toggle" id="metric-filter-toggle" type="button">
                   <span>Filters</span>
                   <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"></polyline></svg>
                 </button>
-                <div class="filter-body expanded" id="metric-filter-body">
+                <div class="filter-body collapsed" id="metric-filter-body">
                   <div class="filter-group">
                     <div class="filter-group-label">Recruitment</div>
                     <div class="filter-stage-row">
@@ -144,10 +144,10 @@
                   </div>
                 </div>
               </div>
-              <div class="chart-wrap chart-wrap-trend" id="chart-wrap-trend">
+              <div class="chart-wrap chart-wrap-trend" id="chart-wrap-trend" style="display:none;">
                 <canvas id="chart-metric-trend"></canvas>
               </div>
-              <div class="chart-wrap-means-outer" id="chart-wrap-means-outer" style="display:none;">
+              <div class="chart-wrap-means-outer" id="chart-wrap-means-outer">
                 <div class="chart-means-scroll" id="chart-means-scroll">
                   <canvas id="chart-metric-means"></canvas>
                 </div>
@@ -207,7 +207,7 @@
                       <p class="concern-card-desc">Whether multiple responses were submitted by the same human using multiple accounts or fake accounts</p>
                     </div>
                   </div>
-                  <p>Each of these concerns can be addressed with targeted quality checks, which may evolve over time. As a starting point, this dashboard tracks the checks introduced and validated in our companion paper — and will expand as researchers contribute new metrics.</p>
+                  <p>Each of these concerns can be addressed with targeted quality checks, which may evolve over time. As a starting point, this dashboard tracks the checks discussed in our companion paper — and will expand as researchers contribute new metrics.</p>
                 </div>
                 <div class="about-references">
                   <h3>References</h3>
@@ -247,7 +247,7 @@
                   <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
                 </div>
                 <div class="metric-item-body collapsed">
-                  <p>Passes instructional attention check. For example, equal to 1 if respondents correctly select the option furthest to the &ldquo;left&rdquo; and &ldquo;right&rdquo; when asked to do so in a 5-point Likert question.</p>
+                  <p>Equal to 1 if respondents pass instructional attention checks. For example, respondent correctly selects the option furthest to the &ldquo;left&rdquo; and &ldquo;right&rdquo; when asked to do so in a 5-point Likert question.</p>
                   <div class="metric-item-note metric-note-good">Higher pass rates indicate more attentive participants.</div>
                 </div>
               </div>
@@ -501,11 +501,11 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/config.js?v=20260311-03"></script>
-  <script src="js/csv-parser.js?v=20260311-03"></script>
-  <script src="js/data-store.js?v=20260311-03"></script>
-  <script src="js/charts.js?v=20260311-03"></script>
-  <script src="js/table.js?v=20260311-03"></script>
-  <script src="js/app.js?v=20260311-03"></script>
+  <script src="js/config.js?v=20260311-15"></script>
+  <script src="js/csv-parser.js?v=20260311-15"></script>
+  <script src="js/data-store.js?v=20260311-15"></script>
+  <script src="js/charts.js?v=20260311-15"></script>
+  <script src="js/table.js?v=20260311-15"></script>
+  <script src="js/app.js?v=20260311-15"></script>
 </body>
 </html>
