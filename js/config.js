@@ -20,6 +20,7 @@ window.DQH.config = {
     'Study link': 'studyLink',
     'Contact Email': 'contactEmail',
     'Platform': 'platform',
+    'Country': 'country',
     'If Other, please specify': 'platformOther',
     'Sample Size': 'sampleSize',
     'Approximate Study Date': 'studyDate',

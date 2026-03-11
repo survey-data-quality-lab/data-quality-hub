@@ -72,9 +72,32 @@ a:hover { text-decoration: underline; }
 .header {
   padding: 40px 0 24px;
   border-bottom: 2px solid var(--border);
-  background: linear-gradient(180deg, var(--bg-elevated) 0%, transparent 100%);
+  background: var(--bg-card) url('../background/background_light.png') center center / cover no-repeat;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
   position: relative;
   overflow: hidden;
+}
+
+[data-theme="dark"] .header {
+  background-image: url('../background/background_dark.png');
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 110% at center, rgba(255,255,255,0.80) 0%, rgba(255,255,255,0.04) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-theme="dark"] .header::before {
+  background: radial-gradient(ellipse 50% 110% at center, rgba(15,17,23,0.70) 0%, rgba(15,17,23,0.04) 100%);
+}
+
+.header > .container {
+  position: relative;
+  z-index: 1;
 }
 
 .header-top {
@@ -117,10 +140,11 @@ a:hover { text-decoration: underline; }
   font-weight: 700;
   letter-spacing: -0.03em;
   margin-bottom: 0;
-  background: linear-gradient(135deg, #4A6EE0 0%, #6C8EFF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #3A5CC5;
+}
+
+[data-theme="dark"] .header-title {
+  color: #6C8EFF;
 }
 
 .theme-toggle {
@@ -161,10 +185,11 @@ a:hover { text-decoration: underline; }
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 4px;
-  background: linear-gradient(135deg, #4A6EE0 0%, #6C8EFF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #3A5CC5;
+}
+
+[data-theme="dark"] .header-desc p:first-child {
+  color: #6C8EFF;
 }
 
 .header-desc p + p {
@@ -277,9 +302,13 @@ a:hover { text-decoration: underline; }
 }
 
 .header-stat strong {
-  color: var(--accent);
+  color: #3A5CC5;
   font-weight: 700;
   font-size: 1.05rem;
+}
+
+[data-theme="dark"] .header-stat strong {
+  color: #6C8EFF;
 }
 
 .header-stat-sep {
@@ -518,12 +547,15 @@ a:hover { text-decoration: underline; }
 .section-title-toggle .toggle-chevron {
   margin-left: auto;
   flex-shrink: 0;
-  opacity: 0.45;
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+  opacity: 0.75;
   transition: transform 0.25s ease, opacity 0.15s;
 }
 
 .section-title-toggle:hover .toggle-chevron {
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .section-title-toggle.expanded .toggle-chevron {
@@ -1036,13 +1068,11 @@ a:hover { text-decoration: underline; }
 /* --- Contribute Section (end of page) --- */
 .contribute-section {
   padding: 24px 0 32px;
-  border-top: 1px solid var(--border);
 }
 
 .contribute-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-top: 3px solid var(--accent);
   border-radius: 10px;
   padding: 24px 28px;
   display: flex;
@@ -1130,6 +1160,17 @@ a:hover { text-decoration: underline; }
   font-size: 0.72em;
   font-weight: 800;
 }
+.contribute-chips .chip-break {
+  width: 100%;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: none;
+  border: none;
+}
+.contribute-chips .chip-break::before { content: none; }
 
 .contribute-time {
   display: flex;
@@ -1165,7 +1206,7 @@ a:hover { text-decoration: underline; }
 
 /* --- More Section --- */
 .section-more {
-  padding: 8px 0 24px;
+  padding: 20px 0 32px;
 }
 
 .section-more-title {
@@ -1181,12 +1222,16 @@ a:hover { text-decoration: underline; }
 }
 
 .more-section {
-  padding: 20px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 24px 28px;
+  margin-bottom: 16px;
+  background: var(--bg-card);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  border: 1px solid var(--border);
 }
 
 .more-section:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .more-section-title {
@@ -1202,7 +1247,7 @@ a:hover { text-decoration: underline; }
 /* Column header row — must match .study-l2 grid exactly */
 .study-col-header {
   display: grid;
-  grid-template-columns: 20px 80px 55px 76px 68px 88px 68px 68px 1fr;
+  grid-template-columns: 20px 1.4fr 1fr 0.7fr 0.9fr 1fr 1fr 1.2fr;
   align-items: center;
   gap: 4px;
   padding: 8px 16px 8px 24px;
@@ -1214,12 +1259,13 @@ a:hover { text-decoration: underline; }
   border-bottom: 1px solid var(--border);
 }
 
-.col-n {
+.col-n, .col-country, .col-date, .col-rate, .col-attention, .col-recruitment {
   text-align: center;
 }
 
-.col-rate, .col-attention, .col-ai, .col-fraud {
-  text-align: right;
+.col-country {
+  color: var(--text-tertiary);
+  font-size: 0.7rem;
 }
 
 .table-controls {
@@ -1296,6 +1342,11 @@ a:hover { text-decoration: underline; }
 
 .study-l1 .toggle-chevron {
   transition: transform 0.3s ease;
+}
+
+.study-l1 .l1-chevron {
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 .study-l1.expanded > .toggle-chevron {
@@ -1382,7 +1433,52 @@ a:hover { text-decoration: underline; }
   font-weight: 600;
 }
 
-.l2-design {
+.study-info-header {
+  margin-bottom: 8px;
+}
+
+.study-info-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.study-info-authors {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.study-info-bg {
+  padding: 4px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.study-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+}
+
+.study-info-bg strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.info-val {
+  color: #3A5CC5;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .info-val {
+  color: #6C8EFF;
+}
+
+.l2-recruitment {
   color: var(--text-secondary);
   font-size: 0.8rem;
   overflow: hidden;
@@ -1390,8 +1486,12 @@ a:hover { text-decoration: underline; }
   white-space: nowrap;
 }
 
-.l3-design {
+.l2-country {
   color: var(--text-secondary);
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .l1-children {
@@ -1407,7 +1507,7 @@ a:hover { text-decoration: underline; }
 
 .study-l2 {
   display: grid;
-  grid-template-columns: 20px 80px 55px 76px 68px 88px 68px 68px 1fr;
+  grid-template-columns: 20px 1.4fr 1fr 0.7fr 0.9fr 1fr 1fr 1.2fr;
   align-items: center;
   gap: 4px;
   padding: 10px 16px 10px 24px;
@@ -1442,8 +1542,8 @@ a:hover { text-decoration: underline; }
   font-variant-numeric: tabular-nums;
 }
 
-.l2-rate, .l2-attention, .l2-ai, .l2-fraud {
-  text-align: right;
+.l2-n, .l2-country, .l2-date, .l2-rate, .l2-attention, .l2-recruitment {
+  text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1462,7 +1562,7 @@ a:hover { text-decoration: underline; }
 
 .study-l3 {
   display: grid;
-  grid-template-columns: 20px 80px 55px 76px 68px 88px 68px 68px 1fr;
+  grid-template-columns: 20px 1.4fr 1fr 0.7fr 0.9fr 1fr 1fr 1.2fr;
   align-items: center;
   gap: 4px;
   padding: 8px 16px 8px 48px;
@@ -1785,6 +1885,18 @@ a:hover { text-decoration: underline; }
 .footer {
   padding: 36px 0 44px;
   border-top: 1px solid var(--border);
+  background: var(--bg-card) url('../background/background_light.png') center center / cover no-repeat;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .footer {
+  background-image: url('../background/background_dark.png');
+}
+
+.footer > .container {
+  position: relative;
+  z-index: 1;
 }
 
 .footer-inner {
@@ -1866,17 +1978,15 @@ a:hover { text-decoration: underline; }
     gap: 20px;
   }
 
-  /* Hide AI Detect, Fraud and Design columns on tablet */
-  .col-ai, .col-fraud, .col-design,
-  .l2-ai, .l2-fraud, .l2-design,
-  .l3-ai, .l3-fraud, .l3-design {
+  /* Hide Country on tablet */
+  .col-country, .l2-country, .l3-country {
     display: none;
   }
 
   .study-col-header,
   .study-l2,
   .study-l3 {
-    grid-template-columns: 18px 75px 48px 68px 62px 80px;
+    grid-template-columns: 20px 1.4fr 0.7fr 0.9fr 1fr 1fr 1.2fr;
     gap: 4px;
     font-size: 0.8rem;
   }
@@ -1925,17 +2035,17 @@ a:hover { text-decoration: underline; }
     display: none;
   }
 
-  /* Also hide Attention and Fraud on phone — keep Platform, N, Date, Pass Rate */
-  .col-attention, .col-fraud,
-  .l2-attention, .l2-fraud,
-  .l3-attention, .l3-fraud {
+  /* Also hide Attention and Recruitment on phone — keep Platform, N, Date, Pass Rate */
+  .col-attention, .col-recruitment,
+  .l2-attention, .l2-recruitment,
+  .l3-attention, .l3-recruitment {
     display: none;
   }
 
   .study-col-header,
   .study-l2,
   .study-l3 {
-    grid-template-columns: 16px 70px 38px 62px 54px;
+    grid-template-columns: 16px 1.5fr 0.8fr 1.1fr 1.2fr;
     gap: 4px;
     padding-left: 12px;
     padding-right: 12px;

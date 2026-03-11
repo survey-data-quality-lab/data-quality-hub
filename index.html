@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20260311-15">
+  <link rel="stylesheet" href="css/styles.css?v=20260311-30">
   <script>if(localStorage.getItem('dqh-theme')!=='dark')document.documentElement.setAttribute('data-theme','light');</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -153,27 +153,18 @@
                 </div>
               </div>
             </div>
-            <div class="definitions-panel">
-              <button class="definitions-toggle" id="definitions-toggle" type="button">
-                <span>See Definitions</span>
-                <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"></polyline></svg>
-              </button>
-              <div class="definitions-body collapsed" id="definitions-body">
-                <div id="definitions-list" class="definitions-list"></div>
-              </div>
-            </div>
           </div>
 
           <!-- Data Quality Concerns -->
           <div class="more-section" id="explanations">
             <h3 class="more-section-title">
-              <button class="section-title-toggle expanded" id="explanations-toggle" type="button" aria-expanded="true" aria-controls="explanations-body">
+              <button class="section-title-toggle" id="explanations-toggle" type="button" aria-expanded="false" aria-controls="explanations-body">
                 <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 Data Quality Concerns
                 <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 8 10 12 14 8"></polyline></svg>
               </button>
             </h3>
-            <div class="explanations-body expanded" id="explanations-body">
+            <div class="explanations-body collapsed" id="explanations-body">
               <div class="about-content">
                 <div class="about-intro">
                   <p>A central concern with online studies is whether each response was submitted by a single attentive human participant.</p>
@@ -209,9 +200,9 @@
                   </div>
                   <p>Each of these concerns can be addressed with targeted quality checks, which may evolve over time. As a starting point, this dashboard tracks the checks discussed in our companion paper — and will expand as researchers contribute new metrics.</p>
                 </div>
-                <div class="about-references">
+                <div class="about-references" style="margin-top:1.25em">
                   <h3>References</h3>
-                  <p>Builds on <a href="https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf" target="_blank" rel="noopener"><em>&ldquo;Mission Possible: The Collection of High Quality Online Data&rdquo;</em></a> by &Ccedil;elebi, Exley, Harrs, Kivimaki, Serra-Garcia &amp; Yusof (2026). The paper provides an evidence-based assessment of data quality across online survey platforms, using laboratory and AI agent responses as benchmarks. It also proposes a new <em>two-stage recruitment method</em> to ensure high-quality online data in an evolving landscape. Materials are available in the companion <a href="https://github.com/survey-data-quality-lab/mission-possible" target="_blank" rel="noopener">GitHub repository</a>.</p>
+                  <p>Builds on <a href="https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf" target="_blank" rel="noopener"><em>&ldquo;Mission Possible: The Collection of High Quality Online Data&rdquo;</em></a> by &Ccedil;elebi, Exley, Harrs, Kivimaki, Serra-Garcia &amp; Yusof (2026). The paper provides an evidence-based assessment of data quality across online survey platforms, using laboratory and AI agent responses as benchmarks. It also proposes a new <em>two-stage recruitment method</em>. Materials are available in the companion <a href="https://github.com/survey-data-quality-lab/mission-possible" target="_blank" rel="noopener">GitHub repository</a>.</p>
                 </div>
               </div>
             </div>
@@ -453,6 +444,7 @@
                 <li>Sample size</li>
                 <li>Study date</li>
                 <li>Basic study information</li>
+                <li class="chip-break" aria-hidden="true"></li>
                 <li>Your name &amp; affiliation</li>
                 <li>At least one data quality metric</li>
               </ul>
@@ -477,8 +469,8 @@
       <div class="container">
         <div class="footer-inner">
           <div class="footer-brand">
-            <span class="footer-name">Data Quality Hub</span>
-            <span class="footer-tagline">Community-driven platform data quality tracking</span>
+            <span class="footer-name">Data Quality Hub for Online Surveys</span>
+            <span class="footer-tagline">A community driven platform for tracking online data quality.</span>
           </div>
           <div class="footer-links">
             <a href="https://github.com/survey-data-quality-lab/data-quality-hub" target="_blank" rel="noopener" class="footer-link">
@@ -501,11 +493,11 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/config.js?v=20260311-15"></script>
-  <script src="js/csv-parser.js?v=20260311-15"></script>
-  <script src="js/data-store.js?v=20260311-15"></script>
-  <script src="js/charts.js?v=20260311-15"></script>
-  <script src="js/table.js?v=20260311-15"></script>
-  <script src="js/app.js?v=20260311-15"></script>
+  <script src="js/config.js?v=20260311-17"></script>
+  <script src="js/csv-parser.js?v=20260311-17"></script>
+  <script src="js/data-store.js?v=20260311-17"></script>
+  <script src="js/charts.js?v=20260311-17"></script>
+  <script src="js/table.js?v=20260311-17"></script>
+  <script src="js/app.js?v=20260311-17"></script>
 </body>
 </html>

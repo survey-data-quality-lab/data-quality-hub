@@ -136,24 +136,30 @@ window.DQH.table = {
     var html = '<div class="study-col-header">';
     html += '<div class="col-chevron"></div>';
     html += '<div class="col-platform">Platform</div>';
+    html += '<div class="col-country">Country</div>';
     html += '<div class="col-n">N</div>';
     html += '<div class="col-date">Date</div>';
-    html += '<div class="col-rate">Pass Rate</div>';
+    html += '<div class="col-rate">Overall</div>';
     html += '<div class="col-attention">Attn Check</div>';
-    html += '<div class="col-ai">AI Detect</div>';
-    html += '<div class="col-fraud">Fraud</div>';
-    html += '<div class="col-design">Design</div>';
+    html += '<div class="col-recruitment">Recruitment</div>';
     html += '</div>';
     return html;
   },
 
+  shortCitation(study) {
+    var researcher = study.researcher || '';
+    var firstAuthor = researcher.split(',')[0].trim();
+    var isMultiple = researcher.indexOf(',') !== -1 || researcher.indexOf('&') !== -1;
+    var name = isMultiple ? firstAuthor + ' et al.' : firstAuthor;
+    var year = study.latestDate ? study.latestDate.getFullYear() : '';
+    return year ? name + ' (' + year + ')' : name;
+  },
+
   renderL1(study, index) {
     var html = '<div class="study-l1" data-index="' + index + '" data-paper-ref="' + this.esc(study.label) + '">';
-    html += '<svg class="toggle-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"></polyline></svg>';
+    html += '<svg class="toggle-chevron l1-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 8 10 12 14 8"></polyline></svg>';
     html += '<div class="l1-paper">' + this.esc(study.label) + '</div>';
-    html += '<div class="l1-researcher">' + this.esc(study.researcher) + '</div>';
-    html += '<div class="l1-meta">' + study.platformCount + ' platform' + (study.platformCount !== 1 ? 's' : '') + '</div>';
-    html += '<div class="l1-n">N = ' + this.fmtNum(study.totalN) + '</div>';
+    html += '<div class="l1-researcher">' + this.esc(this.shortCitation(study)) + '</div>';
     html += '</div>';
 
     // Info popup (hidden by default)
@@ -193,83 +199,61 @@ window.DQH.table = {
     var entries = study.allEntries;
     var html = '<div class="study-info-content">';
 
-    // Collect unique descriptions, quality measures, and notes across all entries
-    var desc = '';
-    var qualDesc = '';
-    var notesList = [];
-    var notesSeen = {};
-    for (var i = 0; i < entries.length; i++) {
-      if (!desc && entries[i].studyDescription) desc = entries[i].studyDescription;
-      if (!qualDesc && entries[i].qualityDescription) qualDesc = entries[i].qualityDescription;
-      var n = entries[i].additionalNotes;
-      if (n && !notesSeen[n]) { notesSeen[n] = true; notesList.push(n); }
-    }
-
-    // Study link (from first entry that has one)
-    var studyLink = '';
-    for (var j = 0; j < entries.length; j++) {
-      if (!studyLink && entries[j].studyLink) { studyLink = entries[j].studyLink; break; }
-    }
-
-    if (desc) {
-      html += '<div class="study-info-row"><strong>Study:</strong> ' + this.esc(desc) + '</div>';
-    }
-    if (studyLink) {
-      html += '<div class="study-info-row"><a href="' + this.esc(studyLink) + '" target="_blank" rel="noopener">View paper / study details &rarr;</a></div>';
-    }
-    if (qualDesc) {
-      html += '<div class="study-info-row"><strong>Pass rate measure:</strong> ' + this.esc(qualDesc) + '</div>';
-    }
-
-    // New metadata fields (shown if present in any entry)
     var dataAvail = '';
     var prereg = '';
     var pubStatus = '';
-    for (var ka = 0; ka < entries.length; ka++) {
-      if (!dataAvail && entries[ka].dataAvailability) dataAvail = entries[ka].dataAvailability;
-      if (!prereg && entries[ka].preregistration) prereg = entries[ka].preregistration;
-      if (!pubStatus && entries[ka].publicationStatus) pubStatus = entries[ka].publicationStatus;
+    var metricFields = ['overallPassRate', 'attentionCheckRate', 'aiDetectionRate', 'accountFraudRate', 'otherMetric1Rate', 'otherMetric2Rate'];
+    var metricSeen = {};
+    for (var i = 0; i < entries.length; i++) {
+      if (!dataAvail && entries[i].dataAvailability) dataAvail = entries[i].dataAvailability;
+      if (!prereg   && entries[i].preregistration)  prereg    = entries[i].preregistration;
+      if (!pubStatus && entries[i].publicationStatus) pubStatus = entries[i].publicationStatus;
+      for (var m = 0; m < metricFields.length; m++) {
+        var f = metricFields[m];
+        if (entries[i][f] !== null && entries[i][f] !== undefined) metricSeen[f] = true;
+      }
     }
-    if (dataAvail) {
-      html += '<div class="study-info-row"><strong>Data Availability:</strong> ' + this.esc(dataAvail) + '</div>';
-    }
-    if (prereg) {
-      html += '<div class="study-info-row"><strong>Pre-registration:</strong> ' + this.esc(prereg) + '</div>';
-    }
-    if (pubStatus) {
-      html += '<div class="study-info-row"><strong>Publication Status:</strong> ' + this.esc(pubStatus) + '</div>';
-    }
+    var metricCount = Object.keys(metricSeen).length;
+    var na = '<span style="color:var(--text-tertiary)">\u2014</span>';
+    var v = ' class="info-val"';
 
-    if (notesList.length) {
-      html += '<div class="study-info-row"><strong>Details:</strong> ' + this.esc(notesList.join(' | ')) + '</div>';
-    }
-
-    if (!desc && !qualDesc && !studyLink && !dataAvail && !prereg && !pubStatus) {
-      html += '<div class="study-info-row" style="color:var(--text-tertiary);font-style:italic">No additional details available for this study.</div>';
-    }
+    html += '<div class="study-info-bg">';
+    html += '<div class="study-info-row">';
+    html += '<div><strong>Authors:</strong> <span' + v + '>' + this.esc(study.researcher) + '</span></div>';
+    html += '</div>';
+    html += '<div class="study-info-row">';
+    html += '<div><strong>Platforms:</strong> <span' + v + '>' + study.platformCount + '</span></div>';
+    html += '<div><strong>Observations:</strong> <span' + v + '>N\u202f=\u202f' + this.fmtNum(study.totalN) + '</span></div>';
+    html += '<div><strong>Quality metrics:</strong> <span' + v + '>' + metricCount + '</span></div>';
+    html += '</div>';
+    html += '<div class="study-info-row">';
+    html += '<div><strong>Pre-registration:</strong> '  + (prereg    ? '<span' + v + '>' + this.esc(prereg)    + '</span>' : na) + '</div>';
+    html += '<div><strong>Data availability:</strong> ' + (dataAvail ? '<span' + v + '>' + this.esc(dataAvail) + '</span>' : na) + '</div>';
+    html += '<div><strong>Paper status:</strong> '      + (pubStatus ? '<span' + v + '>' + this.esc(pubStatus) + '</span>' : na) + '</div>';
+    html += '</div>';
+    html += '</div>';
 
     html += '</div>';
     return html;
   },
 
   renderL2(s) {
-    var design = '';
+    var recruitment = '';
     if (s.recruitmentMethod && s.recruitmentMethod.toLowerCase().indexOf('two-stage') !== -1) {
-      design = 'Two-stage';
+      recruitment = 'Two-stage';
     } else {
-      design = 'Single';
+      recruitment = 'Single';
     }
 
     var html = '<div class="study-l2">';
     html += '<span class="l2-spacer"></span>';
     html += '<div class="l2-platform">' + this.platformTag(s.platform) + '</div>';
+    html += '<div class="l2-country">' + this.esc(s.country || '\u2014') + '</div>';
     html += '<div class="l2-n">' + this.fmtNum(s.sampleSize) + '</div>';
-    html += '<div class="l2-date">' + this.esc(s.studyDate || '') + '</div>';
+    html += '<div class="l2-date">' + this.fmtDate(s.studyDate) + '</div>';
     html += '<div class="l2-rate">' + this.rateCell(s.overallPassRate) + '</div>';
     html += '<div class="l2-attention">' + this.rateCell(s.attentionCheckRate) + '</div>';
-    html += '<div class="l2-ai">' + this.rateCell(s.aiDetectionRate) + '</div>';
-    html += '<div class="l2-fraud">' + this.rateCell(s.accountFraudRate) + '</div>';
-    html += '<div class="l2-design">' + this.esc(design) + '</div>';
+    html += '<div class="l2-recruitment">' + this.esc(recruitment) + '</div>';
     html += '</div>';
     return html;
   },
@@ -278,13 +262,12 @@ window.DQH.table = {
     var html = '<div class="study-l2">';
     html += '<span class="l2-spacer"></span>';
     html += '<div class="l2-platform">' + this.platformTag(s.platform) + '</div>';
+    html += '<div class="l2-country">' + this.esc(s.country || '\u2014') + '</div>';
     html += '<div class="l2-n">' + this.fmtNum(s.sampleSize) + '</div>';
-    html += '<div class="l2-date">' + this.esc(s.studyDate || '') + '</div>';
+    html += '<div class="l2-date">' + this.fmtDate(s.studyDate) + '</div>';
     html += '<div class="l2-rate">' + this.rateCell(s.overallPassRate) + '</div>';
     html += '<div class="l2-attention">' + this.rateCell(s.attentionCheckRate) + '</div>';
-    html += '<div class="l2-ai">' + this.rateCell(s.aiDetectionRate) + '</div>';
-    html += '<div class="l2-fraud">' + this.rateCell(s.accountFraudRate) + '</div>';
-    html += '<div class="l2-design">2-Stage</div>';
+    html += '<div class="l2-recruitment">2-Stage</div>';
     html += '</div>';
     return html;
   },
@@ -333,6 +316,13 @@ window.DQH.table = {
   fmtNum(val) {
     if (val === null || val === undefined) return '\u2014';
     return val.toLocaleString();
+  },
+
+  fmtDate(dateStr) {
+    if (!dateStr) return '\u2014';
+    var d = window.DQH.dataStore.parseDate(dateStr);
+    if (!d) return this.esc(dateStr);
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   },
 
   esc(str) {
