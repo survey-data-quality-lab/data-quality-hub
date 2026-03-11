@@ -15,6 +15,47 @@ window.DQH.dataStore = {
     this.studies = (csvData || []).filter(function(s) {
       return excluded.indexOf(s.platform) === -1;
     });
+    this.registerCustomMetrics();
+  },
+
+  /**
+   * Scan all studies for custom metric fields (custom_*_Rate) and
+   * register them into config.metricConcerns and config.metricOptions.
+   */
+  registerCustomMetrics() {
+    var config = window.DQH.config;
+    var seen = {};
+    for (var i = 0; i < this.studies.length; i++) {
+      var s = this.studies[i];
+      var keys = Object.keys(s);
+      for (var j = 0; j < keys.length; j++) {
+        var k = keys[j];
+        if (k.indexOf('custom_') !== 0 || k.indexOf('_Rate') === -1) continue;
+        var base = k.replace('_Rate', '');
+        if (seen[base]) continue;
+        seen[base] = true;
+
+        var label = s[base + '_Label'] || base;
+        var category = s[base + '_Category'] || '';
+        var concernId = config.categoryToConcernId[category] || 'inattention';
+
+        // Add to numericFields
+        if (config.numericFields.indexOf(k) === -1) {
+          config.numericFields.push(k);
+        }
+
+        // Add to metricOptions
+        config.metricOptions.push({ field: k, label: label });
+
+        // Add to the matching concern group
+        for (var c = 0; c < config.metricConcerns.length; c++) {
+          if (config.metricConcerns[c].id === concernId) {
+            config.metricConcerns[c].metrics.push({ field: k, label: label });
+            break;
+          }
+        }
+      }
+    }
   },
 
   /**
@@ -26,10 +67,10 @@ window.DQH.dataStore = {
     return this.studies.filter(function(s) {
       var stage = (s.stage || '').toLowerCase();
       if (stageFilter === '1st') {
-        return stage === '' || stage.indexOf('first') !== -1;
+        return stage === '' || stage.indexOf('first') !== -1 || stage.indexOf('1st') !== -1;
       }
       if (stageFilter === '2nd') {
-        return stage.indexOf('second') !== -1;
+        return stage.indexOf('second') !== -1 || stage.indexOf('2nd') !== -1;
       }
       return true;
     });
@@ -280,6 +321,16 @@ window.DQH.dataStore = {
     if (!dateStr) return null;
     dateStr = dateStr.trim();
     if (/^\d{4}$/.test(dateStr)) return new Date(parseInt(dateStr), 0, 1);
+
+    // "MonthName YYYY" (e.g., "March 2028")
+    var monthNames = ['january','february','march','april','may','june',
+                      'july','august','september','october','november','december'];
+    var parts = dateStr.match(/^(\w+)\s+(\d{4})$/i);
+    if (parts) {
+      var mi = monthNames.indexOf(parts[1].toLowerCase());
+      if (mi !== -1) return new Date(parseInt(parts[2]), mi, 1);
+    }
+
     var d = new Date(dateStr);
     if (!isNaN(d.getTime())) return d;
     return null;
@@ -287,7 +338,7 @@ window.DQH.dataStore = {
 
   normalizeStage(stageStr) {
     var stage = (stageStr || '').toLowerCase();
-    if (stage.indexOf('second') !== -1) return '2nd';
+    if (stage.indexOf('second') !== -1 || stage.indexOf('2nd') !== -1) return '2nd';
     return '1st';
   },
 

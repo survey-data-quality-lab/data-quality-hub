@@ -15,6 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css?v=20260311-30">
+  <link rel="stylesheet" href="css/submit-form.css?v=20260311">
   <script>if(localStorage.getItem('dqh-theme')!=='dark')document.documentElement.setAttribute('data-theme','light');</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -425,41 +426,11 @@
       </div>
     </section>
 
-    <!-- Contribute -->
+    <!-- Submit Form -->
     <section id="submit" class="contribute-section">
       <div class="container">
-        <div class="contribute-card">
-          <div class="contribute-card-left">
-            <div class="contribute-card-head">
-              <div class="contribute-card-icon" aria-hidden="true">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              </div>
-              <h3 class="contribute-card-title">Contribute your study results</h3>
-            </div>
-            <p class="contribute-card-desc">Help expand the dataset and improve comparisons across platforms.</p>
-            <div class="contribute-what">
-              <span class="contribute-what-label">What to include</span>
-              <ul class="contribute-chips">
-                <li>Platform</li>
-                <li>Sample size</li>
-                <li>Study date</li>
-                <li>Basic study information</li>
-                <li class="chip-break" aria-hidden="true"></li>
-                <li>Your name &amp; affiliation</li>
-                <li>At least one data quality metric</li>
-              </ul>
-            </div>
-            <p class="contribute-time">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              Takes about 5 minutes
-            </p>
-          </div>
-          <div class="contribute-card-right">
-            <a href="https://forms.gle/4hRy2EfM5vVDjEA59" target="_blank" rel="noopener" class="btn-contribute-card">
-              Submit Study Results
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </a>
-          </div>
+        <div class="contribute-card" style="max-width:100%;padding:1.5rem;">
+          <div id="sf-root"></div>
         </div>
       </div>
     </section>
@@ -498,6 +469,7 @@
   <script src="js/data-store.js?v=20260311-17"></script>
   <script src="js/charts.js?v=20260311-17"></script>
   <script src="js/table.js?v=20260311-17"></script>
+  <script src="js/submit-form.js?v=20260311"></script>
   <script src="js/app.js?v=20260311-17"></script>
 </body>
 </html>

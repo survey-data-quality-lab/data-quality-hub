@@ -202,7 +202,8 @@ window.DQH.table = {
     var dataAvail = '';
     var prereg = '';
     var pubStatus = '';
-    var metricFields = ['overallPassRate', 'attentionCheckRate', 'aiDetectionRate', 'accountFraudRate', 'otherMetric1Rate', 'otherMetric2Rate'];
+    var metricFields = ['overallPassRate', 'classicChecksRate', 'videoCheckRate',
+      'typedTextRate', 'typicalSpeedRate', 'recaptchaRate', 'pangramRate', 'uniqueIpRate'];
     var metricSeen = {};
     for (var i = 0; i < entries.length; i++) {
       if (!dataAvail && entries[i].dataAvailability) dataAvail = entries[i].dataAvailability;
@@ -211,6 +212,15 @@ window.DQH.table = {
       for (var m = 0; m < metricFields.length; m++) {
         var f = metricFields[m];
         if (entries[i][f] !== null && entries[i][f] !== undefined) metricSeen[f] = true;
+      }
+      // Also count custom metrics
+      var eKeys = Object.keys(entries[i]);
+      for (var ek = 0; ek < eKeys.length; ek++) {
+        if (eKeys[ek].indexOf('custom_') === 0 && eKeys[ek].indexOf('_Rate') !== -1) {
+          if (entries[i][eKeys[ek]] !== null && entries[i][eKeys[ek]] !== undefined) {
+            metricSeen[eKeys[ek]] = true;
+          }
+        }
       }
     }
     var metricCount = Object.keys(metricSeen).length;
@@ -252,7 +262,7 @@ window.DQH.table = {
     html += '<div class="l2-n">' + this.fmtNum(s.sampleSize) + '</div>';
     html += '<div class="l2-date">' + this.fmtDate(s.studyDate) + '</div>';
     html += '<div class="l2-rate">' + this.rateCell(s.overallPassRate) + '</div>';
-    html += '<div class="l2-attention">' + this.rateCell(s.attentionCheckRate) + '</div>';
+    html += '<div class="l2-attention">' + this.rateCell(s.classicChecksRate) + '</div>';
     html += '<div class="l2-recruitment">' + this.esc(recruitment) + '</div>';
     html += '</div>';
     return html;
@@ -266,7 +276,7 @@ window.DQH.table = {
     html += '<div class="l2-n">' + this.fmtNum(s.sampleSize) + '</div>';
     html += '<div class="l2-date">' + this.fmtDate(s.studyDate) + '</div>';
     html += '<div class="l2-rate">' + this.rateCell(s.overallPassRate) + '</div>';
-    html += '<div class="l2-attention">' + this.rateCell(s.attentionCheckRate) + '</div>';
+    html += '<div class="l2-attention">' + this.rateCell(s.classicChecksRate) + '</div>';
     html += '<div class="l2-recruitment">2-Stage</div>';
     html += '</div>';
     return html;
