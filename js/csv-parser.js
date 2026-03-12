@@ -56,12 +56,15 @@ window.DQH.csvParser = {
             ' | Affiliation: ' + (s.affiliation || '—') +
             ' | N=' + s.sampleSize +
             ' | Date: ' + (s.studyDate || '—') +
-            ' | Overall Pass Rate: ' + s.overallPassRate + '%' +
-            ' | Attention: ' + (s.attentionCheckRate !== null ? s.attentionCheckRate + '%' : '—') +
-            ' | AI Detection: ' + (s.aiDetectionRate !== null ? s.aiDetectionRate + '%' : '—') +
-            ' | Account Fraud: ' + (s.accountFraudRate !== null ? s.accountFraudRate + '%' : '—') +
-            ' | Recruitment: ' + (s.recruitmentMethod || '—') +
-            ' | Stage: ' + (s.stage || '—'));
+            ' | Overall: ' + (s.overallPassRate !== null ? s.overallPassRate + '%' : '—') +
+            ' | Classic: ' + (s.classicChecksRate !== null ? s.classicChecksRate + '%' : '—') +
+            ' | Video: ' + (s.videoCheckRate !== null ? s.videoCheckRate + '%' : '—') +
+            ' | Typed: ' + (s.typedTextRate !== null ? s.typedTextRate + '%' : '—') +
+            ' | Speed: ' + (s.typicalSpeedRate !== null ? s.typicalSpeedRate + '%' : '—') +
+            ' | reCAPTCHA: ' + (s.recaptchaRate !== null ? s.recaptchaRate + '%' : '—') +
+            ' | Pangram: ' + (s.pangramRate !== null ? s.pangramRate + '%' : '—') +
+            ' | UniqueIP: ' + (s.uniqueIpRate !== null ? s.uniqueIpRate + '%' : '—') +
+            ' | Recruitment: ' + (s.recruitmentMethod || '—'));
         });
       } else {
         console.log('[DQH] No approved rows found. Make sure the Approved column has value "1" for rows you want to show.');
@@ -84,14 +87,10 @@ window.DQH.csvParser = {
     const rawHeaders = rows[0];
     const config = window.DQH.config;
 
-    // Build header mapping, skipping section headers
+    // Build header mapping
     const headerMap = [];
     for (let i = 0; i < rawHeaders.length; i++) {
       const raw = rawHeaders[i].trim();
-      if (config.sectionHeaders.some(s => raw.toUpperCase().startsWith(s))) {
-        headerMap.push(null); // skip this column
-        continue;
-      }
       // Try exact match first, then try without asterisks (required field markers)
       let field = config.columnMap[raw];
       if (!field) {
@@ -123,6 +122,24 @@ window.DQH.csvParser = {
           if (isNaN(obj[nf])) obj[nf] = null;
         } else {
           obj[nf] = null;
+        }
+      }
+
+      // Construct studyDate from month + year
+      if (obj.studyMonth && obj.studyYear) {
+        obj.studyDate = obj.studyMonth + ' ' + obj.studyYear;
+      }
+
+      // Discover custom metrics (up to 10 slots)
+      for (var cm = 1; cm <= (config.customMetricSlots || 10); cm++) {
+        var asked = obj['customMetric' + cm + 'Asked'];
+        var name = obj['customMetric' + cm + 'Name'];
+        if (asked === 'Yes' && name) {
+          var key = 'custom_' + name.toLowerCase().replace(/[^a-z0-9]/g, '');
+          obj[key + '_Rate'] = obj['customMetric' + cm + 'Rate'];
+          obj[key + '_Description'] = obj['customMetric' + cm + 'Description'];
+          obj[key + '_Category'] = obj['customMetric' + cm + 'Category'];
+          obj[key + '_Label'] = name;
         }
       }
 

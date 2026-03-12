@@ -557,10 +557,9 @@ window.DQH.charts = {
           : '';
         var stageDisplay = '';
         if (m.stage) {
-          var sl = m.stage.toLowerCase();
-          if (sl.indexOf('second') !== -1) stageDisplay = '2-Stage';
-          else if (sl.indexOf('first') !== -1) stageDisplay = 'Standard';
-          else stageDisplay = m.stage;
+          var nStage = store.normalizeStage(m.stage);
+          if (nStage === '2nd') stageDisplay = '2-Stage';
+          else stageDisplay = 'Standard';
         }
 
         var authorHtml = citation
@@ -770,7 +769,7 @@ window.DQH.charts = {
       values.push(s.rate);
 
       var baseColor = store.getColor(s.platform);
-      var barIs2Stage = s.stage && s.stage.toLowerCase().indexOf('second') !== -1;
+      var barIs2Stage = s.stage && store.normalizeStage(s.stage) === '2nd';
       if (barIs2Stage) {
         has2Stage = true;
         bgColors.push(makeStripePattern(baseColor));
@@ -894,10 +893,9 @@ window.DQH.charts = {
           : '';
         var stageDisplay = '';
         if (m.stage) {
-          var sl = m.stage.toLowerCase();
-          if (sl.indexOf('second') !== -1) stageDisplay = '2-Stage';
-          else if (sl.indexOf('first') !== -1) stageDisplay = 'Standard';
-          else stageDisplay = m.stage;
+          var nStage = store.normalizeStage(m.stage);
+          if (nStage === '2nd') stageDisplay = '2-Stage';
+          else stageDisplay = 'Standard';
         }
 
         var authorHtml = citation

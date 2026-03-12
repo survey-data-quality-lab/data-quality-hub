@@ -1,0 +1,574 @@
+/**
+ * Data Quality Hub — Submit Form Styles
+ * All classes prefixed .sf- to avoid conflicts with existing dashboard CSS.
+ * Uses existing CSS custom properties (--bg-card, --text-primary, --accent, etc.)
+ */
+
+/* ── Container & Progress ───────────────────────────────────────── */
+
+.sf-container {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.sf-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.sf-progress-step {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.sf-progress-step.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sf-progress-step.completed {
+  color: var(--success);
+}
+
+.sf-progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.sf-progress-step.active .sf-progress-dot {
+  background: var(--accent);
+}
+
+.sf-progress-step.completed .sf-progress-dot {
+  background: var(--success);
+}
+
+.sf-progress-line {
+  flex: 1 1 8px;
+  height: 1px;
+  background: var(--border);
+  min-width: 8px;
+  max-width: 32px;
+}
+
+/* ── Step Panels ────────────────────────────────────────────────── */
+
+.sf-step {
+  display: none;
+}
+
+.sf-step.active {
+  display: block;
+}
+
+.sf-step-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.sf-step-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+/* ── Fields ─────────────────────────────────────────────────────── */
+
+.sf-field {
+  margin-bottom: 1rem;
+}
+
+.sf-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.sf-label .sf-required {
+  color: var(--danger);
+  margin-left: 0.15em;
+}
+
+.sf-hint {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-top: 0.2rem;
+  line-height: 1.4;
+}
+
+.sf-input,
+.sf-select,
+.sf-textarea {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-body);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.sf-input:focus,
+.sf-select:focus,
+.sf-textarea:focus {
+  border-color: var(--accent);
+}
+
+.sf-input.sf-has-error,
+.sf-select.sf-has-error,
+.sf-textarea.sf-has-error {
+  border-color: var(--danger);
+}
+
+.sf-textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.sf-error-msg {
+  color: var(--danger);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.sf-error-msg.visible {
+  display: block;
+}
+
+/* Inline selects (month/year side by side) */
+.sf-inline-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sf-inline-group .sf-select {
+  flex: 1;
+}
+
+/* ── Chips (platform selection) ─────────────────────────────────── */
+
+.sf-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.sf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+
+.sf-chip:hover {
+  background: var(--bg-hover);
+}
+
+.sf-chip.selected {
+  border-color: var(--accent);
+  background: rgba(108, 142, 255, 0.1);
+  color: var(--accent);
+}
+
+.sf-chip-check {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--text-tertiary);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.sf-chip.selected .sf-chip-check {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.sf-chip.selected .sf-chip-check::after {
+  content: '';
+  width: 5px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+/* Custom platform tags (added by user) */
+.sf-custom-platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.sf-custom-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  background: rgba(108, 142, 255, 0.1);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  color: var(--accent);
+}
+
+.sf-custom-tag-remove {
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+
+.sf-custom-tag-remove:hover {
+  opacity: 1;
+}
+
+/* Add platform inline input */
+.sf-add-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sf-add-row .sf-input {
+  flex: 1;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.85rem;
+}
+
+.sf-btn-add {
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s;
+}
+
+.sf-btn-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Radio & Checkbox Groups ────────────────────────────────────── */
+
+.sf-radio-group,
+.sf-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.sf-radio-option,
+.sf-checkbox-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.sf-radio-option:hover,
+.sf-checkbox-option:hover {
+  border-color: var(--text-tertiary);
+}
+
+.sf-radio-option input,
+.sf-checkbox-option input {
+  margin-top: 0.15rem;
+  accent-color: var(--accent);
+}
+
+.sf-option-label {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.sf-option-category {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-left: 0.25rem;
+}
+
+/* ── Metric Detail Panels ───────────────────────────────────────── */
+
+.sf-metric-details {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sf-metric-panel {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  animation: sf-slide-down 0.2s ease;
+}
+
+@keyframes sf-slide-down {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sf-metric-panel-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.sf-metric-panel-category {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-bottom: 0.75rem;
+}
+
+.sf-metric-panel .sf-field {
+  margin-bottom: 0.75rem;
+}
+
+.sf-metric-panel .sf-field:last-child {
+  margin-bottom: 0;
+}
+
+/* Custom metric add row (inside metric checkboxes) */
+.sf-add-metric-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.sf-add-metric-row .sf-input {
+  flex: 1;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.85rem;
+}
+
+/* ── Conditional Sections ───────────────────────────────────────── */
+
+.sf-conditional {
+  display: none;
+  margin-top: 0.75rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--border);
+}
+
+.sf-conditional.visible {
+  display: block;
+  animation: sf-slide-down 0.2s ease;
+}
+
+/* ── Overall Quality Section ────────────────────────────────────── */
+
+.sf-section-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.25rem 0;
+}
+
+.sf-section-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.sf-section-hint {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  margin-bottom: 0.75rem;
+}
+
+/* ── Platform Tab Headers (per-platform step) ───────────────────── */
+
+.sf-platform-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sf-platform-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.65rem;
+  background: rgba(108, 142, 255, 0.1);
+  border: 1px solid var(--accent);
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.sf-platform-counter {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+/* ── Navigation Buttons ─────────────────────────────────────────── */
+
+.sf-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.sf-btn-back {
+  padding: 0.55rem 1.1rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.sf-btn-back:hover {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+.sf-btn-next,
+.sf-btn-submit {
+  padding: 0.55rem 1.5rem;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.sf-btn-next:hover,
+.sf-btn-submit:hover {
+  opacity: 0.9;
+}
+
+.sf-btn-next:disabled,
+.sf-btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Push next/submit to the right when there's no back button */
+.sf-nav-right {
+  margin-left: auto;
+}
+
+/* ── Status Messages ────────────────────────────────────────────── */
+
+.sf-status {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  display: none;
+  line-height: 1.5;
+}
+
+.sf-status.sf-status-success {
+  display: block;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid var(--success);
+  color: var(--success);
+}
+
+.sf-status.sf-status-error {
+  display: block;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.sf-status.sf-status-loading {
+  display: block;
+  background: rgba(108, 142, 255, 0.08);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .sf-chips {
+    gap: 0.35rem;
+  }
+
+  .sf-chip {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  .sf-nav {
+    gap: 0.5rem;
+  }
+
+  .sf-btn-next,
+  .sf-btn-submit {
+    padding: 0.55rem 1rem;
+  }
+
+  .sf-progress-step span {
+    display: none;
+  }
+}

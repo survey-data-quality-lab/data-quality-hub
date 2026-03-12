@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Quality Hub — POC Form</title>
+  <style>
+    :root {
+      --bg-body: #0F1117;
+      --bg-card: #1A1D27;
+      --border: #2E3348;
+      --text-primary: #E8EAF0;
+      --text-secondary: #9BA1B5;
+      --accent: #6C8EFF;
+      --success: #34D399;
+      --danger: #F87171;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .poc-container {
+      width: 100%;
+      max-width: 540px;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .poc-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .poc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .poc-field {
+      margin-bottom: 1rem;
+    }
+
+    .poc-field:last-of-type {
+      margin-bottom: 1.5rem;
+    }
+
+    .poc-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .poc-input, .poc-select, .poc-textarea {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .poc-input:focus, .poc-select:focus, .poc-textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .poc-input.error, .poc-select.error, .poc-textarea.error {
+      border-color: var(--danger);
+    }
+
+    .poc-textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .poc-error-msg {
+      color: var(--danger);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    .poc-error-msg.visible {
+      display: block;
+    }
+
+    .poc-btn {
+      width: 100%;
+      padding: 0.65rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .poc-btn:hover { opacity: 0.9; }
+    .poc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .poc-status {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .poc-status.success {
+      display: block;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+
+    .poc-status.error {
+      display: block;
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+
+    .poc-status.loading {
+      display: block;
+      background: rgba(108, 142, 255, 0.1);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .poc-note {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(108, 142, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .poc-note code {
+      background: var(--bg-body);
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+      font-size: 0.8em;
+    }
+  </style>
+</head>
+<body>
+  <div class="poc-container">
+    <h1>POC: Form → Google Sheet Pipeline</h1>
+    <p class="poc-subtitle">Standalone test — not linked from the main site</p>
+
+    <div class="poc-card" id="config-card" style="margin-bottom: 1rem;">
+      <div class="poc-field" style="margin-bottom: 0;">
+        <label class="poc-label" for="scriptUrl">Apps Script Web App URL</label>
+        <input class="poc-input" type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/…/exec">
+        <div style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.35rem;">
+          Paste the URL from your deployed Apps Script. It gets saved in localStorage so you only need to do this once.
+        </div>
+      </div>
+    </div>
+
+    <div class="poc-card">
+      <form id="poc-form" novalidate>
+        <div class="poc-field">
+          <label class="poc-label" for="email">Email *</label>
+          <input class="poc-input" type="email" id="email" required placeholder="researcher@university.edu">
+          <div class="poc-error-msg" id="email-error">Please enter a valid email address</div>
+        </div>
+
+        <div class="poc-field">
+          <label class="poc-label" for="name">Researcher Name *</label>
+          <input class="poc-input" type="text" id="name" required placeholder="Jane Doe">
+          <div class="poc-error-msg" id="name-error">Name is required</div>
+        </div>
+
+        <div class="poc-field">
+          <label class="poc-label" for="affiliation">Affiliation *</label>
+          <input class="poc-input" type="text" id="affiliation" required placeholder="University of Example">
+          <div class="poc-error-msg" id="affiliation-error">Affiliation is required</div>
+        </div>
+
+        <div class="poc-field">
+          <label class="poc-label" for="studyTitle">Study Title *</label>
+          <input class="poc-input" type="text" id="studyTitle" required placeholder="My Survey Study">
+          <div class="poc-error-msg" id="studyTitle-error">Study title is required</div>
+        </div>
+
+        <div class="poc-field">
+          <label class="poc-label" for="platform">Platform *</label>
+          <select class="poc-select" id="platform" required>
+            <option value="">Select a platform…</option>
+            <option value="Prolific">Prolific</option>
+            <option value="MTurk">MTurk</option>
+            <option value="Bilendi">Bilendi</option>
+            <option value="Moblab">Moblab</option>
+            <option value="CloudResearch">CloudResearch</option>
+            <option value="Other">Other</option>
+          </select>
+          <div class="poc-error-msg" id="platform-error">Please select a platform</div>
+        </div>
+
+        <div class="poc-field">
+          <label class="poc-label" for="sampleSize">Sample Size *</label>
+          <input class="poc-input" type="number" id="sampleSize" required min="1" placeholder="200">
+          <div class="poc-error-msg" id="sampleSize-error">Please enter a valid sample size</div>
+        </div>
+
+        <div class="poc-field">
+          <label class="poc-label" for="metric1Rate">Example Metric Rate (%) </label>
+          <input class="poc-input" type="number" id="metric1Rate" min="0" max="100" placeholder="85">
+          <div class="poc-error-msg" id="metric1Rate-error">Must be between 0 and 100</div>
+        </div>
+
+        <div class="poc-field">
+          <label class="poc-label" for="notes">Notes (optional)</label>
+          <textarea class="poc-textarea" id="notes" placeholder="Any additional details…"></textarea>
+        </div>
+
+        <button class="poc-btn" type="submit" id="submit-btn">Submit Test Data</button>
+      </form>
+
+      <div class="poc-status" id="status"></div>
+    </div>
+
+    <div class="poc-note">
+      <strong>Setup steps:</strong><br>
+      1. Create a <strong>blank Google Sheet</strong><br>
+      2. Go to <a href="https://script.google.com" target="_blank" style="color:var(--accent)">script.google.com</a> → New Project<br>
+      3. Paste the contents of <code>web-app.gs</code> into Code.gs<br>
+      4. Replace <code>YOUR_SHEET_ID_HERE</code> with your Sheet ID (the long string between <code>/d/</code> and <code>/edit</code> in the sheet URL)<br>
+      5. Deploy → New deployment → Web app → Execute as: Me, Access: Anyone<br>
+      6. Paste the Web App URL into the field above<br>
+      7. Fill out the form and submit → check the sheet for a new row
+    </div>
+  </div>
+
+  <script>
+    var APPS_SCRIPT_URL = localStorage.getItem('dqh-poc-script-url') || 'https://script.google.com/macros/s/AKfycbxuZNMDrk2H0SUqNJIz9GspUlkc9KVi7EtExb8VgO3UUtynk22yJUrPSlxyn9jxsW7VXA/exec';
+
+    var scriptUrlInput = document.getElementById('scriptUrl');
+    scriptUrlInput.value = APPS_SCRIPT_URL;
+    scriptUrlInput.addEventListener('input', function() {
+      APPS_SCRIPT_URL = scriptUrlInput.value.trim();
+      localStorage.setItem('dqh-poc-script-url', APPS_SCRIPT_URL);
+    });
+
+    var form = document.getElementById('poc-form');
+    var statusEl = document.getElementById('status');
+    var submitBtn = document.getElementById('submit-btn');
+
+    // Field definitions: id, required, type, validation
+    var fields = [
+      { id: 'email',      required: true,  type: 'email' },
+      { id: 'name',       required: true,  type: 'text' },
+      { id: 'affiliation',required: true,  type: 'text' },
+      { id: 'studyTitle', required: true,  type: 'text' },
+      { id: 'platform',   required: true,  type: 'select' },
+      { id: 'sampleSize', required: true,  type: 'number', min: 1 },
+      { id: 'metric1Rate',required: false, type: 'number', min: 0, max: 100 },
+      { id: 'notes',      required: false, type: 'text' }
+    ];
+
+    function validate() {
+      var valid = true;
+      fields.forEach(function(f) {
+        var el = document.getElementById(f.id);
+        var errEl = document.getElementById(f.id + '-error');
+        var val = el.value.trim();
+        var fieldValid = true;
+
+        if (f.required && !val) {
+          fieldValid = false;
+        } else if (val) {
+          if (f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+            fieldValid = false;
+          }
+          if (f.type === 'number') {
+            var num = parseFloat(val);
+            if (isNaN(num)) fieldValid = false;
+            if (f.min !== undefined && num < f.min) fieldValid = false;
+            if (f.max !== undefined && num > f.max) fieldValid = false;
+          }
+        }
+
+        el.classList.toggle('error', !fieldValid);
+        if (errEl) errEl.classList.toggle('visible', !fieldValid);
+        if (!fieldValid) valid = false;
+      });
+      return valid;
+    }
+
+    function setStatus(type, message) {
+      statusEl.className = 'poc-status ' + type;
+      statusEl.textContent = message;
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (!APPS_SCRIPT_URL) {
+        setStatus('error', 'APPS_SCRIPT_URL is not set. Deploy the web app first and paste the URL in the script.');
+        return;
+      }
+
+      if (!validate()) {
+        setStatus('error', 'Please fix the errors above.');
+        return;
+      }
+
+      var data = {};
+      fields.forEach(function(f) {
+        data[f.id] = document.getElementById(f.id).value.trim();
+      });
+
+      submitBtn.disabled = true;
+      setStatus('loading', 'Sending…');
+
+      // mode: 'no-cors' — the POST goes through but we can't read the response.
+      // This is fine: Apps Script doesn't support CORS preflight on doPost.
+      // We show success optimistically. If it fails silently, the row won't appear in the sheet.
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(function() {
+        setStatus('success', 'Submitted! Check your Google Sheet for the new row. (Note: with no-cors mode we can\'t confirm server-side success — verify in the sheet.)');
+        form.reset();
+      })
+      .catch(function(err) {
+        setStatus('error', 'Network error: ' + err.message);
+      })
+      .finally(function() {
+        submitBtn.disabled = false;
+      });
+    });
+
+    // Clear errors on input
+    fields.forEach(function(f) {
+      var el = document.getElementById(f.id);
+      el.addEventListener('input', function() {
+        el.classList.remove('error');
+        var errEl = document.getElementById(f.id + '-error');
+        if (errEl) errEl.classList.remove('visible');
+        if (statusEl.classList.contains('error')) {
+          statusEl.className = 'poc-status';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
