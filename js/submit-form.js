@@ -10,7 +10,7 @@ window.DQH.submitForm = (function () {
   'use strict';
 
   // ── Configuration ──────────────────────────────────────────────
-  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuZNMDrk2H0SUqNJIz9GspUlkc9KVi7EtExb8VgO3UUtynk22yJUrPSlxyn9jxsW7VXA/exec';
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuQyzYReGtJIToIHNXwlWsZ8qaXoOdG2qpSN4uyrWqVObgCodUqjDtzasMK3m7bg3b/exec';
 
   var KNOWN_PLATFORMS = ['Prolific', 'MTurk', 'Bilendi', 'Moblab', 'CloudResearch'];
 
@@ -80,14 +80,19 @@ window.DQH.submitForm = (function () {
     return years;
   }
 
-  function ensurePlatformData(platformName) {
-    var key = platformName;
+  function ensurePlatformData(platformName, sampleIndex) {
+    var key = platformName + '_' + sampleIndex;
     if (!state.platformData[key]) {
       state.platformData[key] = {
         recruitmentMethod: '',     // 'platform' or 'two-stage'
         sampleSize: '', month: '', year: '',
         country: '',
         additionalCriteria: '',    // free-text screening criteria
+        approvalScore: '',
+        minStudies: '',
+        representativeSample: false,
+        screenerStudy: '',
+        submittingScreenerData: '',
         metrics: {},               // { metricId: { rate, description } }
         customMetrics: [],         // [{ name, category, rate, description }]
         overallRate: '', overallDescription: ''
@@ -111,14 +116,15 @@ window.DQH.submitForm = (function () {
       { id: 'researcher', label: 'Researcher Info' },
       { id: 'platforms', label: 'Platforms' }
     ];
-
     for (var i = 0; i < state.platforms.length; i++) {
-      steps.push({
-        id: 'plat-' + i, label: state.platforms[i].name,
-        platformIndex: i
-      });
+      var p = state.platforms[i];
+      var sc = p.sampleCount || 1;
+      for (var s = 0; s < sc; s++) {
+        var lbl = p.name;
+        if (sc > 1) lbl += ' \u2014 Sample ' + (s + 1) + ' of ' + sc;
+        steps.push({ id: 'plat-' + i + '-' + s, label: lbl, platformIndex: i, sampleIndex: s });
+      }
     }
-
     steps.push({ id: 'metadata', label: 'Metadata' });
     return steps;
   }
@@ -195,23 +201,51 @@ window.DQH.submitForm = (function () {
     html += '<input class="sf-input" type="text" id="sf-custom-platform" placeholder="Custom platform name\u2026" value="' + esc(state.customPlatformInput) + '">';
     html += '<button type="button" class="sf-btn-add" data-action="add-platform">+ Add</button>';
     html += '</div>';
+
+    // Sample count picker (shown only if at least one platform selected)
+    if (state.platforms.length > 0) {
+      html += '<div class="sf-sample-counts">';
+      html += '<div class="sf-sample-count-label-row">How many independent samples per platform?</div>';
+      for (var k = 0; k < state.platforms.length; k++) {
+        var pk = state.platforms[k];
+        var sc = pk.sampleCount || 1;
+        html += '<div class="sf-sample-count-row">';
+        html += '<span class="sf-sample-count-name">' + esc(pk.name) + '</span>';
+        html += '<div class="sf-count-picker">';
+        for (var n = 1; n <= 5; n++) {
+          var act = sc === n ? ' active' : '';
+          html += '<button type="button" class="sf-count-btn' + act + '" data-set-sample-count data-platform-idx="' + k + '" data-count="' + n + '">' + n + '</button>';
+        }
+        html += '</div>';
+        html += '<span class="sf-count-note">sample' + (sc > 1 ? 's' : '') + '</span>';
+        if (sc >= 5) html += '<span class="sf-count-note" style="color:var(--danger);margin-left:0.25rem;">If more than 5, please make another submission with the same study title.</span>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
     html += '<div class="sf-error-msg" id="sf-platforms-error"></div>';
     return html;
   }
 
   // ── Platform Detail Step ───────────────────────────────────────
 
-  function renderPlatformDetailStep(platformIndex) {
+  function renderPlatformDetailStep(platformIndex, sampleIndex) {
     var platform = state.platforms[platformIndex];
     var pName = platform.name;
-    var pd = ensurePlatformData(pName);
-    var pfx = 'p' + platformIndex; // unique prefix for IDs
+    var pd = ensurePlatformData(pName, sampleIndex);
+    var pfx = 'p' + platformIndex + 's' + sampleIndex; // unique prefix for IDs
     var html = '';
 
     // Header
     html += '<div class="sf-platform-header">';
     html += '<span class="sf-platform-badge">' + esc(pName) + '</span>';
-    html += '<span class="sf-platform-counter">Platform ' + (platformIndex + 1) + ' of ' + state.platforms.length + '</span>';
+    var sc = state.platforms[platformIndex].sampleCount || 1;
+    if (sc > 1) {
+      html += '<span class="sf-platform-counter">Sample ' + (sampleIndex + 1) + ' of ' + sc + '</span>';
+    } else {
+      html += '<span class="sf-platform-counter">Platform ' + (platformIndex + 1) + ' of ' + state.platforms.length + '</span>';
+    }
     html += '</div>';
 
     // Sample size
@@ -236,45 +270,75 @@ window.DQH.submitForm = (function () {
     // ── Recruitment sub-section ──
     html += '<hr class="sf-section-divider">';
     html += '<div class="sf-section-label">Recruitment</div>';
-    html += '<div class="sf-field"><div class="sf-radio-group" id="sf-recruit-group-' + pfx + '">';
-    var recruitOpts = [
-      { value: 'platform',
-        label: 'Standard Screening Criteria',
-        desc: 'Participants are recruited from the platform using standard screening criteria (e.g. country, socio-demographics, study experience).' },
-      { value: 'two-stage',
-        label: 'Two-Stage Recruitment',
-        desc: 'Participation is limited to a subset of high-quality subjects from a screening study.' }
-    ];
-    for (var ri = 0; ri < recruitOpts.length; ri++) {
-      var rch = pd.recruitmentMethod === recruitOpts[ri].value ? ' checked' : '';
-      html += '<label class="sf-radio-option">';
-      html += '<input type="radio" name="sf-recruit-' + pfx + '" value="' + recruitOpts[ri].value + '"' + rch + '>';
-      html += '<div><span class="sf-option-label">' + esc(recruitOpts[ri].label) + '</span>';
-      html += '<div class="sf-hint">' + esc(recruitOpts[ri].desc) + '</div></div>';
-      html += '</label>';
-    }
-    html += '</div>';
-    html += '<div class="sf-error-msg" id="sf-recruit-' + pfx + '-error"></div>';
-    html += '</div>';
+    html += '<div class="sf-field" id="sf-recruit-field-' + pfx + '">';
+    html += '<div class="sf-radio-group" id="sf-recruit-group-' + pfx + '">';
 
-    // Conditional fields (country + additional criteria) — visible once a method is selected
-    var recruitVisible = pd.recruitmentMethod ? ' visible' : '';
-    html += '<div class="sf-conditional' + recruitVisible + '" id="sf-recruit-fields-' + pfx + '">';
+    // Standard option
+    var stdChecked = pd.recruitmentMethod === 'platform' ? ' checked' : '';
+    html += '<label class="sf-radio-option" style="align-items:flex-start;flex-direction:column;cursor:pointer;">';
+    html += '<div style="display:flex;align-items:flex-start;gap:0.5rem;width:100%;">';
+    html += '<input type="radio" name="sf-recruit-' + pfx + '" value="platform" style="margin-top:0.2rem;"' + stdChecked + '>';
+    html += '<div><span class="sf-option-label">Standard Screening Criteria</span>';
+    html += '<div class="sf-hint">Participants are recruited from the platform using standard screening criteria (e.g. country, socio-demographics, study experience).</div>';
+    html += '</div></div>';
+    // Standard inline fields
+    var stdVisible = pd.recruitmentMethod === 'platform' ? ' visible' : '';
+    html += '<div class="sf-recruit-inline sf-conditional' + stdVisible + '" id="sf-standard-fields-' + pfx + '" style="width:100%;">';
     html += textField('sf-country-' + pfx, 'Country', pd.country, false, '');
+    html += textField('sf-approvalScore-' + pfx, 'Participant Quality / Approval Rate (%)', pd.approvalScore, false, 'e.g., 95');
+    html += textField('sf-minStudies-' + pfx, 'Minimum Completed Studies / HITs', pd.minStudies, false, 'e.g., 100');
+    html += '<div class="sf-field"><label class="sf-checkbox-option" style="cursor:default;">';
+    html += '<input type="checkbox" id="sf-repSample-' + pfx + '"' + (pd.representativeSample ? ' checked' : '') + '>';
+    html += '<span class="sf-option-label">Representative sample</span>';
+    html += '</label></div>';
+    html += '<div class="sf-field"><label class="sf-label" for="sf-addCriteria-' + pfx + '">Additional Screening Conditions</label>';
+    html += '<textarea class="sf-textarea" id="sf-addCriteria-' + pfx + '" placeholder="Describe any screeners applied (e.g., socio-demographics, prior study experience, ...).">' + esc(pd.additionalCriteria) + '</textarea></div>';
+    html += '</div>'; // end standard inline fields
+    html += '</label>'; // end standard option
 
-    // Label for additionalCriteria changes based on selection
-    var addCriteriaLabel = pd.recruitmentMethod === 'two-stage'
-      ? 'Screening Criteria'
-      : 'Screening Criteria';
-    var addCriteriaPlaceholder = pd.recruitmentMethod === 'two-stage'
-      ? 'Describe the data quality checks applied to the screening study to determine which participants were eligible for this two-stage study.'
-      : 'Describe any screeners applied (e.g., socio-demographics, prior study experience, ...).';
+    // Two-stage option
+    var tsChecked = pd.recruitmentMethod === 'two-stage' ? ' checked' : '';
+    html += '<label class="sf-radio-option" style="align-items:flex-start;flex-direction:column;cursor:pointer;">';
+    html += '<div style="display:flex;align-items:flex-start;gap:0.5rem;width:100%;">';
+    html += '<input type="radio" name="sf-recruit-' + pfx + '" value="two-stage" style="margin-top:0.2rem;"' + tsChecked + '>';
+    html += '<div><span class="sf-option-label">Two-Stage Recruitment</span>';
+    html += '<div class="sf-hint">Participation is limited to a subset of high-quality subjects from a screening study.</div>';
+    html += '</div></div>';
+    // Two-stage inline fields
+    var tsVisible = pd.recruitmentMethod === 'two-stage' ? ' visible' : '';
+    html += '<div class="sf-recruit-inline sf-conditional' + tsVisible + '" id="sf-twostage-fields-' + pfx + '" style="width:100%;">';
+    html += textField('sf-country-ts-' + pfx, 'Country', pd.country, false, '');
+    html += '<div class="sf-field"><label class="sf-label" for="sf-addCriteria-ts-' + pfx + '">Additional Screening Conditions</label>';
+    html += '<textarea class="sf-textarea" id="sf-addCriteria-ts-' + pfx + '" placeholder="Describe the data quality checks applied to the screening study to determine which participants were eligible for this two-stage study.">' + esc(pd.additionalCriteria) + '</textarea></div>';
+    // Screener study question
+    html += '<div class="sf-field"><label class="sf-label">Are you also submitting data for the screener study?</label>';
+    html += '<div class="sf-radio-group">';
+    var scYes = pd.submittingScreenerData === 'Yes' ? ' checked' : '';
+    var scNo  = pd.submittingScreenerData === 'No'  ? ' checked' : '';
+    html += '<label class="sf-radio-option"><input type="radio" name="sf-screener-submit-' + pfx + '" value="Yes"' + scYes + '><span class="sf-option-label">Yes</span></label>';
+    html += '<label class="sf-radio-option"><input type="radio" name="sf-screener-submit-' + pfx + '" value="No"' + scNo + '><span class="sf-option-label">No</span></label>';
+    html += '</div></div>';
+    // Screener sample selector
+    var scSelectorVisible = pd.submittingScreenerData === 'Yes' ? ' visible' : '';
+    html += '<div class="sf-conditional' + scSelectorVisible + '" id="sf-screener-selector-' + pfx + '">';
+    html += '<div class="sf-field"><label class="sf-label" for="sf-screenerStudy-' + pfx + '">Which sample is the screener study?</label>';
+    html += '<select class="sf-select" id="sf-screenerStudy-' + pfx + '">';
+    html += '<option value="">Select sample\u2026</option>';
+    var scTotal = state.platforms[platformIndex].sampleCount || 1;
+    for (var si = 0; si < scTotal; si++) {
+      if (si !== sampleIndex) {
+        var sLabel = 'Sample ' + (si + 1) + ' of ' + scTotal;
+        html += '<option value="' + sLabel + '"' + (pd.screenerStudy === sLabel ? ' selected' : '') + '>' + esc(sLabel) + '</option>';
+      }
+    }
+    html += '</select></div>';
+    html += '</div>'; // end screener selector
+    html += '</div>'; // end two-stage inline fields
+    html += '</label>'; // end two-stage option
 
-    html += '<div class="sf-field">';
-    html += '<label class="sf-label" for="sf-addCriteria-' + pfx + '" id="sf-addCriteria-label-' + pfx + '">' + esc(addCriteriaLabel) + '</label>';
-    html += '<textarea class="sf-textarea" id="sf-addCriteria-' + pfx + '" placeholder="' + esc(addCriteriaPlaceholder) + '">' + esc(pd.additionalCriteria) + '</textarea>';
-    html += '</div>';
-    html += '</div>'; // end sf-recruit-fields
+    html += '</div>'; // end radio group
+    html += '<div class="sf-error-msg" id="sf-recruit-' + pfx + '-error"></div>';
+    html += '</div>'; // end recruit field
 
     // ── Metrics ──
     html += '<hr class="sf-section-divider">';
@@ -342,10 +406,13 @@ window.DQH.submitForm = (function () {
 
   function renderMetricPanel(pfx, metricId, name, category, description, data) {
     var id = 'sf-mp-' + pfx + '-' + metricId;
-    var html = '<div class="sf-metric-panel" data-metric-panel="' + metricId + '">';
+    var catSlug = category.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+    var html = '<div class="sf-metric-panel" data-metric-panel="' + metricId + '" data-category="' + catSlug + '">';
+    html += '<div class="sf-metric-panel-header">';
     html += '<div class="sf-metric-panel-title">' + esc(name) + '</div>';
     html += '<div class="sf-metric-panel-category">' + esc(category) + '</div>';
-    if (description) html += '<div class="sf-hint" style="margin-bottom:0.75rem;">' + esc(description) + '</div>';
+    html += '</div>';
+    if (description) html += '<div class="sf-hint">' + esc(description) + '</div>';
     html += '<div class="sf-field"><label class="sf-label" for="' + id + '-rate">Pass Rate (%) <span class="sf-required">*</span></label>';
     html += '<input class="sf-input" type="number" id="' + id + '-rate" min="0" max="100" value="' + esc(data.rate) + '" placeholder="0\u2013100">';
     html += '<div class="sf-error-msg" id="' + id + '-rate-error"></div></div>';
@@ -468,14 +535,14 @@ window.DQH.submitForm = (function () {
       var fbEl = document.getElementById('sf-feedback');
       state.feedback = fbEl ? fbEl.value.trim() : '';
     } else if (step.platformIndex !== undefined) {
-      savePlatformStep(step.platformIndex);
+      savePlatformStep(step.platformIndex, step.sampleIndex || 0);
     }
   }
 
-  function savePlatformStep(idx) {
+  function savePlatformStep(idx, sidx) {
     var pName = state.platforms[idx].name;
-    var pd = ensurePlatformData(pName);
-    var pfx = 'p' + idx;
+    var pd = ensurePlatformData(pName, sidx);
+    var pfx = 'p' + idx + 's' + sidx;
 
     pd.sampleSize = gv('sf-sampleSize-' + pfx);
     pd.month = gv('sf-month-' + pfx);
@@ -483,8 +550,29 @@ window.DQH.submitForm = (function () {
 
     var rEl = document.querySelector('input[name="sf-recruit-' + pfx + '"]:checked');
     pd.recruitmentMethod = rEl ? rEl.value : '';
-    pd.country = gv('sf-country-' + pfx);
-    pd.additionalCriteria = gv('sf-addCriteria-' + pfx);
+
+    if (pd.recruitmentMethod === 'platform') {
+      pd.country = gv('sf-country-' + pfx);
+      pd.approvalScore = gv('sf-approvalScore-' + pfx);
+      pd.minStudies = gv('sf-minStudies-' + pfx);
+      var repEl = document.getElementById('sf-repSample-' + pfx);
+      pd.representativeSample = repEl ? repEl.checked : false;
+      pd.additionalCriteria = gv('sf-addCriteria-' + pfx);
+      pd.screenerStudy = '';
+      pd.submittingScreenerData = '';
+    } else if (pd.recruitmentMethod === 'two-stage') {
+      pd.country = gv('sf-country-ts-' + pfx);
+      pd.approvalScore = '';
+      pd.minStudies = '';
+      pd.representativeSample = false;
+      pd.additionalCriteria = gv('sf-addCriteria-ts-' + pfx);
+      var screenerSubmitEl = document.querySelector('input[name="sf-screener-submit-' + pfx + '"]:checked');
+      pd.submittingScreenerData = screenerSubmitEl ? screenerSubmitEl.value : '';
+      pd.screenerStudy = pd.submittingScreenerData === 'Yes' ? gv('sf-screenerStudy-' + pfx) : '';
+    } else {
+      pd.country = '';
+      pd.additionalCriteria = '';
+    }
 
     // Standard metrics
     var cbContainer = document.getElementById('sf-metrics-cb-' + pfx);
@@ -530,7 +618,7 @@ window.DQH.submitForm = (function () {
     if (step.id === 'researcher') return validateResearcher();
     if (step.id === 'platforms') return validatePlatforms();
     if (step.id === 'metadata') return validateMetadata();
-    if (step.platformIndex !== undefined) return validatePlatformDetail(step.platformIndex);
+    if (step.platformIndex !== undefined) return validatePlatformDetail(step.platformIndex, step.sampleIndex || 0);
     return true;
   }
 
@@ -571,10 +659,10 @@ window.DQH.submitForm = (function () {
     return true;
   }
 
-  function validatePlatformDetail(idx) {
+  function validatePlatformDetail(idx, sidx) {
     var pName = state.platforms[idx].name;
-    var pd = ensurePlatformData(pName);
-    var pfx = 'p' + idx;
+    var pd = ensurePlatformData(pName, sidx);
+    var pfx = 'p' + idx + 's' + sidx;
     var ok = true;
 
     // Sample size
@@ -688,7 +776,9 @@ window.DQH.submitForm = (function () {
       btn.addEventListener('click', function () {
         var name = btn.getAttribute('data-remove-platform');
         state.platforms = state.platforms.filter(function (p) { return p.name !== name; });
-        delete state.platformData[name];
+        Object.keys(state.platformData).forEach(function (k) {
+          if (k === name || k.indexOf(name + '_') === 0) delete state.platformData[k];
+        });
         adjustCurrentStep(); render();
       });
     });
@@ -699,6 +789,19 @@ window.DQH.submitForm = (function () {
     });
     var cpInput = document.getElementById('sf-custom-platform');
     if (cpInput) cpInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addCustomPlatform(); } });
+
+    // Sample count buttons
+    root.querySelectorAll('[data-set-sample-count]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var pidx = parseInt(btn.getAttribute('data-platform-idx'), 10);
+        var cnt  = parseInt(btn.getAttribute('data-count'), 10);
+        if (state.platforms[pidx]) {
+          state.platforms[pidx].sampleCount = cnt;
+          adjustCurrentStep();
+          render();
+        }
+      });
+    });
 
     // Add custom metric
     root.querySelectorAll('[data-action="add-custom-metric"]').forEach(function (btn) {
@@ -716,8 +819,8 @@ window.DQH.submitForm = (function () {
         e.preventDefault();
         var steps = getSteps(); var step = steps[state.currentStep];
         if (step && step.platformIndex !== undefined) {
-          savePlatformStep(step.platformIndex);
-          var pd = ensurePlatformData(state.platforms[step.platformIndex].name);
+          savePlatformStep(step.platformIndex, step.sampleIndex || 0);
+          var pd = ensurePlatformData(state.platforms[step.platformIndex].name, step.sampleIndex || 0);
           pd.customMetrics.splice(parseInt(btn.getAttribute('data-remove-custom-metric'), 10), 1);
           render();
         }
@@ -780,16 +883,17 @@ window.DQH.submitForm = (function () {
     var steps = getSteps(); var step = steps[state.currentStep];
     if (!step || step.platformIndex === undefined) return;
     var idx = step.platformIndex;
-    var pfx = 'p' + idx;
+    var sidx = step.sampleIndex || 0;
+    var pfx = 'p' + idx + 's' + sidx;
     var pName = state.platforms[idx].name;
-    var pd = ensurePlatformData(pName);
+    var pd = ensurePlatformData(pName, sidx);
 
     document.querySelectorAll('#sf-metrics-cb-' + pfx + ' input[data-metric]').forEach(function (cb) {
       cb.addEventListener('change', function () {
         var mid = cb.getAttribute('data-metric');
         if (cb.checked) pd.metrics[mid] = pd.metrics[mid] || { rate: '', description: '' };
         else delete pd.metrics[mid];
-        savePlatformStep(idx); render();
+        savePlatformStep(idx, sidx); render();
       });
     });
   }
@@ -798,28 +902,31 @@ window.DQH.submitForm = (function () {
     var steps = getSteps(); var step = steps[state.currentStep];
     if (!step || step.platformIndex === undefined) return;
     var idx = step.platformIndex;
-    var pfx = 'p' + idx;
+    var sidx = step.sampleIndex || 0;
+    var pfx = 'p' + idx + 's' + sidx;
 
     document.querySelectorAll('input[name="sf-recruit-' + pfx + '"]').forEach(function (radio) {
       radio.addEventListener('change', function () {
-        savePlatformStep(idx);
-        // Show/hide conditional fields
-        var fieldsEl = document.getElementById('sf-recruit-fields-' + pfx);
-        if (fieldsEl) fieldsEl.classList.add('visible');
-        // Update additional criteria label and placeholder based on selection
-        var labelEl = document.getElementById('sf-addCriteria-label-' + pfx);
-        var inputEl = document.getElementById('sf-addCriteria-' + pfx);
-        var pd = ensurePlatformData(state.platforms[idx].name);
-        if (radio.value === 'two-stage' && radio.checked) {
-          if (labelEl) labelEl.textContent = 'Screening Criteria';
-          if (inputEl) inputEl.placeholder = 'Describe the data quality checks applied to the screening study to determine which participants were eligible for this two-stage study.';
-        } else if (radio.value === 'platform' && radio.checked) {
-          if (labelEl) labelEl.textContent = 'Screening Criteria';
-          if (inputEl) inputEl.placeholder = 'Describe any screeners applied (e.g., socio-demographics, prior study experience, ...).';
+        savePlatformStep(idx, sidx);
+        var stdFields = document.getElementById('sf-standard-fields-' + pfx);
+        var tsFields  = document.getElementById('sf-twostage-fields-' + pfx);
+        if (radio.value === 'platform' && radio.checked) {
+          if (stdFields) stdFields.classList.add('visible');
+          if (tsFields)  tsFields.classList.remove('visible');
+        } else if (radio.value === 'two-stage' && radio.checked) {
+          if (tsFields)  tsFields.classList.add('visible');
+          if (stdFields) stdFields.classList.remove('visible');
         }
-        // Clear recruitment error
         var errEl = document.getElementById('sf-recruit-' + pfx + '-error');
         if (errEl) { errEl.classList.remove('visible'); errEl.textContent = ''; }
+      });
+    });
+
+    // Screener submit radio (yes/no)
+    document.querySelectorAll('input[name="sf-screener-submit-' + pfx + '"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        var sel = document.getElementById('sf-screener-selector-' + pfx);
+        if (sel) sel.classList.toggle('visible', radio.value === 'Yes' && radio.checked);
       });
     });
   }
@@ -828,7 +935,8 @@ window.DQH.submitForm = (function () {
     var steps = getSteps(); var step = steps[state.currentStep];
     if (!step || step.platformIndex === undefined) return;
     var idx = step.platformIndex;
-    var pfx = 'p' + idx;
+    var sidx = step.sampleIndex || 0;
+    var pfx = 'p' + idx + 's' + sidx;
     var overallRateEl = document.getElementById('sf-overallRate-' + pfx);
     var overallLabelEl = document.getElementById('sf-overallDesc-label-' + pfx);
     if (overallRateEl && overallLabelEl) {
@@ -843,9 +951,11 @@ window.DQH.submitForm = (function () {
     var i = state.platforms.findIndex(function (p) { return p.name === name; });
     if (i !== -1) {
       state.platforms.splice(i, 1);
-      delete state.platformData[name];
+      Object.keys(state.platformData).forEach(function (k) {
+        if (k === name || k.indexOf(name + '_') === 0) delete state.platformData[k];
+      });
     } else {
-      state.platforms.push({ name: name, isCustom: isCustom });
+      state.platforms.push({ name: name, isCustom: isCustom, sampleCount: 1 });
     }
     adjustCurrentStep(); render();
   }
@@ -855,7 +965,7 @@ window.DQH.submitForm = (function () {
     if (!input) return;
     var name = input.value.trim();
     if (!name || isPlatformSelected(name)) return;
-    state.platforms.push({ name: name, isCustom: true });
+    state.platforms.push({ name: name, isCustom: true, sampleCount: 1 });
     state.customPlatformInput = '';
     render();
   }
@@ -867,8 +977,9 @@ window.DQH.submitForm = (function () {
     if (!name) return;
     var steps = getSteps(); var step = steps[state.currentStep];
     if (step && step.platformIndex !== undefined) {
-      savePlatformStep(step.platformIndex);
-      var pd = ensurePlatformData(state.platforms[step.platformIndex].name);
+      var sidx = step.sampleIndex || 0;
+      savePlatformStep(step.platformIndex, sidx);
+      var pd = ensurePlatformData(state.platforms[step.platformIndex].name, sidx);
       pd.customMetrics.push({ name: name, category: '', rate: '', description: '' });
       render();
     }
@@ -906,31 +1017,42 @@ window.DQH.submitForm = (function () {
     row.push('');
     // 1: Timestamp
     row.push(timestamp);
-    // 2-5: Researcher
+    // 2: Submission ID
+    row.push(submissionId);
+    // 3-6: Researcher
     row.push(researcher.email || '');
     row.push(researcher.name || '');
     row.push(researcher.affiliation || '');
     row.push(researcher.studyTitle || '');
-    // 6: Recruitment method (per-platform)
-    if (entry.recruitmentMethod === 'two-stage') row.push('Two-Stage Recruitment');
-    else if (entry.recruitmentMethod === 'platform') row.push('Platform with Standard Screening Criteria');
-    else row.push('');
-    // 7: Stage (no longer used — empty)
-    row.push('');
-    // 8-9: Platform
+    // 7-13: Study metadata
+    row.push(metadata.preRegistered || '');
+    row.push(metadata.preRegLink || '');
+    row.push(metadata.paperLink || '');
+    row.push(metadata.dataAvailability || '');
+    row.push(metadata.dataLink || '');
+    row.push(metadata.publicationStatus || '');
+    row.push(metadata.feedback || '');
+    // 14-15: Platform
     var isKnown = KNOWN_PLATFORMS.indexOf(entry.platform) !== -1;
     row.push(isKnown ? entry.platform : 'Other');
     row.push(isKnown ? '' : entry.platform);
-    // 10-15: Sample details
+    // 16-19: Sample / dates
+    row.push(entry.sample || '');
     row.push(entry.sampleSize || '');
     row.push(entry.month || '');
     row.push(entry.year || '');
+    // 20: Recruitment strategy
+    if (entry.recruitmentMethod === 'two-stage') row.push('Two-Stage');
+    else if (entry.recruitmentMethod === 'platform') row.push('Standard');
+    else row.push('');
+    // 21-26: Recruitment details
     row.push(entry.country || '');
-    row.push(''); // approvalScore (legacy column)
-    row.push(''); // minStudies (legacy column)
-    // 16: Additional criteria (maps to legacy selectionCriteria column)
+    row.push(entry.approvalScore || '');
+    row.push(entry.minStudies || '');
+    row.push(entry.representativeSample || '');
     row.push(entry.additionalCriteria || '');
-    // 17-37: Standard metrics (3 cols each: Yes/No, Rate, Desc)
+    row.push(entry.screenerStudy || '');
+    // 27-65: Standard metrics (3 cols each: Yes/No, Rate, Desc)
     var metrics = entry.metrics || {};
     for (var mi = 0; mi < METRIC_IDS.length; mi++) {
       var mid = METRIC_IDS[mi];
@@ -942,7 +1064,10 @@ window.DQH.submitForm = (function () {
         row.push('No'); row.push(''); row.push('');
       }
     }
-    // 38-87: Custom metrics (5 cols each: Yes/No, Name, Category, Rate, Desc) x 10
+    // 66-67: Overall quality
+    row.push(entry.overallRate || '');
+    row.push(entry.overallDescription || '');
+    // 68-117: Custom metrics (5 cols each: Yes/No, Name, Category, Rate, Desc) x 10
     var customs = entry.customMetrics || [];
     for (var ci = 0; ci < MAX_CUSTOM; ci++) {
       if (ci < customs.length) {
@@ -955,27 +1080,19 @@ window.DQH.submitForm = (function () {
         row.push('No'); row.push(''); row.push(''); row.push(''); row.push('');
       }
     }
-    // 88-89: Overall quality
-    row.push(entry.overallRate || '');
-    row.push(entry.overallDescription || '');
-    // 90-96: Metadata
-    row.push(metadata.preRegistered || '');
-    row.push(metadata.preRegLink || '');
-    row.push(metadata.paperLink || '');
-    row.push(metadata.dataAvailability || '');
-    row.push(metadata.dataLink || '');
-    row.push(metadata.publicationStatus || '');
-    row.push(metadata.feedback || '');
-    // 97: Submission ID
-    row.push(submissionId);
     return row;
   }
 
   var CSV_HEADERS = [
-    'Approved','Timestamp','Contact Email','Researcher Name','Researcher Affiliation','Study Title',
-    'Recruitment Method','Stage','Platform','If Other, please specify','Sample Size',
-    'Study Start Month','Study Start Year','Country','Participant quality/approval score',
-    'Minimum number of completed studies/HITs','Additional Screening Criteria',
+    'Approved','Timestamp','Submission ID',
+    'Contact Email','Researcher Name','Researcher Affiliation','Study Title',
+    'Is this study pre-registered?','Pre-registration link','Paper or study link',
+    'Data Availability','Data Repository Link','Publication Status','Feedback',
+    'Platform','If Other, please specify',
+    'Sample','Sample Size','Study Start Month','Study Start Year',
+    'Recruitment Strategy','Country',
+    'Participant quality/approval score','Minimum number of completed studies/HITs',
+    'Representative Sample','Additional Screening Conditions','Screener Study',
     'Did you measure: Attention Check?','Attention Check — Rate (%)','Attention Check — Additional Information',
     'Did you measure: Video Check?','Video Check — Rate (%)','Video Check — Additional Information',
     'Did you measure: Typed Text?','Typed Text — Rate (%)','Typed Text — Additional Information',
@@ -988,7 +1105,8 @@ window.DQH.submitForm = (function () {
     'Did you measure: No Foreign IP Address?','No Foreign IP Address — Rate (%)','No Foreign IP Address — Additional Information',
     'Did you measure: Not in a Geolocation Cluster?','Not in a Geolocation Cluster — Rate (%)','Not in a Geolocation Cluster — Additional Information',
     'Did you measure: No Duplicate Submission?','No Duplicate Submission — Rate (%)','No Duplicate Submission — Additional Information',
-    'Did you measure: No Duplicate Device Fingerprint?','No Duplicate Device Fingerprint — Rate (%)','No Duplicate Device Fingerprint — Additional Information'
+    'Did you measure: No Duplicate Device Fingerprint?','No Duplicate Device Fingerprint — Rate (%)','No Duplicate Device Fingerprint — Additional Information',
+    'Overall data quality pass rate (%)','Description of overall quality measure'
   ];
   // Add custom metric headers
   (function () {
@@ -999,16 +1117,6 @@ window.DQH.submitForm = (function () {
       CSV_HEADERS.push('Additional Metric ' + i + ' — Rate (%)');
       CSV_HEADERS.push('Additional Metric ' + i + ' — Description');
     }
-    CSV_HEADERS.push('Overall data quality pass rate (%)');
-    CSV_HEADERS.push('Description of overall quality measure');
-    CSV_HEADERS.push('Is this study pre-registered?');
-    CSV_HEADERS.push('Pre-registration link');
-    CSV_HEADERS.push('Paper or study link');
-    CSV_HEADERS.push('Data Availability');
-    CSV_HEADERS.push('Data Repository Link');
-    CSV_HEADERS.push('Publication Status');
-    CSV_HEADERS.push('Feedback');
-    CSV_HEADERS.push('Submission ID');
   })();
 
   function csvEscape(val) {
@@ -1072,7 +1180,10 @@ window.DQH.submitForm = (function () {
     };
 
     for (var i = 0; i < state.platforms.length; i++) {
-      payload.entries.push(buildEntry(i));
+      var sc = state.platforms[i].sampleCount || 1;
+      for (var s = 0; s < sc; s++) {
+        payload.entries.push(buildEntry(i, s));
+      }
     }
 
     // Build CSV before sending (so we have it regardless of response)
@@ -1112,14 +1223,20 @@ window.DQH.submitForm = (function () {
     });
   }
 
-  function buildEntry(platformIndex) {
+  function buildEntry(platformIndex, sampleIndex) {
     var p = state.platforms[platformIndex];
-    var pd = state.platformData[p.name] || {};
+    var pd = state.platformData[p.name + '_' + sampleIndex] || {};
+    var sc = p.sampleCount || 1;
     return {
       platform: p.name, isCustom: p.isCustom || false,
+      sample: (sampleIndex + 1) + ' of ' + sc,
       recruitmentMethod: pd.recruitmentMethod || '',
       sampleSize: pd.sampleSize || '', month: pd.month || '', year: pd.year || '',
       country: pd.country || '', additionalCriteria: pd.additionalCriteria || '',
+      approvalScore: pd.approvalScore || '',
+      minStudies: pd.minStudies || '',
+      representativeSample: pd.representativeSample ? 'Yes' : 'No',
+      screenerStudy: pd.screenerStudy || '',
       metrics: pd.metrics || {}, customMetrics: pd.customMetrics || [],
       overallRate: pd.overallRate || '', overallDescription: pd.overallDescription || ''
     };
@@ -1297,7 +1414,7 @@ window.DQH.submitForm = (function () {
       if (s.id === 'researcher')       html += renderResearcherStep();
       else if (s.id === 'platforms')   html += renderPlatformsStep();
       else if (s.id === 'metadata')    html += renderMetadataStep();
-      else if (s.platformIndex !== undefined) html += renderPlatformDetailStep(s.platformIndex);
+      else if (s.platformIndex !== undefined) html += renderPlatformDetailStep(s.platformIndex, s.sampleIndex || 0);
 
       html += renderNav(i, steps.length);
       html += '</div>';

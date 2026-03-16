@@ -205,9 +205,11 @@ window.DQH.table = {
     var studyLink = '';
     var preRegLink = '';
     var dataLink = '';
-    var credibility = '';
+
     var metricFields = ['overallPassRate', 'classicChecksRate', 'videoCheckRate',
-      'typedTextRate', 'typicalSpeedRate', 'recaptchaRate', 'pangramRate', 'uniqueIpRate'];
+      'typedTextRate', 'typicalSpeedRate', 'recaptchaRate', 'pangramRate',
+      'mouseClicksRate', 'mouseMovementsRate', 'uniqueIpRate', 'noForeignIpRate',
+      'noGeoClusterRate', 'noDuplicateSubmissionRate', 'noDuplicateFingerprintRate'];
     var metricSeen = {};
     for (var i = 0; i < entries.length; i++) {
       if (!dataAvail && entries[i].dataAvailability) dataAvail = entries[i].dataAvailability;
@@ -216,7 +218,6 @@ window.DQH.table = {
       if (!studyLink && entries[i].studyLink)  studyLink  = entries[i].studyLink;
       if (!preRegLink && entries[i].preRegLink) preRegLink = entries[i].preRegLink;
       if (!dataLink && entries[i].dataLink) dataLink = entries[i].dataLink;
-      if (!credibility && entries[i].credibilityInfo) credibility = entries[i].credibilityInfo;
       for (var m = 0; m < metricFields.length; m++) {
         var f = metricFields[m];
         if (entries[i][f] !== null && entries[i][f] !== undefined) metricSeen[f] = true;
@@ -264,13 +265,6 @@ window.DQH.table = {
       if (studyLink) html += '<div><strong>Paper link:</strong> ' + linkHtml(studyLink) + '</div>';
       if (preRegLink) html += '<div><strong>Pre-reg link:</strong> ' + linkHtml(preRegLink) + '</div>';
       if (dataLink) html += '<div><strong>Data link:</strong> ' + linkHtml(dataLink) + '</div>';
-      html += '</div>';
-    }
-
-    // Credibility info
-    if (credibility) {
-      html += '<div class="study-info-row">';
-      html += '<div style="flex-basis:100%"><strong>Credibility:</strong> <span' + v + '>' + this.esc(credibility) + '</span></div>';
       html += '</div>';
     }
 

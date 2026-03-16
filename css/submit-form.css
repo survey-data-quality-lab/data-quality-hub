@@ -353,26 +353,66 @@
 .sf-metric-panel {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
   border-radius: 10px;
   padding: 1rem;
   animation: sf-slide-down 0.2s ease;
 }
+
+.sf-metric-panel[data-category="attention"] { border-left-color: #60A5FA; }
+.sf-metric-panel[data-category="ai-bot"]    { border-left-color: #A78BFA; }
+.sf-metric-panel[data-category="fraud"]     { border-left-color: #FB923C; }
 
 @keyframes sf-slide-down {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+.sf-metric-panel-header {
+  margin-bottom: 0.6rem;
+}
+
 .sf-metric-panel-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 0.15rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
 }
 
 .sf-metric-panel-category {
-  font-size: 0.72rem;
-  color: var(--text-tertiary);
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 20px;
+  margin-bottom: 0;
+  background: rgba(107, 113, 133, 0.15);
+  color: var(--text-secondary);
+}
+
+.sf-metric-panel[data-category="attention"] .sf-metric-panel-category {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60A5FA;
+}
+
+.sf-metric-panel[data-category="ai-bot"] .sf-metric-panel-category {
+  background: rgba(167, 139, 250, 0.15);
+  color: #A78BFA;
+}
+
+.sf-metric-panel[data-category="fraud"] .sf-metric-panel-category {
+  background: rgba(251, 146, 60, 0.15);
+  color: #FB923C;
+}
+
+.sf-metric-panel .sf-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
   margin-bottom: 0.75rem;
+  line-height: 1.45;
 }
 
 .sf-metric-panel .sf-field {
@@ -545,6 +585,94 @@
   background: rgba(108, 142, 255, 0.08);
   border: 1px solid var(--accent);
   color: var(--accent);
+}
+
+/* ── Sample Count Picker (Step 2) ───────────────────────────────── */
+
+.sf-sample-counts {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sf-sample-count-label-row {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  margin-bottom: 0.15rem;
+}
+
+.sf-sample-count-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sf-sample-count-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 100px;
+}
+
+.sf-count-picker {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.sf-count-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-body);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sf-count-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.sf-count-btn.active {
+  border-color: var(--accent);
+  background: rgba(108, 142, 255, 0.12);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sf-count-note {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* ── Inline Recruitment Fields ──────────────────────────────────── */
+
+.sf-recruit-inline {
+  margin-top: 0.65rem;
+  padding: 0.75rem;
+  padding-left: 0.65rem;
+  border-left: 2px solid var(--border);
+  border-radius: 0 6px 6px 0;
+  background: var(--bg-body);
+}
+
+.sf-recruit-inline .sf-field {
+  margin-bottom: 0.65rem;
+}
+
+.sf-recruit-inline .sf-field:last-child {
+  margin-bottom: 0;
 }
 
 /* ── Responsive ─────────────────────────────────────────────────── */
