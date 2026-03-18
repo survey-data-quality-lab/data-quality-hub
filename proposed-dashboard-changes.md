@@ -1,107 +1,102 @@
 # Proposed Changes for Data Quality Hub Dashboard
 
-## B. Submit / Contribute Your Own Study Results — Multi-Step Form
+Reviewed: March 2026
 
-The submission form is a multi-step wizard. The changes below are organized by page. The revised page order is also specified.
+## 1) Submission Form and User Flow
 
-### B1. Page Order
+### 1.1 Add explicit publication consent in the survey form
+- Add a required consent checkbox before submission:
+	- "I confirm that the submitted data may be reviewed and, if approved, published on the Data Quality Hub dashboard."
+- Add short privacy text near the email field:
+	- "Your email will not be displayed publicly. It is used only for identity verification and communication about your submission."
 
-Change the page order so that **Platforms** comes before **Recruitment Method**. Recruitment details are then collected as a sub-section within each platform's data-entry page (see B4). The standalone "Recruitment Method" page is removed. New page sequence:
+### 1.2 Update first-page navigation
+- Add a Back button on the first submission page (researcher details page) so users can return to the main page.
 
-1. Start / Entry selection
-2. Researcher Information
-3. Platforms (one data-entry sub-page per selected platform, each containing a Recruitment sub-section)
-4. Study Metadata
+### 1.3 Disable edit submission for now
+- Temporarily disable the Edit Existing Entry / Edit Survey function in the public workflow.
+- Keep this feature out of the currently published flow and re-enable only when the updated version is ready.
 
----
+### 1.4 Clarify when to submit one sample vs multiple samples
+- Add guidance text in the form (near sample entry section):
+	- Submit separate samples when:
+		- Different screeners were used for different samples on the same platform.
+		- Different metrics were used.
+		- Samples were collected at clearly different time points.
+	- Submitting one combined sample is acceptable when these differences are minor or not central to the analysis.
 
-### B2. Page: Researcher Information
+## 2) Email Verification and Authentication Workflow
 
-**2a. Introductory text**
-- Remove the final sentence: *"If your study uses multiple platforms, you provide data for each platform separately."*
-- This sentence is confusing and should be deleted entirely.
+### 2.1 Change notification timing
+- Current behavior: maintainers receive an email immediately after form submission.
+- New behavior: maintainers should receive a notification only after the submitter confirms their email address.
 
-**2b. Contact Email field**
-- Directly below the "Contact Email" field label (and/or the asterisk indicating it is required), add the following sentence in **red text**:
-  > *Please provide your institutional email address so we can verify your identity.*
+### 2.2 Confirmation-based submission flow
+- On initial submit:
+	- Send confirmation email to submitter.
+	- Do not trigger maintainer notification yet.
+- After submitter clicks confirmation link:
+	- Mark submission as confirmed.
+	- Trigger maintainer notification email.
 
-**2c. "Edit Existing Entry" section**
-- Remove the "Edit Existing Entry" section from the Researcher Information page.
-- This section should only be shown when the user explicitly clicks an "Edit Existing Entry" button on the very first page (the start/entry-selection screen).
+### 2.3 Automatic password generation
+- Remove user-selected password from the submission process.
+- Generate a temporary password automatically as exactly 5 random digits.
+- Include this generated password in the confirmation email.
+- Storage rules:
+	- Do not store this password in the main dashboard data sheet.
+	- Store only in the private password/account information sheet.
 
-**2d. Back button**
-- Remove the back button that navigates all the way back to the main start page (i.e., the one that returns to the "would you like to submit?" entry screen).
-- Keep only the standard survey "Previous" back button that navigates to the preceding survey page.
+## 3) Review and Publication Policy (Publicly Stated)
 
----
+### 3.1 Identity and affiliation verification policy
+- Publish a clear policy that entries are reviewed before publication.
+- State that submitters must be academic researchers and that affiliation is verified using the institutional/university email domain provided.
 
-### B3. Recruitment Options (used in B4 sub-section)
+### 3.2 Metric acceptance policy
+- Publish a policy that accepted metrics must include a rationale showing the metric addresses one or more specific data quality concerns.
+- Preferred standard:
+	- Metric has prior validation in published work.
+	- Submission includes a citation or link to the validating study when available.
 
-These two options replace the current recruitment method choices. Use these exact labels and descriptions:
+### 3.3 Add metric provenance field
+- For each metric, add a short metadata field:
+	- "Introduced by study" (citation and/or URL).
+- Show this in metric details so users can trace the origin of each metric.
 
-**Option 1**
-- **Label:** Platform with Standard Screening Criteria
-- **Description:** Participants are recruited from the platform using standard criteria, for example country, socio-demographics, study experience, and so on. (Phrasing should make clear that many other similar standard screeners may be used.)
+## 4) Dashboard and Legal Risk Content Updates
 
-**Option 2**
-- **Label:** Two-Stage Recruitment *(title unchanged)*
-- **Description:** Recruitment is limited to the subset of high-quality subjects from a screening study.
+These updates should be aligned with the Legal Risk Review document.
 
----
+### 4.1 Privacy and data-use transparency
+- Add or link a privacy notice/policy covering:
+	- What personal data is collected.
+	- Why it is collected.
+	- What is displayed publicly vs stored privately.
+	- How deletion/correction requests can be made.
 
-### B4. Per-Platform Data Entry (sub-page for each selected platform)
+### 4.2 Accuracy and non-endorsement disclaimers
+- Add a visible statement that dashboard data is self-reported by researchers and reviewed before publication, but not independently audited.
+- Add non-affiliation language clarifying the hub is an independent academic initiative and not endorsed by listed platforms.
 
-Each platform selected on the Platforms page gets a dedicated data-entry form. The structure for each platform's form is:
+### 4.3 Publication safeguards for aggregated metrics
+- Where aggregated platform metrics are shown, include context such as study count/sample size and caution on interpretation when evidence is limited.
 
-1. **Sample size** — as currently implemented.
-2. **Study start date** — as currently implemented.
-3. **Recruitment sub-section**
-   - The user selects one of the two recruitment options defined in B3.
-   - **If "Platform with Standard Screening Criteria" is selected:**
-     - Show: Country selection field.
-     - Show: Additional screening criteria (free-text field) — for any supplementary screeners applied beyond country.
-   - **If "Two-Stage Recruitment" is selected:**
-     - Show: Country selection field.
-     - Show: Additional screening criteria (free-text field) — in this context, the user should enter what data quality checks were applied to the screening study to determine which participants from that study were eligible for the second-stage study.
+## 5) Discussion Forum Onboarding
 
----
+### 5.1 Add welcome and usage guidance post
+- Create a pinned welcome message in the forum.
+- Include a short introduction explaining:
+	- Purpose of the forum.
+	- What kinds of questions/discussion are encouraged.
+	- Basic posting expectations and constructive tone.
+- Content can be adapted from the old dashboard test GitHub repository.
 
-### B5. Quality Metrics Section
+## 6) Suggested Rollout Order
 
-**5a. Metric titles**
-- The title of each quality metric in the form must match the metric name as it appears in the Data Quality Metrics list on the dashboard.
-
-**5b. Metric descriptions**
-- The description shown when a metric input field is revealed must be taken directly from the corresponding entry in the Data Quality Metrics list. Ensure parity between the two.
-
-**5c. Expand the list of available metrics**
-- The list of selectable quality metrics in the form must be expanded to match the full list of metrics shown in the Data Quality Metrics section of the dashboard. Add any metrics that are currently missing.
-
-**5d. Rename "Description" → "Additional Information"**
-- For each metric's free-text note field, change the field label from "Description" to "Additional Information".
-- Update the placeholder/helper text inside the field to:
-  > *Enter any additional information about your measurement approach that may be relevant for interpreting this result. For example, if you deviate from the thresholds that are currently suggested.*
-
-**5e. Overall data quality field**
-- Keep the overall data quality field as an optional, always-available metric that sits alongside the other selectable metrics.
-- Update the field description text to:
-  > *If you have a composite pass rate for your main data quality checks, enter it here.*
-- Make the **Additional Information field mandatory** whenever the user enters a numeric value in this field (i.e., if a number is provided, an explanation of how the composite metric is constructed must also be provided).
-
----
-
-### B6. Page: Study Metadata (last page)
-
-**6a. Section header / introductory text**
-- Change the section header or introductory sentence to:
-  > *Details about your study that may provide context for your results.*
-
-**6b. Replace "Additional Credibility Information" with a Feedback box**
-- Remove the "Additional Credibility Information" field entirely.
-- In its place, add a **Feedback** section with the following:
-  - **Field label:** Feedback
-  - **Question text:**
-    > *Please provide us with feedback about your experience submitting your study data.*
-    >
-    > *Was there anything that you found unclear or confusing? Is there anything we can improve?*
-  - **Placeholder text:** *(none — leave the input box empty so we can observe whether people fill it in spontaneously)*
+1. Implement confirmation-based email workflow and automatic password generation.
+2. Update submission form (consent checkbox, first-page Back button, sample guidance text).
+3. Disable Edit Existing Entry in the public flow.
+4. Publish review and metric acceptance policies.
+5. Add dashboard legal/disclaimer content and privacy links.
+6. Publish forum welcome and guidance post.
