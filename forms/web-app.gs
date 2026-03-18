@@ -29,6 +29,7 @@ var ADMIN_EMAILS = [
 ];
 
 var TOKEN_SECRET = 'missionpossible';
+var ADMIN_TOKEN_SECRET = 'missionpossible-admin-review';
 
 var DEPLOYED_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_WSkv2bqLmKJxgtrYGS98WZCMp-AT-gHSibipbdv4UOEa9DUzRH5OMO7QdRpANGZuug/exec';
 var GITHUB_PAGES_URL    = 'https://survey-data-quality-lab.github.io/data-quality-hub';
@@ -234,6 +235,18 @@ function doGet(e) {
 
   if (action === 'verify') {
     return handleVerify(e.parameter.email, e.parameter.dataId, e.parameter.token);
+  }
+
+  if (action === 'review') {
+    return handleAdminReview(e.parameter.submissionId, e.parameter.token);
+  }
+
+  if (action === 'approve') {
+    return handleAdminApprove(e.parameter.submissionId, e.parameter.token);
+  }
+
+  if (action === 'disapprove') {
+    return handleAdminDisapprove(e.parameter.submissionId, e.parameter.token);
   }
 
   return HtmlService.createHtmlOutput('<p>Data Quality Hub API</p>');
@@ -457,6 +470,14 @@ function generateToken(email, submissionId) {
   }).join('');
 }
 
+function generateAdminToken(submissionId) {
+  var raw = 'admin-review|' + submissionId + '|' + ADMIN_TOKEN_SECRET;
+  var digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, raw);
+  return digest.map(function (b) {
+    return ('0' + ((b < 0 ? b + 256 : b).toString(16))).slice(-2);
+  }).join('');
+}
+
 // ── Email: Verification ────────────────────────────────────────────
 
 function sendVerificationEmail(email, submissionId, token) {
@@ -482,18 +503,297 @@ function sendVerificationEmail(email, submissionId, token) {
 
 function sendAdminNotification(email, submissionId, timestamp) {
   var sheetUrl = 'https://docs.google.com/spreadsheets/d/' + DATA_SHEET_ID;
+  var adminToken = generateAdminToken(submissionId);
+  var reviewUrl = DEPLOYED_SCRIPT_URL +
+    '?action=review' +
+    '&submissionId=' + encodeURIComponent(submissionId) +
+    '&token=' + encodeURIComponent(adminToken);
 
   var subject = 'DQH: New Submission from ' + email;
   var body = 'A new submission has been received.\n\n' +
     'Researcher email: ' + email + '\n' +
     'Submission ID: ' + submissionId + '\n' +
     'Time: ' + timestamp.toISOString() + '\n\n' +
+    'Review and approve this submission:\n' + reviewUrl + '\n\n' +
     'View the Data sheet:\n' + sheetUrl + '\n\n' +
     'The submission requires email verification before it becomes visible. ' +
     'Once verified, set Approved=1 to show it on the dashboard.';
 
   var adminList = ADMIN_EMAILS.join(',');
   GmailApp.sendEmail(adminList, subject, body);
+}
+
+// ── HTML Helpers ───────────────────────────────────────────────────
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function field(label, value) {
+  if (!value && value !== 0) return '';
+  return '<div class="field"><span class="label">' + escHtml(label) + ':</span> ' + escHtml(value) + '</div>';
+}
+
+function fieldHtml(label, html) {
+  if (!html) return '';
+  return '<div class="field"><span class="label">' + escHtml(label) + ':</span> ' + html + '</div>';
+}
+
+function linkify(url) {
+  if (!url) return '';
+  var safe = escHtml(url);
+  return '<a href="' + safe + '" target="_blank">' + safe + '</a>';
+}
+
+function metricRow(name, rate, desc) {
+  return '<tr><td>' + escHtml(name) + '</td><td>' + escHtml(rate) + '%</td><td>' + escHtml(desc || '\u2014') + '</td></tr>';
+}
+
+function sectionCard(title, content) {
+  return '<div class="card"><h2>' + escHtml(title) + '</h2>' + content + '</div>';
+}
+
+function adminPage(title, bodyContent) {
+  return '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>' + escHtml(title) + ' \u2014 Data Quality Hub</title>' +
+    '<style>' +
+    'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0;padding:2rem;background:#0f172a;color:#e2e8f0;}' +
+    '.container{max-width:720px;margin:0 auto;}' +
+    'h1{color:#f8fafc;margin-bottom:1.5rem;font-size:1.5rem;}' +
+    'h2{color:#94a3b8;font-size:1.1rem;margin:0 0 1rem 0;border-bottom:1px solid #334155;padding-bottom:0.5rem;}' +
+    'h3{color:#94a3b8;font-size:0.95rem;margin:1rem 0 0.5rem 0;}' +
+    '.card{background:#1e293b;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,0.2);}' +
+    '.badges{display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}' +
+    '.badge{padding:0.35rem 0.75rem;border-radius:6px;font-size:0.85rem;font-weight:600;}' +
+    '.badge-green{background:#166534;color:#bbf7d0;}' +
+    '.badge-amber{background:#92400e;color:#fde68a;}' +
+    '.badge-red{background:#991b1b;color:#fecaca;}' +
+    '.field{margin-bottom:0.5rem;font-size:0.95rem;}' +
+    '.label{color:#94a3b8;font-weight:600;}' +
+    '.metrics{width:100%;border-collapse:collapse;margin-top:0.5rem;}' +
+    '.metrics th,.metrics td{text-align:left;padding:0.4rem 0.75rem;border-bottom:1px solid #334155;font-size:0.9rem;}' +
+    '.metrics th{color:#94a3b8;font-weight:600;}' +
+    '.btn-approve{display:inline-block;background:#16a34a;color:#fff;padding:0.75rem 2rem;border-radius:8px;font-size:1rem;font-weight:600;text-decoration:none;}' +
+    '.btn-approve:hover{background:#15803d;}' +
+    '.btn-disapprove{display:inline-block;background:#dc2626;color:#fff;padding:0.75rem 2rem;border-radius:8px;font-size:1rem;font-weight:600;text-decoration:none;}' +
+    '.btn-disapprove:hover{background:#b91c1c;}' +
+    'a{color:#60a5fa;text-decoration:none;}a:hover{text-decoration:underline;}' +
+    'p{margin:0.5rem 0;}' +
+    '</style></head><body>' +
+    '<div class="container">' +
+    '<h1>' + escHtml(title) + '</h1>' +
+    bodyContent +
+    '</div></body></html>';
+}
+
+// ── Admin Review Handler ──────────────────────────────────────────
+
+function handleAdminReview(submissionId, token) {
+  if (!submissionId || !token || token !== generateAdminToken(submissionId)) {
+    return HtmlService.createHtmlOutput(adminPage('Access Denied', '<div class="card"><p>Invalid or expired admin link.</p></div>'));
+  }
+
+  var dataSheet = SpreadsheetApp.openById(DATA_SHEET_ID).getSheetByName('Sheet1');
+  var allData = dataSheet.getDataRange().getValues();
+  var rows = [];
+  for (var i = 1; i < allData.length; i++) {
+    if (String(allData[i][3]) === String(submissionId)) {
+      rows.push(allData[i]);
+    }
+  }
+
+  if (rows.length === 0) {
+    return HtmlService.createHtmlOutput(adminPage('Not Found', '<div class="card"><p>No data found for submission ID: ' + escHtml(submissionId) + '</p></div>'));
+  }
+
+  var r = rows[0];
+  var approved = String(r[0]) === '1';
+  var emailVerified = String(r[1]) === '1';
+
+  var html = '<div class="badges">' +
+    '<span class="badge ' + (approved ? 'badge-green' : 'badge-amber') + '">' + (approved ? 'Approved' : 'Not Approved') + '</span>' +
+    '<span class="badge ' + (emailVerified ? 'badge-green' : 'badge-red') + '">' + (emailVerified ? 'Email Verified' : 'Email Not Verified') + '</span>' +
+    '</div>';
+
+  // Researcher card
+  var resHtml = field('Name', r[5]) + field('Email', r[4]) + field('Affiliation', r[6]) + field('Study Title', r[7]);
+  html += sectionCard('Researcher', resHtml);
+
+  // Metadata card
+  var metaHtml = field('Pre-registered', r[8]) +
+    fieldHtml('Pre-registration Link', linkify(r[9])) +
+    fieldHtml('Paper/Study Link', linkify(r[10])) +
+    field('Data Availability', r[11]) +
+    fieldHtml('Data Repository Link', linkify(r[12])) +
+    field('Publication Status', r[13]);
+  html += sectionCard('Study Metadata', metaHtml);
+
+  // Feedback
+  if (r[14]) {
+    html += sectionCard('Feedback', '<p>' + escHtml(r[14]) + '</p>');
+  }
+
+  // Entry cards
+  for (var e = 0; e < rows.length; e++) {
+    var row = rows[e];
+    var platform = String(row[15]);
+    if (platform === 'Other' && row[16]) platform = String(row[16]);
+    var sample = String(row[17] || '');
+    var cardTitle = 'Entry ' + (e + 1) + ': ' + platform + (sample ? ' \u2014 ' + sample : '');
+
+    var entryHtml = field('Platform', platform) +
+      field('Sample', row[17]) +
+      field('Sample Size', row[18]);
+
+    var dateStr = '';
+    if (row[19]) dateStr += row[19];
+    if (row[19] && row[20]) dateStr += ' / ';
+    if (row[20]) dateStr += row[20];
+    entryHtml += field('Study Date', dateStr);
+
+    entryHtml += field('Recruitment Strategy', row[21]) +
+      field('Country', row[22]) +
+      field('Approval Score', row[23]) +
+      field('Min. Completed Studies', row[24]) +
+      field('Representative Sample', row[25]) +
+      field('Additional Screening', row[26]) +
+      field('Screener Study', row[27]);
+
+    // Standard metrics table
+    var metricIds = Object.keys(METRIC_COLUMNS);
+    var metricsHtml = '';
+    for (var mi = 0; mi < metricIds.length; mi++) {
+      var mid = metricIds[mi];
+      var cols = METRIC_COLUMNS[mid];
+      if (String(row[cols.ask]) === 'Yes') {
+        var metricName = HEADERS[cols.rate].replace(' \u2014 Rate (%)', '');
+        metricsHtml += metricRow(metricName, row[cols.rate], row[cols.desc]);
+      }
+    }
+
+    // Custom metrics
+    for (var ci = 0; ci < CUSTOM_METRIC_COLUMNS.length; ci++) {
+      var cc = CUSTOM_METRIC_COLUMNS[ci];
+      if (String(row[cc.ask]) === 'Yes') {
+        var customName = String(row[cc.name] || '') + ' (' + String(row[cc.cat] || '') + ')';
+        metricsHtml += metricRow(customName, row[cc.rate], row[cc.desc]);
+      }
+    }
+
+    if (metricsHtml) {
+      entryHtml += '<h3>Metrics</h3>' +
+        '<table class="metrics"><thead><tr><th>Metric</th><th>Rate</th><th>Details</th></tr></thead>' +
+        '<tbody>' + metricsHtml + '</tbody></table>';
+    }
+
+    // Overall quality
+    if (row[67]) {
+      entryHtml += field('Overall Quality Rate', row[67] + '%');
+      entryHtml += field('Overall Quality Description', row[68]);
+    }
+
+    html += sectionCard(cardTitle, entryHtml);
+  }
+
+  // Approve / Disapprove button
+  if (!approved) {
+    var approveUrl = DEPLOYED_SCRIPT_URL +
+      '?action=approve' +
+      '&submissionId=' + encodeURIComponent(submissionId) +
+      '&token=' + encodeURIComponent(token);
+    html += '<div style="text-align:center;margin:2rem 0;">' +
+      '<a href="' + approveUrl + '" class="btn-approve" target="_top">\u2713 Approve This Submission</a>' +
+      '</div>';
+  } else {
+    var disapproveUrl = DEPLOYED_SCRIPT_URL +
+      '?action=disapprove' +
+      '&submissionId=' + encodeURIComponent(submissionId) +
+      '&token=' + encodeURIComponent(token);
+    html += '<div style="text-align:center;margin:2rem 0;">' +
+      '<a href="' + disapproveUrl + '" class="btn-disapprove" target="_top">\u2717 Revoke Approval</a>' +
+      '</div>';
+  }
+
+  // Sheet link
+  var sheetUrl = 'https://docs.google.com/spreadsheets/d/' + DATA_SHEET_ID;
+  html += '<p style="text-align:center;margin-top:1rem;"><a href="' + sheetUrl + '" target="_blank">Open Google Sheet</a></p>';
+
+  return HtmlService.createHtmlOutput(adminPage('Submission Review: ' + submissionId, html));
+}
+
+// ── Admin Approve Handler ─────────────────────────────────────────
+
+function handleAdminApprove(submissionId, token) {
+  if (!submissionId || !token || token !== generateAdminToken(submissionId)) {
+    return HtmlService.createHtmlOutput(adminPage('Access Denied', '<div class="card"><p>Invalid or expired admin link.</p></div>'));
+  }
+
+  var dataSheet = SpreadsheetApp.openById(DATA_SHEET_ID).getSheetByName('Sheet1');
+  var allData = dataSheet.getDataRange().getValues();
+  var updated = 0;
+
+  for (var i = 1; i < allData.length; i++) {
+    if (String(allData[i][3]) === String(submissionId)) {
+      dataSheet.getRange(i + 1, 1).setValue('1');  // Column A = Approved (1-indexed)
+      updated++;
+    }
+  }
+
+  if (updated === 0) {
+    return HtmlService.createHtmlOutput(adminPage('Not Found', '<div class="card"><p>No data found for submission ID: ' + escHtml(submissionId) + '</p></div>'));
+  }
+
+  var reviewUrl = DEPLOYED_SCRIPT_URL +
+    '?action=review' +
+    '&submissionId=' + encodeURIComponent(submissionId) +
+    '&token=' + encodeURIComponent(token);
+
+  var successHtml = '<div class="card" style="text-align:center;">' +
+    '<div style="font-size:3rem;color:#22c55e;margin-bottom:1rem;">&#10003;</div>' +
+    '<p style="font-size:1.1rem;">Submission <strong>' + escHtml(submissionId) + '</strong> has been approved.</p>' +
+    '<p>' + updated + ' row(s) updated.</p>' +
+    '<p style="margin-top:1.5rem;"><a href="' + reviewUrl + '" target="_top">Back to Review</a></p>' +
+    '</div>';
+
+  return HtmlService.createHtmlOutput(adminPage('Approved', successHtml));
+}
+
+// ── Admin Disapprove Handler ──────────────────────────────────────
+
+function handleAdminDisapprove(submissionId, token) {
+  if (!submissionId || !token || token !== generateAdminToken(submissionId)) {
+    return HtmlService.createHtmlOutput(adminPage('Access Denied', '<div class="card"><p>Invalid or expired admin link.</p></div>'));
+  }
+
+  var dataSheet = SpreadsheetApp.openById(DATA_SHEET_ID).getSheetByName('Sheet1');
+  var allData = dataSheet.getDataRange().getValues();
+  var updated = 0;
+
+  for (var i = 1; i < allData.length; i++) {
+    if (String(allData[i][3]) === String(submissionId)) {
+      dataSheet.getRange(i + 1, 1).setValue('');  // Column A = Approved → clear
+      updated++;
+    }
+  }
+
+  if (updated === 0) {
+    return HtmlService.createHtmlOutput(adminPage('Not Found', '<div class="card"><p>No data found for submission ID: ' + escHtml(submissionId) + '</p></div>'));
+  }
+
+  var reviewUrl = DEPLOYED_SCRIPT_URL +
+    '?action=review' +
+    '&submissionId=' + encodeURIComponent(submissionId) +
+    '&token=' + encodeURIComponent(token);
+
+  var successHtml = '<div class="card" style="text-align:center;">' +
+    '<div style="font-size:3rem;color:#f59e0b;margin-bottom:1rem;">&#10007;</div>' +
+    '<p style="font-size:1.1rem;">Approval revoked for submission <strong>' + escHtml(submissionId) + '</strong>.</p>' +
+    '<p>' + updated + ' row(s) updated.</p>' +
+    '<p style="margin-top:1.5rem;"><a href="' + reviewUrl + '" target="_top">Back to Review</a></p>' +
+    '</div>';
+
+  return HtmlService.createHtmlOutput(adminPage('Approval Revoked', successHtml));
 }
 
 // ── Verification HTML Page ─────────────────────────────────────────
