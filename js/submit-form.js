@@ -10,7 +10,7 @@ window.DQH.submitForm = (function () {
   'use strict';
 
   // ── Configuration ──────────────────────────────────────────────
-  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuQyzYReGtJIToIHNXwlWsZ8qaXoOdG2qpSN4uyrWqVObgCodUqjDtzasMK3m7bg3b/exec';
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_WSkv2bqLmKJxgtrYGS98WZCMp-AT-gHSibipbdv4UOEa9DUzRH5OMO7QdRpANGZuug/exec';
 
   var KNOWN_PLATFORMS = ['Prolific', 'MTurk', 'Bilendi', 'Moblab', 'CloudResearch'];
 
@@ -54,7 +54,7 @@ window.DQH.submitForm = (function () {
   var state = {
     currentStep: 0,
     // Researcher info
-    email: '', researcherName: '', affiliation: '', studyTitle: '',
+    email: '', password: '', researcherName: '', affiliation: '', studyTitle: '',
     // Selected platforms
     platforms: [],
     customPlatformInput: '',
@@ -72,6 +72,12 @@ window.DQH.submitForm = (function () {
     var div = document.createElement('div');
     div.appendChild(document.createTextNode(str || ''));
     return div.innerHTML;
+  }
+
+  async function hashPassword(pw) {
+    var enc = new TextEncoder().encode(pw);
+    var buf = await crypto.subtle.digest('SHA-256', enc);
+    return Array.from(new Uint8Array(buf)).map(function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
   }
 
   function getYearOptions() {
@@ -165,6 +171,10 @@ window.DQH.submitForm = (function () {
       '<p style="color:var(--danger);font-size:0.8rem;margin:0 0 0.3rem;">Please provide your institutional email address so we can verify your identity.</p>' +
       '<input class="sf-input" type="email" id="sf-email" value="' + esc(state.email) + '" placeholder="researcher@university.edu">' +
       '<div class="sf-error-msg" id="sf-email-error"></div></div>' +
+      '<div class="sf-field"><label class="sf-label" for="sf-password">Choose a Passphrase <span class="sf-required">*</span></label>' +
+      '<p style="color:var(--text-secondary);font-size:0.8rem;margin:0 0 0.3rem;">Simple identifier for future edits. Not high security.</p>' +
+      '<input class="sf-input" type="password" id="sf-password" value="' + esc(state.password) + '" placeholder="Enter a passphrase">' +
+      '<div class="sf-error-msg" id="sf-password-error"></div></div>' +
       textField('sf-name', 'Researcher Name', state.researcherName, true, 'Jane Doe') +
       textField('sf-affiliation', 'Affiliation', state.affiliation, true, 'University of Example') +
       textField('sf-studyTitle', 'Study Title', state.studyTitle, true, 'My Survey Study');
@@ -519,6 +529,7 @@ window.DQH.submitForm = (function () {
 
     if (step.id === 'researcher') {
       state.email = gv('sf-email');
+      state.password = gv('sf-password');
       state.researcherName = gv('sf-name');
       state.affiliation = gv('sf-affiliation');
       state.studyTitle = gv('sf-studyTitle');
@@ -625,6 +636,7 @@ window.DQH.submitForm = (function () {
   function validateResearcher() {
     var ok = true;
     if (!gv('sf-email') || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(gv('sf-email'))) { showError('sf-email', 'Please enter a valid email address'); ok = false; }
+    if (!gv('sf-password')) { showError('sf-password', 'Please choose a passphrase'); ok = false; }
     if (!gv('sf-name')) { showError('sf-name', 'Name is required'); ok = false; }
     if (!gv('sf-affiliation')) { showError('sf-affiliation', 'Affiliation is required'); ok = false; }
     if (!gv('sf-studyTitle')) { showError('sf-studyTitle', 'Study title is required'); ok = false; }
@@ -1015,16 +1027,18 @@ window.DQH.submitForm = (function () {
     var row = [];
     // 0: Approved (empty)
     row.push('');
-    // 1: Timestamp
+    // 1: Email Confirmed (empty)
+    row.push('');
+    // 2: Timestamp
     row.push(timestamp);
-    // 2: Submission ID
+    // 3: Submission ID
     row.push(submissionId);
-    // 3-6: Researcher
+    // 4-7: Researcher
     row.push(researcher.email || '');
     row.push(researcher.name || '');
     row.push(researcher.affiliation || '');
     row.push(researcher.studyTitle || '');
-    // 7-13: Study metadata
+    // 8-14: Study metadata
     row.push(metadata.preRegistered || '');
     row.push(metadata.preRegLink || '');
     row.push(metadata.paperLink || '');
@@ -1032,27 +1046,27 @@ window.DQH.submitForm = (function () {
     row.push(metadata.dataLink || '');
     row.push(metadata.publicationStatus || '');
     row.push(metadata.feedback || '');
-    // 14-15: Platform
+    // 15-16: Platform
     var isKnown = KNOWN_PLATFORMS.indexOf(entry.platform) !== -1;
     row.push(isKnown ? entry.platform : 'Other');
     row.push(isKnown ? '' : entry.platform);
-    // 16-19: Sample / dates
+    // 17-20: Sample / dates
     row.push(entry.sample || '');
     row.push(entry.sampleSize || '');
     row.push(entry.month || '');
     row.push(entry.year || '');
-    // 20: Recruitment strategy
+    // 21: Recruitment strategy
     if (entry.recruitmentMethod === 'two-stage') row.push('Two-Stage');
     else if (entry.recruitmentMethod === 'platform') row.push('Standard');
     else row.push('');
-    // 21-26: Recruitment details
+    // 22-27: Recruitment details
     row.push(entry.country || '');
     row.push(entry.approvalScore || '');
     row.push(entry.minStudies || '');
     row.push(entry.representativeSample || '');
     row.push(entry.additionalCriteria || '');
     row.push(entry.screenerStudy || '');
-    // 27-65: Standard metrics (3 cols each: Yes/No, Rate, Desc)
+    // 28-66: Standard metrics (3 cols each: Yes/No, Rate, Desc)
     var metrics = entry.metrics || {};
     for (var mi = 0; mi < METRIC_IDS.length; mi++) {
       var mid = METRIC_IDS[mi];
@@ -1064,10 +1078,10 @@ window.DQH.submitForm = (function () {
         row.push('No'); row.push(''); row.push('');
       }
     }
-    // 66-67: Overall quality
+    // 67-68: Overall quality
     row.push(entry.overallRate || '');
     row.push(entry.overallDescription || '');
-    // 68-117: Custom metrics (5 cols each: Yes/No, Name, Category, Rate, Desc) x 10
+    // 69-118: Custom metrics (5 cols each: Yes/No, Name, Category, Rate, Desc) x 10
     var customs = entry.customMetrics || [];
     for (var ci = 0; ci < MAX_CUSTOM; ci++) {
       if (ci < customs.length) {
@@ -1084,7 +1098,7 @@ window.DQH.submitForm = (function () {
   }
 
   var CSV_HEADERS = [
-    'Approved','Timestamp','Submission ID',
+    'Approved','Email Confirmed','Timestamp','Submission ID',
     'Contact Email','Researcher Name','Researcher Affiliation','Study Title',
     'Is this study pre-registered?','Pre-registration link','Paper or study link',
     'Data Availability','Data Repository Link','Publication Status','Feedback',
@@ -1155,7 +1169,7 @@ window.DQH.submitForm = (function () {
 
   // ── Submit ─────────────────────────────────────────────────────
 
-  function submitForm() {
+  async function submitForm() {
     var statusEl = document.getElementById('sf-status');
     if (statusEl) { statusEl.className = 'sf-status sf-status-loading'; statusEl.textContent = 'Submitting\u2026'; }
     var submitBtn = document.querySelector('.sf-btn-submit');
@@ -1163,6 +1177,12 @@ window.DQH.submitForm = (function () {
 
     var submissionId = generateSubmissionId();
     var timestamp = new Date().toISOString();
+
+    // Hash password client-side before sending
+    var passwordHash = '';
+    if (state.password) {
+      passwordHash = await hashPassword(state.password);
+    }
 
     var payload = {
       researcher: {
@@ -1176,6 +1196,7 @@ window.DQH.submitForm = (function () {
         feedback: state.feedback
       },
       submissionId: submissionId,
+      passwordHash: passwordHash,
       entries: []
     };
 
@@ -1195,12 +1216,15 @@ window.DQH.submitForm = (function () {
       body: JSON.stringify(payload)
     })
     .then(function () {
-      // Show success with download button
+      // Show success with download button and email verification notice
       var container = document.getElementById('sf-root');
       if (container) {
         container.innerHTML = '<div class="sf-container">' +
           '<div class="sf-status sf-status-success" style="display:block;">' +
-          '<strong>Thank you!</strong> Your study data has been submitted. It will appear on the dashboard after review.' +
+          '<strong>Thank you!</strong> Your submission has been received.' +
+          '<div style="margin-top:0.75rem;font-weight:600;color:#fbbf24;">Please check your email to verify your submission.</div>' +
+          '<p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.85rem;">A verification link has been sent to <strong>' + esc(state.email) + '</strong>. ' +
+          'After verification, an admin will review your submission before it appears on the dashboard.</p>' +
           '<div style="margin-top:1rem;">' +
           '<p style="margin-bottom:0.75rem;color:var(--text-secondary);font-size:0.82rem;">Please download and keep this CSV file. You can use it later to update your submission via the "Edit Existing Entry" section below.</p>' +
           '<button type="button" class="sf-btn-next" id="sf-download-csv">Download Submission CSV</button>' +
@@ -1244,7 +1268,7 @@ window.DQH.submitForm = (function () {
 
   function resetState() {
     state.currentStep = 0;
-    state.email = ''; state.researcherName = ''; state.affiliation = ''; state.studyTitle = '';
+    state.email = ''; state.password = ''; state.researcherName = ''; state.affiliation = ''; state.studyTitle = '';
     state.platforms = []; state.customPlatformInput = ''; state.platformData = {};
     state.preRegistered = ''; state.preRegLink = ''; state.paperLink = '';
     state.dataAvailability = ''; state.dataLink = ''; state.publicationStatus = '';

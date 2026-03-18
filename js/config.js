@@ -1,19 +1,20 @@
 /**
  * Data Quality Hub — Configuration
- * Column mapping matches web-app.gs HEADERS (118 columns, A–DN).
+ * Column mapping matches web-app.gs HEADERS (119 columns, A–DO).
  */
 window.DQH = window.DQH || {};
 
 window.DQH.config = {
-  csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHe5UBU0HfXIs8e_UtSATKCUWnzi2XcPrVizJ6zSQa_G_Zob8JJF3EaMc-G7PxsJ894XVCSy718DgR/pub?output=csv',
+  csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vScIrVKhgm8atUKIJON51ZMw-8jPFqUlF39WOubwG2cW6r936exZi5G8A9z0lEUt3JhoYLU_nDHHQQV/pub?gid=0&single=true&output=csv',
   formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeM6jem75hqylsprdyew3nkXDVswuvT5zTvtw0JrM5uXoakyg/viewform?usp=header',
   githubUrl: 'https://github.com/survey-data-quality-lab/data-quality-hub',
 
   // Exact Google Sheet column headers → internal field names
-  // Matched from web-app.gs HEADERS array (118 columns)
+  // Matched from web-app.gs HEADERS array (119 columns)
   columnMap: {
-    // Base metadata (columns 0–6)
+    // Base metadata (columns 0–7)
     'Approved':               'approved',
+    'Email Confirmed':        'emailConfirmed',
     'Timestamp':              'timestamp',
     'Submission ID':          'submissionId',
     'Contact Email':          'contactEmail',

@@ -112,8 +112,8 @@ window.DQH.csvParser = {
         obj[field] = (c < row.length) ? row[c].trim() : '';
       }
 
-      // Filter: only approved rows
-      if (obj.approved !== '1') continue;
+      // Filter: only approved AND email-confirmed rows
+      if (obj.approved !== '1' || obj.emailConfirmed !== '1') continue;
 
       // Parse numeric fields
       for (const nf of config.numericFields) {
