@@ -36,8 +36,9 @@ Reviewed: March 2026
 	- Send confirmation email to submitter.
 	- Do not trigger maintainer notification yet.
 - After submitter clicks confirmation link:
-	- Mark submission as confirmed.
-	- Trigger maintainer notification email.
+	- Mark email as confirmed.
+	- Trigger maintainer notification email (in the maintainer notification email, there ll be a link as before where we go and can see the entry and there we approve).
+ 	- During the approve screen reached via email link by the maintainers, if the submission is not approved there should be a text field below where we should provide a reason for not approving it and when we click disapprove an email should be sent to the researcher who submitted it. So the maintainer screen for approavel needs to be slightly modified in terms of UI and also we need to add a new interaction to it that triggers an email sent back to the researcher who submitted it. And also when the data is submitted, an the maintainer approves it an email again should be sent to the researcher who submitted with a predefined text like "Your submission is approved." and then provive the link to the page (main github page) 
 
 ### 2.3 Automatic password generation
 - Remove user-selected password from the submission process.
@@ -95,7 +96,7 @@ These updates should be aligned with the Legal Risk Review document.
 ## 6) Suggested Rollout Order
 
 1. Implement confirmation-based email workflow and automatic password generation.
-2. Update submission form (consent checkbox, first-page Back button, sample guidance text).
+2. Update submission form (consent checkbox, first-page Back button, sample guidance text) (I have added some extras here such as email sent back to the research on approval or disapproval).
 3. Disable Edit Existing Entry in the public flow.
 4. Publish review and metric acceptance policies.
 5. Add dashboard legal/disclaimer content and privacy links.
