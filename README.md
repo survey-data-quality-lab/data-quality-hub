@@ -11,7 +11,7 @@
 
 ## 🎯 Mission
 
-Online survey platforms vary dramatically in data quality. This project aims to:
+Online survey platforms vary in data quality. This project aims to:
 
 1. **Aggregate data** from researchers worldwide
 2. **Provide transparent comparisons** of data quality metrics
