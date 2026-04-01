@@ -14,53 +14,21 @@ Online survey platforms vary dramatically in data quality. This project aims to:
 
 1. **Aggregate data** from researchers worldwide
 2. **Provide transparent comparisons** of data quality metrics
-3. **Help researchers choose** the best platform for their needs
-4. **Track quality trends** over time
-5. **Build community knowledge** about best practices in an evolving landscape
+3. **Track quality trends** over time
+4. **Build community knowledge** about best practices in an evolving landscape
 
 ## 🚀 Quick Links
 
 - **[📈 View Live Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/)**
 - **[💬 Join Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)**
-- **[📝 Submit Data via Google Form](https://docs.google.com/forms/d/e/1FAIpQLSfhwduzGfQl-vvU59Jm8R-U8QAGhR7PsE0XApvJLtC1tURObQ/viewform)**
-- **📖 Metric Definitions**
-
-
-## 📈 Current Statistics
-
-The dashboard currently aggregates data from:
-- **4** online platforms
-- **1** laboratory
-- **1** research studies
-- **3,000+** total survey responses across all sources
-- Studies conducted in **2025-2026**
-
-## 🌐 Platforms Covered
-
-- **[Prolific Academic](https://www.prolific.com)**
-- **[Amazon Mechanical Turk](https://www.mturk.com)**
-- **[Moblab](https://www.moblab.com)**
-- **[Bilendi](https://www.bilendi.com)**
-- **Labs**
-- **Other** - Additional platforms as contributed
-
 
 ## 📊 Metrics Tracked
 
 The initial set of data quality metrics is based on our companion paper "[Mission Possible: The Collection of High Quality Online Data](https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf)". Additional metrics are reported as contributed.
 
-
 ## 🤝 How to Contribute
 
-We welcome data from researchers worldwide! Choose your preferred submission method:
-
-### Option 1: Google Form (Recommended) 📝
-
-No technical skills required. The Google form guides you through each field with examples and help text. Click [here](https://docs.google.com/forms/d/e/1FAIpQLSfhwduzGfQl-vvU59Jm8R-U8QAGhR7PsE0XApvJLtC1tURObQ/viewform)
-
-### Option 2: CSV Upload (Advanced - Coming Soon) 📤
-
-You or your AI agent makes a pull request to add your data, which is automatically reviewed. 
+We welcome data from researchers worldwide! You can submit your study resulst via the survey form on our [📈 Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/). 
 
 ### Why Contribute?
 
@@ -71,20 +39,19 @@ You or your AI agent makes a pull request to add your data, which is automatical
 - **No Personally Identifiable Data**: You only submit aggregate, anonymized metrics
 - **Attribution**: Your name and affiliation will be visible
 
+## 💬 Have Questions?
 
-## 📞 Contact & Support
+- **[Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)** - Ask questions, share experiences, and propose new data quality checks.
 
-### Have Questions?
+## 🐛 Report Issues
 
-- **[💬 Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)** - Ask questions, share experiences, and propose new data quality checks.
+- **[Issues](https://github.com/survey-data-quality-lab/data-quality-hub/issues)** - Report bugs or request features
 
-### Report Issues
+## 🧑‍💻 Contact Maintainers
 
-- **[🐛 Issues](https://github.com/survey-data-quality-lab/data-quality-hub/issues)** - Report bugs or request features
+[Can Celebi](https://can-celebi.github.io/) · [Vienna Center for Experimental Economics](https://vcee.univie.ac.at/)
 
-### Direct Contact
-
-- **Email**: Contact the maintainers, [Can Celebi](https://can-celebi.github.io/) ([Vienna Center for Experimental Economics](https://vcee.univie.ac.at/)) or [Sören Harrs](https://sites.google.com/view/sorenharrs-econ) ([University of Vienna](https://econ.univie.ac.at/)), via email.
+[Sören Harrs](https://sites.google.com/view/sorenharrs-econ) · [University of Vienna](https://econ.univie.ac.at/)
 
 ---
 [View Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/) • [Join Discussions](https://github.com/survey-data-quality-lab/data-quality-hub/discussions)
