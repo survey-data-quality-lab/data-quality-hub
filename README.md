@@ -27,12 +27,12 @@ Online survey platforms vary in data quality. This project aims to:
 
 ## 📊 Metrics Tracked
 
-The initial set of data quality metrics is based on our companion paper "[Mission Possible: The Collection of High Quality Online Data](https://github.com/survey-data-quality-lab/mission-possible/blob/main/paper/DataQuality_Mar2026.pdf)". Additional metrics are reported as contributed.
+The initial set of data quality metrics is based on our companion paper "[Mission Possible: The Collection of High-Quality Online Data](https://www.ifo.de/DocDL/cesifo1_wp12535.pdf)". Additional metrics are reported as contributed.
 
 
 ## 🤝 How to Contribute
 
-We welcome data from researchers worldwide! You can submit your study resulst via the survey form on our [📈 Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/). 
+We welcome data from researchers worldwide! You can submit your study results via the survey form on our [📈 Dashboard](https://survey-data-quality-lab.github.io/data-quality-hub/). 
 
 ### Why Contribute?
 
