@@ -4,7 +4,7 @@
 
 ---
 
-## Before Going Live (Blocking)
+## Before Going Live (Blocking) @can-celebi
 
 These are gaps that will cause immediate problems once real researchers submit:
 
@@ -12,43 +12,40 @@ These are gaps that will cause immediate problems once real researchers submit:
 
 2. **Delete test submissions** — `forms/README.md` explicitly flags that test data is in the response sheet and must be removed before going live.
 
-3. **Disable "Edit Existing Entry"** — if it's still exposed, researchers can overwrite approved entries.
+3. **Populate with Mission Possible Data** 
 
-4. **Consent checkbox** — required for GDPR. Without it there is no legal basis for processing and displaying researcher names.
-
-5. ~~**`TOKEN_SECRET = 'missionpossible'`** in `web-app.gs` — committed to the repo in plaintext. Anyone who finds it can forge verification tokens. Move it to Apps Script's `PropertiesService` before going live.~~ **DONE — 2026-04-30.** `web-app.gs:31-34` now reads `TOKEN_SECRET` and `ADMIN_TOKEN_SECRET` from `PropertiesService.getScriptProperties()`. Fresh 32-byte hex secrets were generated and stored in the Apps Script project's Script Properties (Project Settings → Script Properties). The old `'missionpossible'` / `'missionpossible-admin-review'` values are burned and must not be reused. To rotate in the future: edit the values in Script Properties, no code change or redeploy needed for the secret itself (but redeploy is needed if the source file is changed for any other reason). Any pre-existing verification/admin links from before this change are now invalid — fine because we have no real submissions yet.
+4. **New "Editing of Entries functionality** ID + Password - see form with all their data which they can edit. -> apprvoal email workflow again.
 
 ---
 
-## Legal / Compliance (Should Do Before Launch)
+## Legal / Compliance (Should Do Before Launch) @sharrs
+
+5. **Consent checkbox** — required for GDPR. Without it there is no legal basis for processing and displaying researcher names.
 
 6. **Privacy policy page** — covers what's collected, why, who sees it, how to request deletion. Link it from the footer and from near the email field in the form. Also resolves the Google-as-data-processor DPA gap if Google's terms are referenced.
 
-7. **Accuracy + non-affiliation disclaimer** — a footer statement: self-reported data, not independently verified, not affiliated with any listed platform. Needed to limit defamation/disparagement exposure.
+7. **Disclaimer** — a footer statement: self-reported data, not independently verified, not affiliated with any listed platform. Needed to limit defamation/disparagement exposure.
 
 8. **Move Google Sheet + Apps Script to an institutional Google Workspace account** — a personal Google account has no DPA with Google, which is a GDPR compliance problem.
 
 ---
 
-## For Smooth Long-Term Operation
+## Metric Approval Workflow and Review Guidance + Showing on the Dashboard? @sharrs
 
-These are the things that will quietly cause pain once data accumulates:
+Say what they need to provide as Additional Informatino for a new metric. 
 
-9. **Minimum study threshold for platform aggregates** — suppress platform-level trend lines with fewer than ~3 studies, replacing them with "Insufficient data". Without this, one outlier submission shapes the entire platform average and creates disparagement risk.
+1. Definition of metric.
 
-10. **Internal approver review guide** — `submission-review-policy.md` (Part B) serves this purpose. No separate file needed.
+2. We require validation data, a published study showing that the metric can address this issue. If there are convincing theorteical arguments maybe. Otherwise will be added to a dicussion list of proposed metrics or sth.  Solve differentiation between. 
 
-11. **Researcher notification emails on approval/disapproval** — on approval: "Your submission is approved" email with dashboard link; on disapproval: reason + email to researcher. Partially implemented in `web-app.gs` but not yet connected to the review screen UI.
+Either a study validating the metric - or a very strong rational why it addresses the corresponding data qualtiy concern. 
 
-12. **Retraction/withdrawal flag** — add a `retracted` flag that shows a tombstone notice rather than silently deleting entries. Once studies get cited or screenshotted, silent deletion misrepresents the record.
+13. **Metric provenance field** — a "Introduced by study" citation field for each custom metric. As the metric list grows, this becomes essential for users to evaluate unfamiliar metrics. Adding it later means a schema change (new columns in the sheet and `HEADERS`/`columnMap`). Plus add academic literature or links to companies for different metrics. 
 
-13. **Metric provenance field** — a "Introduced by study" citation field for each custom metric. As the metric list grows, this becomes essential for users to evaluate unfamiliar metrics. Adding it later means a schema change (new columns in the sheet and `HEADERS`/`columnMap`).
-
-14. **Publication consent checkbox** — confirms the researcher's data (not just personal info) may be published on the dashboard.
 
 ---
 
-## Automated Review Workflow (Admin Screen Overhaul)
+## Automated Review Workflow (Admin Screen Overhaul) @can-celebi
 
 The current admin review screen (`handleAdminReview` in `forms/web-app.gs`) only has two buttons: Approve and Revoke Approval. The full review workflow defined in `submission-review-policy.md` cannot be executed without the following changes. All items below are changes to `web-app.gs` only — no frontend or sheet schema changes required except where noted.
 
@@ -100,11 +97,28 @@ The review screen currently shows only "Approved" / "Not Approved" and "Email Ve
 
 ---
 
+## For Smooth Long-Term Operation [OPTIONAL]
+
+These are the things that will quietly cause pain once data accumulates:
+
+9. **Minimum study threshold for platform aggregates** — suppress platform-level trend lines with fewer than ~3 studies, replacing them with "Insufficient data". Without this, one outlier submission shapes the entire platform average and creates disparagement risk.
+
+10. **Internal approver review guide** — `submission-review-policy.md` (Part B) serves this purpose. No separate file needed.
+
+11. **Researcher notification emails on approval/disapproval** — on approval: "Your submission is approved" email with dashboard link; on disapproval: reason + email to researcher. Partially implemented in `web-app.gs` but not yet connected to the review screen UI.
+
+12. **Retraction/withdrawal flag** — add a `retracted` flag that shows a tombstone notice rather than silently deleting entries. Once studies get cited or screenshotted, silent deletion misrepresents the record.
+
+
+
+---
+
+
 ## Priority Order
 
 | Priority | Item |
 |---|---|
-| Blocking | ~~Token secret out of repo (#5)~~ ✅, delete test data (#2), consent checkbox (#4) |
+| Blocking | Token secret out of repo (#5), delete test data (#2), consent checkbox (#4) |
 | Before launch | Privacy policy (#6), disclaimer (#7), email flow audit (#1), disable edit (#3) |
 | First week | Institutional Google account (#8), approval emails (#11), fix admin notification timing (#17) |
 | Before first real submissions | Full admin screen overhaul (#15, #16, #18, #19, #20) |
