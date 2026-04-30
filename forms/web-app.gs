@@ -28,8 +28,10 @@ var ADMIN_EMAILS = [
   'soeren.harrs@univie.ac.at'
 ];
 
-var TOKEN_SECRET = 'missionpossible';
-var ADMIN_TOKEN_SECRET = 'missionpossible-admin-review';
+// Secrets are stored in Script Properties (Project Settings → Script Properties).
+// Never commit the values themselves to this file.
+var TOKEN_SECRET = PropertiesService.getScriptProperties().getProperty('TOKEN_SECRET');
+var ADMIN_TOKEN_SECRET = PropertiesService.getScriptProperties().getProperty('ADMIN_TOKEN_SECRET');
 
 var DEPLOYED_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_WSkv2bqLmKJxgtrYGS98WZCMp-AT-gHSibipbdv4UOEa9DUzRH5OMO7QdRpANGZuug/exec';
 var GITHUB_PAGES_URL    = 'https://survey-data-quality-lab.github.io/data-quality-hub';

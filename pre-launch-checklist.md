@@ -16,7 +16,7 @@ These are gaps that will cause immediate problems once real researchers submit:
 
 4. **Consent checkbox** — required for GDPR. Without it there is no legal basis for processing and displaying researcher names.
 
-5. **`TOKEN_SECRET = 'missionpossible'`** in `web-app.gs` — committed to the repo in plaintext. Anyone who finds it can forge verification tokens. Move it to Apps Script's `PropertiesService` before going live.
+5. ~~**`TOKEN_SECRET = 'missionpossible'`** in `web-app.gs` — committed to the repo in plaintext. Anyone who finds it can forge verification tokens. Move it to Apps Script's `PropertiesService` before going live.~~ **DONE — 2026-04-30.** `web-app.gs:31-34` now reads `TOKEN_SECRET` and `ADMIN_TOKEN_SECRET` from `PropertiesService.getScriptProperties()`. Fresh 32-byte hex secrets were generated and stored in the Apps Script project's Script Properties (Project Settings → Script Properties). The old `'missionpossible'` / `'missionpossible-admin-review'` values are burned and must not be reused. To rotate in the future: edit the values in Script Properties, no code change or redeploy needed for the secret itself (but redeploy is needed if the source file is changed for any other reason). Any pre-existing verification/admin links from before this change are now invalid — fine because we have no real submissions yet.
 
 ---
 
@@ -104,7 +104,7 @@ The review screen currently shows only "Approved" / "Not Approved" and "Email Ve
 
 | Priority | Item |
 |---|---|
-| Blocking | Token secret out of repo (#5), delete test data (#2), consent checkbox (#4) |
+| Blocking | ~~Token secret out of repo (#5)~~ ✅, delete test data (#2), consent checkbox (#4) |
 | Before launch | Privacy policy (#6), disclaimer (#7), email flow audit (#1), disable edit (#3) |
 | First week | Institutional Google account (#8), approval emails (#11), fix admin notification timing (#17) |
 | Before first real submissions | Full admin screen overhaul (#15, #16, #18, #19, #20) |
